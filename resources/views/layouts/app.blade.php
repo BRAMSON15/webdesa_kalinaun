@@ -83,7 +83,7 @@
                             </ul>
                         </li>
                     @else
-                        <li class="nav-item me-2">
+                        <!-- <li class="nav-item me-2">
                             <a class="nav-link fw-bold" href="{{ route('login') }}" style="color: #27ae60;">
                                 <i class="fas fa-sign-in-alt me-1"></i> Login
                             </a>
@@ -93,7 +93,7 @@
                                style="background-color: #f1c40f; border:none; box-shadow: 0 4px 10px rgba(241, 196, 15, 0.3);">
                                 <i class="fas fa-user-plus me-1"></i> Register
                             </a>
-                        </li>
+                        </li> -->
                     @endauth
                 </ul>
             </div>
