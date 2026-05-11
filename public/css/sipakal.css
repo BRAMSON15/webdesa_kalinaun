@@ -1,0 +1,316 @@
+
+        :root {
+            /* AdminLTE Classic Color Palette */
+            --primary-color: #f39c12; /* Orange Header */
+            --primary-hover: #e08e0b;
+            --secondary-color: #3c8dbc; /* Blue */
+            
+            --sidebar-bg: #222d32;
+            --sidebar-hover: #1e282c;
+            --sidebar-text: #b8c7ce;
+            --sidebar-active-text: #ffffff;
+            --sidebar-active-border: #3c8dbc;
+            
+            --text-dark: #333333;
+            --text-muted: #777777;
+            
+            --bg-body: #ecf0f5; /* Light grey body */
+            --bg-white: #ffffff;
+            
+            --border-color: #f4f4f4;
+            --border-box: #d2d6de;
+            
+            /* AdminLTE Shadows (very subtle or flat) */
+            --shadow-sm: 0 1px 1px rgba(0,0,0,0.1);
+            --shadow-md: 0 1px 3px rgba(0,0,0,0.1);
+            
+            /* Border Radius */
+            --radius-box: 3px;
+            --radius-btn: 3px;
+            
+            /* Typography */
+            --font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            line-height: 1.42857143;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-family);
+            font-weight: 500;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-display);
+            letter-spacing: -0.02em;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* --- Public Header (Navbar) --- */
+        .public-navbar {
+            background-color: var(--primary-color);
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            z-index: 1000;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 230px;
+            height: 50px;
+            background-color: var(--primary-hover);
+            color: white;
+            font-size: 20px;
+            line-height: 50px;
+            text-align: center;
+            font-weight: 300;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .brand-logo span {
+            color: white;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            padding-right: 15px;
+            height: 100%;
+        }
+
+        .nav-link {
+            font-weight: 400;
+            font-size: 14px;
+            color: white;
+            padding: 15px;
+            line-height: 20px;
+            transition: background 0.3s;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(0,0,0,0.1);
+            color: white;
+        }
+
+        .btn-masuk {
+            background-color: transparent;
+            color: white;
+            border: 1px solid white;
+            padding: 5px 15px;
+            border-radius: var(--radius-btn);
+            font-size: 14px;
+            font-weight: 400;
+            margin-left: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn-masuk:hover {
+            background-color: white;
+            color: var(--primary-color);
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* --- Dashboard Layout --- */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            padding-top: 50px; /* Space for the fixed header */
+        }
+
+        .dashboard-sidebar {
+            width: 230px;
+            background-color: var(--sidebar-bg);
+            padding-top: 0;
+            position: fixed;
+            top: 50px; /* Below header */
+            left: 0;
+            height: calc(100vh - 50px);
+            overflow-y: auto;
+            z-index: 800;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* User panel in sidebar */
+        .sidebar-user-panel {
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-user-panel .image {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: #555;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 20px;
+        }
+
+        .sidebar-user-panel .info {
+            color: white;
+        }
+
+        .sidebar-user-panel .info p {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .sidebar-user-panel .info a {
+            color: #4b6;
+            font-size: 11px;
+            text-decoration: none;
+        }
+
+        .sidebar-user-panel .info a i {
+            margin-right: 3px;
+        }
+
+        /* Sidebar Menu Header */
+        .sidebar-header {
+            color: #4b646f;
+            background: #1a2226;
+            padding: 10px 25px 10px 15px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px 12px 15px;
+            color: var(--sidebar-text);
+            font-size: 14px;
+            border-left: 3px solid transparent;
+            transition: background 0.3s, color 0.3s;
+            cursor: pointer;
+        }
+
+        .sidebar-item:hover {
+            color: var(--sidebar-active-text);
+            background-color: var(--sidebar-hover);
+        }
+
+        .sidebar-item.active-admin,
+        .sidebar-item.active-masyarakat {
+            color: var(--sidebar-active-text);
+            background-color: var(--sidebar-hover);
+            border-left-color: var(--sidebar-active-border);
+        }
+
+        .sidebar-item i.fa, .sidebar-item i.fas, .sidebar-item i.far {
+            width: 20px;
+            text-align: center;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        .btn-keluar {
+            margin-top: 10px;
+            background: none;
+            border: none;
+            border-left: 3px solid transparent;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .btn-keluar:hover {
+            background-color: #dd4b39;
+            color: white;
+        }
+
+        .dashboard-main {
+            flex: 1;
+            margin-left: 230px;
+            min-height: calc(100vh - 50px);
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-body);
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 15px 15px 25px;
+            border-bottom: 1px solid var(--border-box);
+            background: transparent;
+        }
+
+        .dashboard-header h1 {
+            font-size: 24px;
+            font-weight: 400;
+            color: #333;
+            margin: 0;
+            display: inline-block;
+        }
+
+        .dashboard-header small {
+            font-size: 15px;
+            color: #777;
+            font-weight: 300;
+            margin-left: 10px;
+        }
+
+        .dashboard-content {
+            padding: 15px;
+            flex: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            .dashboard-sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            .dashboard-main {
+                margin-left: 0;
+            }
+        }
+    
