@@ -105,6 +105,37 @@ class AdminController extends Controller
         return view('admin.data-pengguna', compact('users'));
     }
 
+    public function updatePengguna(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'no_hp' => 'nullable|string|max:20',
+            'nik' => 'nullable|string|max:20',
+            'alamat' => 'nullable|string',
+            'tempat_lahir' => 'nullable|string|max:100',
+            'tanggal_lahir' => 'nullable|date',
+            'jenis_kelamin' => 'nullable|in:L,P',
+            'pekerjaan' => 'nullable|string|max:100',
+            'role' => 'nullable|in:masyarakat,kades',
+        ]);
+
+        $user = User::findOrFail($id);
+        
+        // Don't allow changing admin role
+        if ($user->role === 'admin') {
+            return response()->json(['error' => 'Cannot modify admin user'], 403);
+        }
+
+        $user->update($request->all());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data pengguna berhasil diperbarui',
+            'user' => $user
+        ]);
+    }
+
     // Kelola Jenis Surat
     public function jenisSurat()
     {

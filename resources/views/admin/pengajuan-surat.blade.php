@@ -65,7 +65,7 @@
                                         </td>
                                         <td>
                                             <div class="btn-group">
-                                                <button class="btn btn-sm btn-info" onclick="viewDetail({{ $pengajuan->id }})">
+                                                <button class="btn btn-sm btn-info" onclick="viewPengajuanDetail({{ $pengajuan->id }})" data-bs-toggle="modal" data-bs-target="#pengajuanDetailModal">
                                                     <i class="fas fa-eye"></i> Detail
                                                 </button>
                                                 @if($pengajuan->status == 'disetujui')
@@ -88,14 +88,194 @@
                     @endif
                 </div>
             </div>
+
+            <!-- Pengajuan Detail Modal -->
+            <div class="modal fade" id="pengajuanDetailModal" tabindex="-1" aria-labelledby="pengajuanDetailModalLabel" aria-hidden="true" style="z-index: 9999;">
+                <div class="modal-dialog modal-lg modal-dialog-scrollable" style="margin-top: 60px;">
+                    <div class="modal-content">
+                        <!-- <div class="modal-header bg-info text-white">
+                            <h5 class="modal-title" id="pengajuanDetailModalLabel">
+                                <i class="fas fa-file-alt"></i> Detail Pengajuan Surat
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div> -->
+                        <!-- <div class="modal-body" id="pengajuanDetailContent" style="max-height: calc(100vh - 200px); overflow-y: auto;">
+                            <div class="text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div> -->
+                        <!-- <div class="modal-footer bg-light">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        </div> -->
+                    </div>
+                </div>
+            </div>
         </section>
     </div>
 </div>
 
+<style>
+    .modal-backdrop {
+        z-index: 9998 !important;
+    }
+    
+    .modal {
+        z-index: 9999 !important;
+    }
+    
+    .modal-dialog {
+        margin-top: 60px !important;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-function viewDetail(id) {
-    // Implement detail view functionality
-    alert('Detail pengajuan ID: ' + id);
+const pengajuans = @json($pengajuans);
+
+function viewPengajuanDetail(id) {
+    const pengajuan = pengajuans.find(p => p.id === id);
+    if (!pengajuan) {
+        console.error('Pengajuan not found:', id);
+        return;
+    }
+    
+    console.log('Pengajuan data:', pengajuan);
+    
+    let content = `
+        <div class="row">
+            <div class="col-12">
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><strong>📋 Informasi Pengajuan</strong></h6>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-borderless table-sm mb-0">
+                            <tr>
+                                <td width="150"><strong>Nama Pemohon:</strong></td>
+                                <td><strong>${pengajuan.user ? pengajuan.user.name : 'N/A'}</strong></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Email:</strong></td>
+                                <td>${pengajuan.user ? pengajuan.user.email : 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>No. HP:</strong></td>
+                                <td>${pengajuan.user && pengajuan.user.no_hp ? pengajuan.user.no_hp : '-'}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Jenis Surat:</strong></td>
+                                <td>${pengajuan.jenis_surat ? pengajuan.jenis_surat.nama_surat : 'N/A'}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tanggal Pengajuan:</strong></td>
+                                <td>${formatDate(pengajuan.created_at)}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Status:</strong></td>
+                                <td><span class="badge bg-${getStatusBadgeColor(pengajuan.status)}">${getStatusLabel(pengajuan.status)}</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><strong>📝 Keperluan</strong></h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">${pengajuan.keperluan || '<em class="text-muted">Tidak ada keterangan keperluan</em>'}</p>
+                    </div>
+                </div>
+    `;
+    
+    if (pengajuan.data_formulir) {
+        content += `
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><strong>📊 Data Formulir</strong></h6>
+                    </div>
+                    <div class="card-body">
+                        <div style="overflow-x: auto;">
+                            <pre style="margin: 0; font-size: 12px; background: #f8f9fa; padding: 10px; border-radius: 4px;">${JSON.stringify(pengajuan.data_formulir, null, 2)}</pre>
+                        </div>
+                    </div>
+                </div>
+        `;
+    }
+    
+    if (pengajuan.dokumen_pendukung && pengajuan.dokumen_pendukung.length > 0) {
+        content += `
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><strong>📎 Dokumen Pendukung</strong></h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+        `;
+        
+        pengajuan.dokumen_pendukung.forEach((doc, index) => {
+            content += `
+                            <div class="col-md-6 mb-2">
+                                <a href="/storage/${doc}" target="_blank" class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="fas fa-file-download"></i> Dokumen ${index + 1}
+                                </a>
+                            </div>
+            `;
+        });
+        
+        content += `
+                        </div>
+                    </div>
+                </div>
+        `;
+    }
+    
+    content += `
+            </div>
+        </div>
+    `;
+    
+    const contentElement = document.getElementById('pengajuanDetailContent');
+    if (contentElement) {
+        contentElement.innerHTML = content;
+        console.log('Content updated successfully');
+    } else {
+        console.error('Content element not found');
+    }
+}
+
+function getStatusBadgeColor(status) {
+    switch(status) {
+        case 'pending': return 'warning';
+        case 'diproses': return 'info';
+        case 'disetujui': return 'success';
+        case 'ditolak': return 'danger';
+        default: return 'secondary';
+    }
+}
+
+function getStatusLabel(status) {
+    switch(status) {
+        case 'pending': return 'Pending';
+        case 'diproses': return 'Diproses';
+        case 'disetujui': return 'Disetujui';
+        case 'ditolak': return 'Ditolak';
+        default: return status;
+    }
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 }
 </script>
 @endsection

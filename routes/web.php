@@ -42,6 +42,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     
     // Data Pengguna
     Route::get('/data-pengguna', [AdminController::class, 'dataPengguna'])->name('data-pengguna');
+    Route::put('/data-pengguna/{id}', [AdminController::class, 'updatePengguna'])->name('data-pengguna.update');
     
     // Jenis Surat
     Route::get('/jenis-surat', [AdminController::class, 'jenisSurat'])->name('jenis-surat');

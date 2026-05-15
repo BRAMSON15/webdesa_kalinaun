@@ -66,13 +66,13 @@
                                         <td>{{ $informasi->created_at->format('d/m/Y H:i') }}</td>
                                         <td>
                                             <div class="btn-group">
-                                                <button class="btn btn-sm btn-info">
+                                                <a href="#" class="btn btn-sm btn-info" onclick="viewInformasi({{ $informasi->id }})" data-bs-toggle="modal" data-bs-target="#informasiDetailModal">
                                                     <i class="fas fa-eye"></i> Lihat
-                                                </button>
-                                                <button class="btn btn-sm btn-warning">
+                                                </a>
+                                                <a href="#" class="btn btn-sm btn-warning" onclick="editInformasi({{ $informasi->id }})">
                                                     <i class="fas fa-edit"></i> Edit
-                                                </button>
-                                                <button class="btn btn-sm btn-danger">
+                                                </a>
+                                                <button class="btn btn-sm btn-danger" onclick="deleteInformasi({{ $informasi->id }})">
                                                     <i class="fas fa-trash"></i> Hapus
                                                 </button>
                                             </div>
@@ -96,4 +96,129 @@
         </section>
     </div>
 </div>
+
+<!-- Informasi Detail Modal -->
+<div class="modal fade" id="informasiDetailModal" tabindex="-1" aria-labelledby="informasiDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white sticky-top">
+                <h5 class="modal-title" id="informasiDetailModalLabel">
+                    <i class="fas fa-info-circle"></i> Detail Informasi
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="informasiDetailContent" style="max-height: 70vh; overflow-y: auto;">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light sticky-bottom">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const informasis = @json($informasis);
+
+function viewInformasi(id) {
+    const informasi = informasis.find(i => i.id === id);
+    if (!informasi) return;
+    
+    const content = `
+        <div class="row">
+            <div class="col-12">
+                <table class="table table-borderless">
+                    <tr>
+                        <td width="150"><strong>Judul:</strong></td>
+                        <td>${informasi.judul}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kategori:</strong></td>
+                        <td><span class="badge bg-info">${informasi.kategori.charAt(0).toUpperCase() + informasi.kategori.slice(1)}</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Status:</strong></td>
+                        <td><span class="badge bg-${informasi.status === 'published' ? 'success' : 'warning'}">${informasi.status === 'published' ? 'Published' : 'Draft'}</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Dibuat:</strong></td>
+                        <td>${formatDate(informasi.created_at)}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Diupdate:</strong></td>
+                        <td>${formatDate(informasi.updated_at)}</td>
+                    </tr>
+                </table>
+                <hr>
+                <h6><strong>Konten:</strong></h6>
+                <div class="border rounded p-3 bg-light">
+                    ${informasi.konten.replace(/\n/g, '<br>')}
+                </div>
+                ${informasi.gambar ? `
+                <hr>
+                <h6><strong>Gambar:</strong></h6>
+                <img src="/storage/${informasi.gambar}" class="img-fluid rounded" alt="Gambar Informasi">
+                ` : ''}
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('informasiDetailContent').innerHTML = content;
+}
+
+function editInformasi(id) {
+    // Redirect to edit page (you can create this route)
+    window.location.href = `/admin/informasi-desa/${id}/edit`;
+}
+
+function deleteInformasi(id) {
+    if (confirm('Yakin ingin menghapus informasi ini?')) {
+        // Make AJAX call to delete
+        fetch(`/admin/informasi-desa/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Informasi berhasil dihapus!');
+                window.location.reload();
+            } else {
+                alert('Gagal menghapus informasi: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan saat menghapus informasi');
+        });
+    }
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+// Add CSRF token if not present
+if (!document.querySelector('meta[name="csrf-token"]')) {
+    const meta = document.createElement('meta');
+    meta.name = 'csrf-token';
+    meta.content = '{{ csrf_token() }}';
+    document.getElementsByTagName('head')[0].appendChild(meta);
+}
+</script>
 @endsection
