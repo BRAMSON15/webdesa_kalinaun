@@ -62,7 +62,7 @@
                     <i class="fas fa-eye icon-right" onclick="togglePassword(this)"></i>
                 </div>
 
-                <a href="#" class="forgot-password">lupa sandi?</a>
+                <a href="{{ route('forgot-password') }}" class="forgot-password">lupa sandi?</a>
 
                 <button type="submit" class="btn-submit" id="submitBtn">masuk sekarang</button>
             </form>

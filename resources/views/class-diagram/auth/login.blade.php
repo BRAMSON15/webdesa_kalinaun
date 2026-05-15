@@ -62,12 +62,12 @@
 
                     <hr>
                     <div class="text-center">
-                        <small class="text-muted">
+                        <!-- <small class="text-muted">
                             <strong>Akun Demo Class Diagram:</strong><br>
                             <strong>Masyarakat:</strong> ahmad.wijaya@gmail.com / password123<br>
                             <strong>Sekdes:</strong> sekdes_desa / sekdes123<br>
                             <strong>Admin:</strong> admin_desa / admin123
-                        </small>
+                        </small> -->
                     </div>
                 </div>
             </div>
