@@ -30,7 +30,7 @@
                 </div>
                 <br>
                 <h1 id="titleText">Masuk ke SIPAKAL</h1>
-                <p id="descText">gunakan NIK/Email untuk masuk</p>
+                <p id="descText">Gunakan Email untuk masuk</p>
             </div>
 
             <!-- Fake Toggle just for visual requirement of Sketch 2 -->
