@@ -253,7 +253,7 @@
     <div class="page">
         <!-- Kop Surat -->
         <div class="kop-surat">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Logo_Kabupaten_Minahasa_Utara.png" alt="Logo Kab" class="logo-kab">
+            <img src="{{ asset('img/logo.png') }}" alt="Logo Kab" class="logo-kab">
             <div class="header-text">
                 <h3>PEMERINTAH KABUPATEN MINAHASA UTARA</h3>
                 <h2>KECAMATAN KALAWAT</h2>

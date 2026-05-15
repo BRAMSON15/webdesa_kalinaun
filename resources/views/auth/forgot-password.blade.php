@@ -8,9 +8,7 @@
     <!-- Public Header -->
     <nav class="public-navbar">
         <div class="brand-logo">
-            <div style="width: 40px; height: 40px; background-color: var(--primary-hover); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white;">
-                <i class="fas fa-tree"></i>
-            </div>
+            <img src="{{ asset('img/logo.png') }}" alt="Logo" width="50" class="me-2">
             <span>Desa Kalinaun</span>
         </div>
         <div class="nav-links">
@@ -25,9 +23,7 @@
         <div class="login-card">
             
             <div class="login-header">
-                <div style="width: 75px; height: 75px; background-color: var(--bg-body); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 35px; color: var(--primary-color); margin-bottom: 1rem; border: 2px solid var(--border-box);">
-                    <i class="fas fa-key"></i>
-                </div>
+                <img src="{{ asset('img/logo.png') }}" alt="Logo" width="120" class="mb-3">
                 <br>
                 <h1>Lupa Sandi?</h1>
                 <p>Masukkan email Anda untuk menerima token reset password</p>

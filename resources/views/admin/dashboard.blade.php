@@ -6,18 +6,7 @@
 <!-- Full AdminLTE Structure -->
 <div class="wrapper" style="height: auto; min-height: 100%;">
 
-    <header class="main-header">
-        <a href="" class="logo"><b>Desa</b>Kalinaun</a>
-        <nav class="navbar">
-            <a href="#" class="sidebar-toggle">
-                <i class="fas fa-bars"></i>
-            </a>
-            <div class="navbar-right">
-                <img src="https://via.placeholder.com/160" alt="User Image">
-                <span>{{ auth()->user()->name ?? 'Administrator' }}</span>
-            </div>
-        </nav>
-    </header>
+    @include('admin.partials.header')
 
     <aside class="dashboard-sidebar">
         @include('admin.partials.sidebar')

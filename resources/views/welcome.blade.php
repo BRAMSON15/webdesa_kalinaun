@@ -13,7 +13,10 @@
             <div class="row text-center text-md-start align-items-center">
                 <div class="col-md-7 mb-4 mb-md-0">
                     <div class="p-4 rounded" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
-                        <h1 class="display-4 fw-bold mb-3" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.3);"><i class="fas fa-leaf text-white"></i> Sistem Informasi Desa Kalinaun</h1>
+                        <h1 class="display-4 fw-bold mb-3 d-flex align-items-center justify-content-center justify-content-md-start" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
+                            <img src="{{ asset('img/logo.png') }}" alt="Logo" width="80" class="me-3">
+                            Sistem Informasi Desa Kalinaun
+                        </h1>
                         <p class="lead mb-4" style="font-size: 1.25rem;">Lebih Cepat, Mudah, dan Transparan. Mewujudkan tata kelola desa digital terintegrasi untuk masyarakat cerdas nan modern.</p>
                         @guest
                         <div class="mt-4 mt-md-5">

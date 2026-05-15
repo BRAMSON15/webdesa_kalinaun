@@ -14,9 +14,10 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white py-3 sticky-top"
         style="box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-bottom: 1px solid rgba(46, 204, 113, 0.2);">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ route('home') }}"
-                style="color: #27ae60; font-size: 1.5rem; letter-spacing: -0.5px;">
-                <i class="fas fa-leaf text-success"></i> Desa Kalinaun
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ route('home') }}"
+                style="color: #27ae60; font-size: 1.6rem; letter-spacing: -0.5px;">
+                <img src="{{ asset('img/logo.png') }}" alt="Logo" width="50" class="me-2">
+                Desa Kalinaun
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">

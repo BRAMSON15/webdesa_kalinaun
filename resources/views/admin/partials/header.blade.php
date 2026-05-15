@@ -1,5 +1,5 @@
 <header class="main-header">
-    <a href="{{ route('kades.dashboard') }}" class="logo d-flex align-items-center">
+    <a href="{{ route('admin.dashboard') }}" class="logo d-flex align-items-center">
         <img src="{{ asset('img/logo.png') }}" alt="Logo" width="45" class="me-2">
         <b>Desa</b> Kalinaun
     </a>
@@ -8,8 +8,7 @@
             <i class="fas fa-bars"></i>
         </a>
         <div class="navbar-right">
-            <img src="https://via.placeholder.com/160" alt="User Image">
-            <span>{{ auth()->user()->name ?? 'Kepala Desa' }}</span>
+            <span>{{ auth()->user()->name ?? 'Administrator' }}</span>
         </div>
     </nav>
 </header>
