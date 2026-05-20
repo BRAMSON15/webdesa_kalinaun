@@ -4,77 +4,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Sistem Informasi Desa')</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>@yield('title', 'Website Resmi Desa Kalinaun')</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ asset('css/kalinaun.css') }}" rel="stylesheet">
+    
     @stack('styles')
 </head>
 
-<body style="background-color: #f8f9fa; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-    <nav class="navbar navbar-expand-lg navbar-light bg-white py-3 sticky-top"
-        style="box-shadow: 0 4px 20px rgba(0,0,0,0.05); border-bottom: 1px solid rgba(46, 204, 113, 0.2);">
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar d-none d-lg-block">
         <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ route('home') }}"
-                style="color: #27ae60; font-size: 1.6rem; letter-spacing: -0.5px;">
-                <img src="{{ asset('img/logo.png') }}" alt="Logo" width="50" class="me-2">
-                Desa Kalinaun
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="#"><i class="fas fa-phone me-2"></i> 0822-9176-3634</a>
+                    <a href="#"><i class="fas fa-envelope me-2"></i> desakalinaunliktim@gmail.com</a>
+                </div>
+                <div>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    @auth
+                        <span class="ms-3 text-white-50 small">Selamat datang, {{ auth()->user()->name }}</span>
+                    @endauth
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navbar -->
+    <nav class="navbar navbar-expand-xl sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{{ route('home') }}">
+                <img src="{{ asset('img/logo.png') }}" alt="Logo" width="45" class="me-2">
+                <div class="d-flex flex-column">
+                    <span class="lh-1">Desa Kalinaun</span>
+                    <small style="font-size: 0.65rem; color: var(--text-muted); font-weight: 400;">Kab. Minahasa Utara</small>
+                </div>
             </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto ps-3" style="border-left: 2px solid #eee; margin-left: 10px;">
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav mx-auto">
+</ul>
+                <div class="d-flex align-items-center gap-2">
                     @auth
-                        @if(auth()->user()->isAdmin())
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('admin.dashboard') }}">Dashboard</a>
-                            </li>
-                        @elseif(auth()->user()->isKades())
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('kades.dashboard') }}">Dashboard</a>
-                            </li>
-                        @elseif(auth()->user()->isMasyarakat())
-                            <li class="nav-item">
-                                <a class="nav-link fw-semibold" href="{{ route('masyarakat.dashboard') }}"
-                                    style="color: #2c3e50;">Dashboard</a>
-                            </li>
-                        @endif
-                    @endauth
-                </ul>
-
-                <ul class="navbar-nav align-items-center">
-                    @auth
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle fw-semibold d-flex align-items-center" href="#" id="navbarDropdown" role="button"
-                                data-bs-toggle="dropdown" style="color: #2c3e50;">
-                                <img src="https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name) }}&background=2ecc71&color=fff"
-                                    alt="User" class="rounded-circle me-2" width="30" height="30">
-                                <span class="d-none d-md-inline">{{ auth()->user()->name }}</span>
-                                @if(auth()->user()->isKades())
-                                    <span class="badge bg-success ms-2 d-none d-lg-inline">Kepala Desa</span>
-                                @elseif(auth()->user()->isAdmin())
-                                    <span class="badge bg-danger ms-2 d-none d-lg-inline">Admin</span>
-                                @elseif(auth()->user()->isMasyarakat())
-                                    <span class="badge bg-info ms-2 d-none d-lg-inline">Masyarakat</span>
-                                @endif
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                @if(auth()->user()->isAdmin())
-                                    <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
-                                @elseif(auth()->user()->isKades())
-                                    <li><a class="dropdown-item" href="{{ route('kades.dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('kades.profil') }}"><i class="fas fa-user me-2"></i>Profil</a></li>
-                                @elseif(auth()->user()->isMasyarakat())
-                                    <li><a class="dropdown-item" href="{{ route('masyarakat.dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('masyarakat.profil') }}"><i class="fas fa-user me-2"></i>Profil</a></li>
-                                @endif
+                        <div class="dropdown">
+                            <button class="btn btn-primary-premium dropdown-toggle py-2 px-4" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-circle me-2"></i> Akun Saya
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow">
                                 <li>
-                                    <hr class="dropdown-divider">
+                                    <h6 class="dropdown-header">Role: 
+                                        @if(auth()->user()->isAdmin()) Admin
+                                        @elseif(auth()->user()->isKades()) Kades
+                                        @else Masyarakat
+                                        @endif
+                                    </h6>
                                 </li>
                                 <li>
-                                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                                    @if(auth()->user()->isAdmin())
+                                        <a class="dropdown-item" href="{{ route('admin.dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+                                    @elseif(auth()->user()->isKades())
+                                        <a class="dropdown-item" href="{{ route('kades.dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+                                    @else
+                                        <a class="dropdown-item" href="{{ route('masyarakat.dashboard') }}"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a>
+                                    @endif
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{{ route('logout') }}" method="POST">
                                         @csrf
                                         <button type="submit" class="dropdown-item text-danger">
                                             <i class="fas fa-sign-out-alt me-2"></i> Logout
@@ -82,39 +92,31 @@
                                     </form>
                                 </li>
                             </ul>
-                        </li>
+                        </div>
                     @else
-                        <!-- <li class="nav-item me-2">
-                            <a class="nav-link fw-bold" href="{{ route('login') }}" style="color: #27ae60;">
-                                <i class="fas fa-sign-in-alt me-1"></i> Login
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-warning rounded-pill px-4 fw-bold" href="{{ route('register') }}" 
-                               style="background-color: #f1c40f; border:none; box-shadow: 0 4px 10px rgba(241, 196, 15, 0.3);">
-                                <i class="fas fa-user-plus me-1"></i> Register
-                            </a>
-                        </li> -->
+                        <a href="{{ route('login') }}" class="btn btn-outline-premium py-2">Login</a>
+                        <a href="{{ route('register') }}" class="btn btn-primary-premium py-2">Daftar</a>
                     @endauth
-                </ul>
+                </div>
             </div>
         </div>
     </nav>
 
-    <main class="w-100 p-0 m-0">
+    <!-- Main Content -->
+    <main>
         @if(session('success'))
-            <div class="container">
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
+            <div class="container mt-4">
+                <div class="alert alert-success border-0 shadow-sm alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             </div>
         @endif
 
         @if(session('error'))
-            <div class="container">
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ session('error') }}
+            <div class="container mt-4">
+                <div class="alert alert-danger border-0 shadow-sm alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i> {{ session('error') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             </div>
@@ -123,7 +125,65 @@
         @yield('content')
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="footer-info pe-lg-4">
+                        <img src="{{ asset('img/logo.png') }}" alt="Logo" width="60" class="mb-4">
+                        <h4 class="text-white mb-3">Pemerintah Desa Kalinaun</h4>
+                        <p class="mb-4">Sistem Informasi Desa yang dirancang untuk mempercepat pelayanan publik dan transparansi data kependudukan.</p>
+                        <div class="social-links d-flex gap-3">
+                            <a href="#" class="btn btn-sm btn-outline-light rounded-circle"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="btn btn-sm btn-outline-light rounded-circle"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="btn btn-sm btn-outline-light rounded-circle"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <h5 class="footer-heading">Profil Desa</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Sejarah Desa</a></li>
+                        <li><a href="#">Visi & Misi</a></li>
+                        <li><a href="#">Struktur Organisasi</a></li>
+                        <li><a href="#">Geografis Desa</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <h5 class="footer-heading">Layanan Publik</h5>
+                    <ul class="footer-links">
+                        <li><a href="#">Pengajuan Surat</a></li>
+                        <li><a href="#">Informasi Publik</a></li>
+                        <li><a href="#">Layanan Mandiri</a></li>
+                        <li><a href="#">Lapak Desa</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-4">
+                    <h5 class="footer-heading">Kontak Kami</h5>
+                    <ul class="footer-links">
+                        <li class="d-flex align-items-start">
+                            <i class="fas fa-map-marker-alt mt-1 me-3 text-primary"></i>
+                            <span>Jl. Likupang - Girian, Kec. Likupang Timur, Kab. Minahasa Utara, Sulawesi Utara</span>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="fas fa-phone me-3 text-primary"></i>
+                            <span>0822-9176-3634</span>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="fas fa-envelope me-3 text-primary"></i>
+                            <span>desakalinaunliktim@gmail.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="mb-0">&copy; {{ date('Y') }} Desa Kalinaun. All Rights Reserved. <br> <span class="opacity-50 small">Design by RumahDesa.Net</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 </body>
 

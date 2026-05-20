@@ -12,14 +12,14 @@
             <img src="{{ asset('img/logo.png') }}" alt="Logo" width="50" class="me-2">
             <span>Desa Kalinaun</span>
         </div>
-        <div class="nav-links">
+        <!-- <div class="nav-links">
             <a href="{{ route('home') }}" class="nav-link">Beranda</a>
             <a href="#" class="nav-link">Informasi desa</a>
             <a href="#" class="nav-link">profil desa</a>
             <a href="{{ route('login') }}" class="btn-masuk">
                 <i class="fas fa-arrow-right"></i> masuk
             </a>
-        </div>
+        </div> -->
     </nav>
 
     <!-- Register Container -->

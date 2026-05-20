@@ -1,35 +1,32 @@
 
         :root {
-            /* AdminLTE Classic Color Palette */
-            --primary-color: #f39c12; /* Orange Header */
-            --primary-hover: #e08e0b;
-            --secondary-color: #3c8dbc; /* Blue */
+            /* Premium Green Theme */
+            --primary-color: #22c55e;
+            --primary-hover: #16a34a;
+            --secondary-color: #3b82f6;
             
-            --sidebar-bg: #222d32;
-            --sidebar-hover: #1e282c;
-            --sidebar-text: #b8c7ce;
+            --sidebar-bg: #0f172a;
+            --sidebar-hover: #1e293b;
+            --sidebar-text: #94a3b8;
             --sidebar-active-text: #ffffff;
-            --sidebar-active-border: #3c8dbc;
+            --sidebar-active-border: #22c55e;
             
-            --text-dark: #333333;
-            --text-muted: #777777;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
             
-            --bg-body: #ecf0f5; /* Light grey body */
+            --bg-body: #f8fafc;
             --bg-white: #ffffff;
             
-            --border-color: #f4f4f4;
-            --border-box: #d2d6de;
+            --border-color: #e2e8f0;
+            --border-box: #cbd5e1;
             
-            /* AdminLTE Shadows (very subtle or flat) */
-            --shadow-sm: 0 1px 1px rgba(0,0,0,0.1);
-            --shadow-md: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
             
-            /* Border Radius */
-            --radius-box: 3px;
-            --radius-btn: 3px;
+            --radius-box: 8px;
+            --radius-btn: 8px;
             
-            /* Typography */
-            --font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         * {
