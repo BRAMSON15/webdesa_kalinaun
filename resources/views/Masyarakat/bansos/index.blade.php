@@ -1,14 +1,12 @@
-@extends('layouts.app')
+@extends('layouts.masyarakat')
 
 @section('title', 'Program Bansos')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h2><i class="fas fa-hand-holding-heart"></i> Program Bantuan Sosial</h2>
-        </div>
-        <div class="col-md-4 text-right">
+<div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0"><i class="fas fa-hand-holding-heart me-2"></i> Program Bantuan Sosial</h2>
+        <div class="d-flex gap-2">
             <a href="{{ route('masyarakat.bansos.applications') }}" class="btn btn-info">
                 <i class="fas fa-list"></i> Pendaftaran Saya
             </a>
@@ -17,24 +15,6 @@
             </a>
         </div>
     </div>
-
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
 
     <!-- Program Cards -->
     <div class="row">

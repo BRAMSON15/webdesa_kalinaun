@@ -95,9 +95,13 @@ class PengaduanController extends Controller
 
         $pengaduan->update($validated);
 
-        // Send notification if status changed
+        // Send notification if status changed (with error handling)
         if ($oldStatus !== $pengaduan->status) {
-            NotificationService::notifyComplaintStatusChange($pengaduan, $oldStatus);
+            try {
+                NotificationService::notifyComplaintStatusChange($pengaduan, $oldStatus);
+            } catch (\Exception $e) {
+                \Log::error('Notification error: ' . $e->getMessage());
+            }
         }
 
         return redirect()->route('admin.pengaduan.show', $pengaduan)

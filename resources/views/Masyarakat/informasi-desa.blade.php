@@ -1,34 +1,27 @@
-@extends('layouts.app')
+@extends('layouts.masyarakat')
 
-@section('title', 'Informasi Desa - Website Resmi Desa Kalinaun')
+@section('title', 'Informasi Desa - Desa Kalinaun')
 
 @section('content')
-<!-- Page Header -->
-<div class="py-5 bg-light border-bottom">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h1 class="fw-bold mb-2">Informasi Desa</h1>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-decoration-none">Beranda</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Informasi Desa</li>
-                    </ol>
-                </nav>
-            </div>
-            <div class="col-lg-6 mt-3 mt-lg-0">
-                <form method="GET" action="{{ route('masyarakat.informasi-desa') }}" class="input-group">
-                    <input type="text" name="search" class="form-control" placeholder="Cari berita atau pengumuman..." value="{{ request('search') }}">
-                    <button class="btn btn-primary-premium" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </form>
-            </div>
+<div>
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <h2 class="mb-1"><i class="fas fa-bullhorn me-2"></i> Informasi Desa</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{{ route('masyarakat.dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Informasi Desa</li>
+                </ol>
+            </nav>
         </div>
+        <form method="GET" action="{{ route('masyarakat.informasi-desa') }}" class="input-group" style="max-width: 380px;">
+            <input type="text" name="search" class="form-control" placeholder="Cari berita atau pengumuman..." value="{{ request('search') }}">
+            <button class="btn btn-success" type="submit">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
     </div>
-</div>
-
-<div class="container py-5">
     <div class="row">
         <!-- Main Content -->
         <div class="col-lg-8">

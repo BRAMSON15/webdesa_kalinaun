@@ -1,23 +1,19 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Arsip - SIPAKAL</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/dashboardkades.css') }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <div class="dashboard-container">
-        @include('Kades.partials.header')
-        @include('Kades.partials.sidebar')
-        
-        <div class="dashboard-main">
-            <div class="dashboard-content">
+@extends('layouts.sipakal')
 
-                <div class="container-fluid mt-4">
+@section('title', 'Laporan Arsip - SIPAKAL')
+
+@section('body')
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ asset('css/dashboardkades.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="wrapper" style="height: auto; min-height: 100%;">
+    @include('Kades.partials.header')
+    @include('Kades.partials.sidebar')
+    
+    <div class="dashboard-main">
+        <div class="dashboard-content">
+            <div class="container-fluid mt-4">
                 <!-- Filter & Export Section -->
                 <div class="card shadow-sm mb-4">
                     <div class="card-body">
@@ -203,65 +199,65 @@
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Chart
-        const ctx = document.getElementById('chartPengajuan').getContext('2d');
-        const chartData = {
-            labels: ['Disetujui', 'Ditolak'],
-            datasets: [{
-                label: 'Jumlah Pengajuan',
-                data: [
-                    {{ $pengajuans->where('status', 'disetujui')->count() }},
-                    {{ $pengajuans->where('status', 'ditolak')->count() }}
-                ],
-                backgroundColor: [
-                    'rgba(40, 167, 69, 0.8)',
-                    'rgba(220, 53, 69, 0.8)'
-                ],
-                borderColor: [
-                    'rgba(40, 167, 69, 1)',
-                    'rgba(220, 53, 69, 1)'
-                ],
-                borderWidth: 1
-            }]
-        };
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Chart
+    const ctx = document.getElementById('chartPengajuan').getContext('2d');
+    const chartData = {
+        labels: ['Disetujui', 'Ditolak'],
+        datasets: [{
+            label: 'Jumlah Pengajuan',
+            data: [
+                {{ $pengajuans->where('status', 'disetujui')->count() }},
+                {{ $pengajuans->where('status', 'ditolak')->count() }}
+            ],
+            backgroundColor: [
+                'rgba(40, 167, 69, 0.8)',
+                'rgba(220, 53, 69, 0.8)'
+            ],
+            borderColor: [
+                'rgba(40, 167, 69, 1)',
+                'rgba(220, 53, 69, 1)'
+            ],
+            borderWidth: 1
+        }]
+    };
 
-        const myChart = new Chart(ctx, {
-            type: 'bar',
-            data: chartData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 1
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false
+    const myChart = new Chart(ctx, {
+        type: 'bar',
+        data: chartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
                     }
                 }
-            }
-        });
-    </script>
-    @include('Kades.partials.scripts')
-
-    <style>
-        @media print {
-            .dashboard-sidebar, .main-header, .btn, .no-print {
-                display: none !important;
-            }
-            .dashboard-main {
-                margin-left: 0 !important;
-                width: 100% !important;
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
             }
         }
-    </style>
-</body>
-</html>
+    });
+</script>
+@include('Kades.partials.scripts')
+
+<style>
+    @media print {
+        .dashboard-sidebar, .main-header, .btn, .no-print {
+            display: none !important;
+        }
+        .dashboard-main {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+    }
+</style>
+@endsection

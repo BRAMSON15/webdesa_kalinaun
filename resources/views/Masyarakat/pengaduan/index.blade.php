@@ -1,14 +1,12 @@
-@extends('layouts.app')
+@extends('layouts.masyarakat')
 
 @section('title', 'Pengaduan Saya')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <h2><i class="fas fa-comments"></i> Pengaduan Saya</h2>
-        </div>
-        <div class="col-md-4 text-right">
+<div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0"><i class="fas fa-comments me-2"></i> Pengaduan Saya</h2>
+        <div class="d-flex gap-2">
             <a href="{{ route('masyarakat.pengaduan.create') }}" class="btn btn-success">
                 <i class="fas fa-plus"></i> Buat Pengaduan
             </a>
@@ -18,25 +16,16 @@
         </div>
     </div>
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
-
     <!-- Filter Section -->
-    <div class="card mb-4">
+    <div class="card mb-4 shadow-sm">
         <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="fas fa-filter"></i> Filter Pengaduan</h5>
+            <h5 class="mb-0 fs-6"><i class="fas fa-filter"></i> Filter Pengaduan</h5>
         </div>
         <div class="card-body">
-            <form method="GET" action="{{ route('masyarakat.pengaduan.index') }}" class="form-inline">
-                <div class="form-group mr-3">
-                    <label for="status" class="mr-2">Status:</label>
-                    <select name="status" id="status" class="form-control">
+            <form method="GET" action="{{ route('masyarakat.pengaduan.index') }}" class="row g-3 align-items-center">
+                <div class="col-auto d-flex align-items-center gap-2">
+                    <label for="status" class="col-form-label mb-0 fw-semibold text-muted" style="min-width: 60px;">Status:</label>
+                    <select name="status" id="status" class="form-select" style="min-width: 150px;">
                         <option value="">Semua Status</option>
                         <option value="baru" {{ request('status') == 'baru' ? 'selected' : '' }}>Baru</option>
                         <option value="diproses" {{ request('status') == 'diproses' ? 'selected' : '' }}>Diproses</option>
@@ -45,12 +34,14 @@
                     </select>
                 </div>
 
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-search"></i> Cari
-                </button>
-                <a href="{{ route('masyarakat.pengaduan.index') }}" class="btn btn-secondary ml-2">
-                    <i class="fas fa-redo"></i> Reset
-                </a>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-search"></i> Cari
+                    </button>
+                    <a href="{{ route('masyarakat.pengaduan.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i> Reset
+                    </a>
+                </div>
             </form>
         </div>
     </div>

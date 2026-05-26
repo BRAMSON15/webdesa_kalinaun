@@ -64,8 +64,12 @@ class BansosController extends Controller
             'status' => 'menunggu',
         ]);
 
-        // Send notification
-        NotificationService::notifyNewBansosApplication($penerima);
+        // Send notification (with error handling)
+        try {
+            NotificationService::notifyNewBansosApplication($penerima);
+        } catch (\Exception $e) {
+            \Log::error('Notification error: ' . $e->getMessage());
+        }
 
         return redirect()->route('masyarakat.bansos.show', $bansos)
             ->with('success', 'Pendaftaran berhasil. Silakan tunggu verifikasi dari admin.');

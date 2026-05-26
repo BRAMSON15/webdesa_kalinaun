@@ -1,22 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Masyarakat - SIPAKAL</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/dashboardmasyarakat.css') }}">
-</head>
-<body>
-    <div class="dashboard-container">
-        @include('Masyarakat.partials.header')
-        @include('Masyarakat.partials.sidebar')
+@extends('layouts.masyarakat')
 
-        
-        <div class="dashboard-main">
-            <div class="dashboard-content">
-                <div class="container-fluid mt-4">
+@section('title', 'Dashboard Masyarakat - SIPAKAL')
+
+@section('content')
                     <!-- Welcome Section -->
                     <div class="row mb-4">
                         <div class="col-12">
@@ -309,12 +295,4 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    @include('Masyarakat.partials.scripts')
-</body>
-</html>
+@endsection

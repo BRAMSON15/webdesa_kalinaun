@@ -1,10 +1,10 @@
-@extends('layouts.app')
+@extends('layouts.masyarakat')
 
 @section('title', 'Form Pengajuan Surat')
 
 @section('content')
-<div class="container">
-    <div class="row">
+<div>
+    <div class="row mb-4">
         <div class="col-12">
             <h2><i class="fas fa-edit"></i> Form Pengajuan: {{ $jenisSurat->nama_surat }}</h2>
             <p class="text-muted">{{ $jenisSurat->deskripsi }}</p>
@@ -13,8 +13,8 @@
     </div>
 
     <div class="row">
-        <div class="col-md-8">
-            <div class="card">
+        <div class="col-md-8 mb-4">
+            <div class="card shadow-sm">
                 <div class="card-body">
                     <form method="POST" action="{{ route('masyarakat.pengajuan-surat.store') }}" enctype="multipart/form-data">
                         @csrf
@@ -32,21 +32,17 @@
 
                         <!-- Form Data Tambahan -->
                         <div class="mb-3">
-                            <h5>Data Tambahan</h5>
+                            <h5 class="fs-6 fw-bold mb-3">Data Tambahan</h5>
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
-                                        <input type="text" class="form-control" id="nama_lengkap" 
-                                               name="data_formulir[nama_lengkap]" value="{{ auth()->user()->name }}" readonly>
-                                    </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
+                                    <input type="text" class="form-control" id="nama_lengkap" 
+                                           name="data_formulir[nama_lengkap]" value="{{ auth()->user()->name }}" readonly>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="nik" class="form-label">NIK</label>
-                                        <input type="text" class="form-control" id="nik" 
-                                               name="data_formulir[nik]" value="{{ auth()->user()->nik }}" readonly>
-                                    </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="nik" class="form-label">NIK</label>
+                                    <input type="text" class="form-control" id="nik" 
+                                           name="data_formulir[nik]" value="{{ auth()->user()->nik }}" readonly>
                                 </div>
                             </div>
                             <div class="mb-3">
@@ -58,19 +54,15 @@
                             <!-- Field tambahan berdasarkan jenis surat -->
                             @if(str_contains(strtolower($jenisSurat->nama_surat), 'usaha'))
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="nama_usaha" class="form-label">Nama Usaha</label>
-                                        <input type="text" class="form-control" id="nama_usaha" 
-                                               name="data_formulir[nama_usaha]" value="{{ old('data_formulir.nama_usaha') }}">
-                                    </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="nama_usaha" class="form-label">Nama Usaha</label>
+                                    <input type="text" class="form-control" id="nama_usaha" 
+                                           name="data_formulir[nama_usaha]" value="{{ old('data_formulir.nama_usaha') }}">
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="jenis_usaha" class="form-label">Jenis Usaha</label>
-                                        <input type="text" class="form-control" id="jenis_usaha" 
-                                               name="data_formulir[jenis_usaha]" value="{{ old('data_formulir.jenis_usaha') }}">
-                                    </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="jenis_usaha" class="form-label">Jenis Usaha</label>
+                                    <input type="text" class="form-control" id="jenis_usaha" 
+                                           name="data_formulir[jenis_usaha]" value="{{ old('data_formulir.jenis_usaha') }}">
                                 </div>
                             </div>
                             <div class="mb-3">
@@ -82,26 +74,22 @@
 
                             @if(str_contains(strtolower($jenisSurat->nama_surat), 'nikah'))
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="nama_calon_pasangan" class="form-label">Nama Calon Pasangan</label>
-                                        <input type="text" class="form-control" id="nama_calon_pasangan" 
-                                               name="data_formulir[nama_calon_pasangan]" value="{{ old('data_formulir.nama_calon_pasangan') }}">
-                                    </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="nama_calon_pasangan" class="form-label">Nama Calon Pasangan</label>
+                                    <input type="text" class="form-control" id="nama_calon_pasangan" 
+                                           name="data_formulir[nama_calon_pasangan]" value="{{ old('data_formulir.nama_calon_pasangan') }}">
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label for="tanggal_rencana_nikah" class="form-label">Tanggal Rencana Nikah</label>
-                                        <input type="date" class="form-control" id="tanggal_rencana_nikah" 
-                                               name="data_formulir[tanggal_rencana_nikah]" value="{{ old('data_formulir.tanggal_rencana_nikah') }}">
-                                    </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="tanggal_rencana_nikah" class="form-label">Tanggal Rencana Nikah</label>
+                                    <input type="date" class="form-control" id="tanggal_rencana_nikah" 
+                                           name="data_formulir[tanggal_rencana_nikah]" value="{{ old('data_formulir.tanggal_rencana_nikah') }}">
                                 </div>
                             </div>
                             @endif
                         </div>
 
                         <!-- Upload Dokumen Pendukung -->
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label for="dokumen_pendukung" class="form-label">Dokumen Pendukung</label>
                             <input type="file" class="form-control @error('dokumen_pendukung.*') is-invalid @enderror" 
                                    id="dokumen_pendukung" name="dokumen_pendukung[]" multiple 
@@ -128,28 +116,26 @@
         </div>
 
         <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="fas fa-info-circle"></i> Informasi</h5>
+            <div class="card shadow-sm mb-3">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0 fs-6"><i class="fas fa-info-circle"></i> Informasi</h5>
                 </div>
                 <div class="card-body">
-                    <h6>Jenis Surat:</h6>
+                    <h6 class="fs-6 fw-bold">Jenis Surat:</h6>
                     <p>{{ $jenisSurat->nama_surat }}</p>
 
                     @if($jenisSurat->persyaratan)
-                    <h6>Persyaratan:</h6>
-                    <ul>
+                    <h6 class="fs-6 fw-bold">Persyaratan:</h6>
+                    <ul class="ps-3">
                         @foreach($jenisSurat->persyaratan as $syarat)
                         <li>{{ $syarat }}</li>
                         @endforeach
                     </ul>
                     @endif
 
-                    <div class="alert alert-info">
-                        <small>
-                            <i class="fas fa-clock"></i>
-                            Pengajuan akan diproses dalam 1-3 hari kerja setelah dokumen lengkap.
-                        </small>
+                    <div class="alert alert-info py-2 px-3 mb-0 small">
+                        <i class="fas fa-clock"></i>
+                        Pengajuan akan diproses dalam 1-3 hari kerja setelah dokumen lengkap.
                     </div>
                 </div>
             </div>

@@ -51,8 +51,12 @@ class PengaduanController extends Controller
 
         $pengaduan = Pengaduan::create($validated);
 
-        // Send notification
-        NotificationService::notifyNewComplaint($pengaduan);
+        // Send notification (with error handling)
+        try {
+            NotificationService::notifyNewComplaint($pengaduan);
+        } catch (\Exception $e) {
+            \Log::error('Notification error: ' . $e->getMessage());
+        }
 
         return redirect()->route('masyarakat.pengaduan.index')
             ->with('success', 'Pengaduan berhasil dikirim. Terima kasih atas masukan Anda.');

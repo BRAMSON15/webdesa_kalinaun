@@ -1,22 +1,18 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitoring Pengajuan - SIPAKAL</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/dashboardkades.css') }}">
-</head>
-<body>
-    <div class="dashboard-container">
-        @include('Kades.partials.header')
-        @include('Kades.partials.sidebar')
-        
-        <div class="dashboard-main">
-            <div class="dashboard-content">
+@extends('layouts.sipakal')
 
-                <div class="container-fluid mt-4">
+@section('title', 'Monitoring Pengajuan - SIPAKAL')
+
+@section('body')
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ asset('css/dashboardkades.css') }}">
+
+<div class="wrapper" style="height: auto; min-height: 100%;">
+    @include('Kades.partials.header')
+    @include('Kades.partials.sidebar')
+    
+    <div class="dashboard-main">
+        <div class="dashboard-content">
+            <div class="container-fluid mt-4">
                 <!-- Filter Section -->
                 <div class="card shadow-sm mb-4">
                     <div class="card-body">
@@ -190,8 +186,8 @@
             </div>
         </div>
     </div>
+</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    @include('Kades.partials.scripts')
-</body>
-</html>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+@include('Kades.partials.scripts')
+@endsection

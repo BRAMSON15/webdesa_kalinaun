@@ -134,9 +134,8 @@ class BansosController extends Controller
     /**
      * Approve a recipient
      */
-    public function approvePenerima(PenerimaBansos $penerima)
+    public function approvePenerima(Request $request, Bansos $bansos, PenerimaBansos $penerima)
     {
-        $bansos = $penerima->bansos;
         $oldStatus = $penerima->status;
 
         if (!$bansos->hasQuota()) {
@@ -152,8 +151,12 @@ class BansosController extends Controller
         // Update kuota terpakai
         $bansos->increment('kuota_terpakai');
 
-        // Send notification
-        NotificationService::notifyBansosStatusChange($penerima, $oldStatus);
+        // Send notification (with error handling)
+        try {
+            NotificationService::notifyBansosStatusChange($penerima, $oldStatus);
+        } catch (\Exception $e) {
+            \Log::error('Notification error: ' . $e->getMessage());
+        }
 
         return back()->with('success', 'Penerima berhasil disetujui');
     }
@@ -161,7 +164,7 @@ class BansosController extends Controller
     /**
      * Reject a recipient
      */
-    public function rejectPenerima(Request $request, PenerimaBansos $penerima)
+    public function rejectPenerima(Request $request, Bansos $bansos, PenerimaBansos $penerima)
     {
         $oldStatus = $penerima->status;
         
@@ -174,8 +177,12 @@ class BansosController extends Controller
             'alasan_penolakan' => $validated['alasan_penolakan'],
         ]);
 
-        // Send notification
-        NotificationService::notifyBansosStatusChange($penerima, $oldStatus);
+        // Send notification (with error handling)
+        try {
+            NotificationService::notifyBansosStatusChange($penerima, $oldStatus);
+        } catch (\Exception $e) {
+            \Log::error('Notification error: ' . $e->getMessage());
+        }
 
         return back()->with('success', 'Penerima berhasil ditolak');
     }
