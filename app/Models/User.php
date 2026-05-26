@@ -48,6 +48,16 @@ class User extends Authenticatable
         return $this->hasMany(ArsipDokumen::class, 'uploaded_by');
     }
 
+    public function pengaduan()
+    {
+        return $this->hasMany(Pengaduan::class);
+    }
+
+    public function penerimabansos()
+    {
+        return $this->hasMany(PenerimaBansos::class);
+    }
+
     // Helper methods
     public function isAdmin()
     {

@@ -32,7 +32,7 @@
     </li>
     <li class="sidebar-item {{ request()->routeIs('admin.pengajuan-surat*') ? 'active-admin' : '' }}">
         <a href="{{ route('admin.pengajuan-surat') }}">
-            <i class="fa fa-file"></i> <span>Status Pengajuan & Pengaduan</span>
+            <i class="fa fa-file"></i> <span>Status Pengajuan</span>
         </a>
     </li>
     <li class="sidebar-item {{ request()->routeIs('admin.informasi-desa*') ? 'active-admin' : '' }}">
@@ -53,6 +53,21 @@
     <li class="sidebar-item {{ request()->routeIs('admin.arsip-dokumen*') ? 'active-admin' : '' }}">
         <a href="{{ route('admin.arsip-dokumen') }}">
             <i class="fa fa-archive"></i> <span>Kelola Arsip Dokumen</span>
+        </a>
+    </li>
+    <li class="sidebar-item {{ request()->routeIs('admin.pengaduan*') ? 'active-admin' : '' }}">
+        <a href="{{ route('admin.pengaduan.index') }}">
+            <i class="fa fa-comments"></i> <span>Kelola Pengaduan</span>
+        </a>
+    </li>
+    <li class="sidebar-item {{ request()->routeIs('admin.bansos*') ? 'active-admin' : '' }}">
+        <a href="{{ route('admin.bansos.index') }}">
+            <i class="fa fa-hand-holding-heart"></i> <span>Kelola Bansos</span>
+        </a>
+    </li>
+    <li class="sidebar-item {{ request()->routeIs('admin.analytics*') ? 'active-admin' : '' }}">
+        <a href="{{ route('admin.analytics') }}">
+            <i class="fa fa-chart-line"></i> <span>Analytics & Laporan</span>
         </a>
     </li>
     <li>

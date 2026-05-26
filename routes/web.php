@@ -59,6 +59,24 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/arsip-dokumen', [AdminController::class, 'arsipDokumen'])->name('arsip-dokumen');
     Route::get('/arsip-dokumen/create', [AdminController::class, 'createArsip'])->name('arsip-dokumen.create');
     Route::post('/arsip-dokumen', [AdminController::class, 'storeArsip'])->name('arsip-dokumen.store');
+    
+    // Pengaduan Masyarakat
+    Route::resource('pengaduan', \App\Http\Controllers\Admin\PengaduanController::class);
+    
+    // Bansos Management
+    Route::resource('bansos', \App\Http\Controllers\Admin\BansosController::class);
+    Route::post('/bansos/{bansos}/penerima/{penerima}/approve', [\App\Http\Controllers\Admin\BansosController::class, 'approvePenerima'])->name('bansos.approve-penerima');
+    Route::post('/bansos/{bansos}/penerima/{penerima}/reject', [\App\Http\Controllers\Admin\BansosController::class, 'rejectPenerima'])->name('bansos.reject-penerima');
+    Route::get('/bansos/{bansos}/penerima', [\App\Http\Controllers\Admin\BansosController::class, 'managePenerima'])->name('bansos.manage-penerima');
+    
+    // Export
+    Route::get('/export/pengaduan', [\App\Http\Controllers\ExportController::class, 'exportPengaduan'])->name('export.pengaduan');
+    Route::get('/export/bansos', [\App\Http\Controllers\ExportController::class, 'exportBansos'])->name('export.bansos');
+    Route::get('/export/penerima-bansos', [\App\Http\Controllers\ExportController::class, 'exportPenerimaBansos'])->name('export.penerima-bansos');
+    Route::get('/export/pengajuan-surat', [\App\Http\Controllers\ExportController::class, 'exportPengajuanSurat'])->name('export.pengajuan-surat');
+    
+    // Analytics
+    Route::get('/analytics', [\App\Http\Controllers\AnalyticsController::class, 'index'])->name('analytics');
 });
 
 // Kades Routes
@@ -106,6 +124,24 @@ Route::middleware(['auth', 'role:masyarakat'])->prefix('masyarakat')->name('masy
     Route::get('/profil', [MasyarakatController::class, 'profil'])->name('profil');
     Route::put('/profil', [MasyarakatController::class, 'updateProfil'])->name('profil.update');
     Route::put('/profil/update-password', [MasyarakatController::class, 'updatePassword'])->name('profil.update-password');
+    
+    // Pengaduan Masyarakat
+    Route::resource('pengaduan', \App\Http\Controllers\Masyarakat\PengaduanController::class);
+    
+    // Bansos
+    Route::get('/bansos', [\App\Http\Controllers\Masyarakat\BansosController::class, 'index'])->name('bansos.index');
+    Route::get('/bansos/{bansos}', [\App\Http\Controllers\Masyarakat\BansosController::class, 'show'])->name('bansos.show');
+    Route::post('/bansos/{bansos}/apply', [\App\Http\Controllers\Masyarakat\BansosController::class, 'apply'])->name('bansos.apply');
+    Route::get('/bansos-applications', [\App\Http\Controllers\Masyarakat\BansosController::class, 'myApplications'])->name('bansos.applications');
+    Route::get('/bansos-applications/{penerima}', [\App\Http\Controllers\Masyarakat\BansosController::class, 'applicationDetail'])->name('bansos.application-detail');
+    Route::delete('/bansos-applications/{penerima}', [\App\Http\Controllers\Masyarakat\BansosController::class, 'cancelApplication'])->name('bansos.cancel-application');
+    
+    // Notifications
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::delete('/notifications/{notification}', [\App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::delete('/notifications', [\App\Http\Controllers\NotificationController::class, 'deleteAll'])->name('notifications.delete-all');
 });
 
 // ========================================

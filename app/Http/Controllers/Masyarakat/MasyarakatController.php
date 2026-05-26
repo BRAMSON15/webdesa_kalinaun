@@ -9,6 +9,9 @@ use App\Models\PengajuanSurat;
 use App\Models\JenisSurat;
 use App\Models\InformasiDesa;
 use App\Models\ProfilDesa;
+use App\Models\Pengaduan;
+use App\Models\Bansos;
+use App\Models\PenerimaBansos;
 
 class MasyarakatController extends Controller
 {
@@ -21,6 +24,10 @@ class MasyarakatController extends Controller
             'pengajuan_diproses' => $user->pengajuanSurats()->where('status', 'diproses')->count(),
             'pengajuan_disetujui' => $user->pengajuanSurats()->where('status', 'disetujui')->count(),
             'pengajuan_ditolak' => $user->pengajuanSurats()->where('status', 'ditolak')->count(),
+            'total_pengaduan' => Pengaduan::where('user_id', $user->id)->count(),
+            'pengaduan_diproses' => Pengaduan::where('user_id', $user->id)->where('status', 'diproses')->count(),
+            'bansos_aktif' => Bansos::aktif()->withQuota()->count(),
+            'bansos_terdaftar' => PenerimaBansos::where('user_id', $user->id)->count(),
         ];
 
         $pengajuanTerbaru = $user->pengajuanSurats()

@@ -10,6 +10,9 @@ use App\Models\JenisSurat;
 use App\Models\ProfilDesa;
 use App\Models\InformasiDesa;
 use App\Models\ArsipDokumen;
+use App\Models\Pengaduan;
+use App\Models\Bansos;
+use App\Models\PenerimaBansos;
 
 class AdminController extends Controller
 {
@@ -20,11 +23,21 @@ class AdminController extends Controller
             'total_pengajuan' => PengajuanSurat::count(),
             'pengajuan_pending' => PengajuanSurat::where('status', 'diproses')->count(),
             'total_informasi' => InformasiDesa::count(),
+            'total_pengaduan' => Pengaduan::count(),
+            'pengaduan_baru' => Pengaduan::where('status', 'baru')->count(),
+            'pengaduan_diproses' => Pengaduan::where('status', 'diproses')->count(),
+            'pengaduan_selesai' => Pengaduan::where('status', 'selesai')->count(),
+            'total_bansos' => Bansos::count(),
+            'bansos_aktif' => Bansos::where('status', 'aktif')->count(),
+            'total_penerima_bansos' => PenerimaBansos::count(),
+            'penerima_disetujui' => PenerimaBansos::where('status', 'disetujui')->count(),
         ];
 
         $pengajuanTerbaru = PengajuanSurat::with(['user', 'jenisSurat'])->latest()->take(5)->get();
+        $pengaduanTerbaru = Pengaduan::with('user')->latest()->take(5)->get();
+        $bansosAktif = Bansos::where('status', 'aktif')->latest()->take(5)->get();
 
-        return view('admin.dashboard', compact('stats', 'pengajuanTerbaru'));
+        return view('admin.dashboard', compact('stats', 'pengajuanTerbaru', 'pengaduanTerbaru', 'bansosAktif'));
     }
 
     // Kelola Profil Desa

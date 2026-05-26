@@ -97,5 +97,11 @@ class DatabaseSeeder extends Seeder
             'misi' => 'Meningkatkan pelayanan publik, Mengembangkan ekonomi desa, Melestarikan budaya lokal',
             'sejarah' => 'Desa Maju Jaya didirikan pada tahun 1945...',
         ]);
+
+        // Call new seeders
+        $this->call([
+            PengaduanSeeder::class,
+            BansosSeeder::class,
+        ]);
     }
 }

@@ -98,6 +98,73 @@
                         </div>
                     </div>
 
+                    <!-- Pengaduan & Bansos Statistics -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-white bg-info shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title">Total Pengaduan</h6>
+                                            <h2 class="mb-0">{{ $stats['total_pengaduan'] ?? 0 }}</h2>
+                                        </div>
+                                        <div>
+                                            <i class="fas fa-comments fa-3x opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-white bg-secondary shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title">Pengaduan Diproses</h6>
+                                            <h2 class="mb-0">{{ $stats['pengaduan_diproses'] ?? 0 }}</h2>
+                                        </div>
+                                        <div>
+                                            <i class="fas fa-hourglass-half fa-3x opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-white bg-success shadow-sm">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title">Bansos Aktif</h6>
+                                            <h2 class="mb-0">{{ $stats['bansos_aktif'] ?? 0 }}</h2>
+                                        </div>
+                                        <div>
+                                            <i class="fas fa-hand-holding-heart fa-3x opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-white bg-purple shadow-sm" style="background-color: #9b59b6 !important;">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="card-title">Bansos Terdaftar</h6>
+                                            <h2 class="mb-0">{{ $stats['bansos_terdaftar'] ?? 0 }}</h2>
+                                        </div>
+                                        <div>
+                                            <i class="fas fa-list fa-3x opacity-50"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Quick Actions -->
                     <div class="row mb-4">
                         <div class="col-md-6 mb-3">

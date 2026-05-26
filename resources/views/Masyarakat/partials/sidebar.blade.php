@@ -35,6 +35,16 @@
                 <i class="fas fa-bullhorn"></i> <span>Informasi Desa</span>
             </a>
         </li>
+        <li class="sidebar-item-wrapper">
+            <a href="{{ route('masyarakat.pengaduan.index') }}" class="sidebar-item d-flex align-items-center gap-3 px-3 py-2 text-decoration-none {{ request()->routeIs('masyarakat.pengaduan*') ? 'active' : '' }}">
+                <i class="fas fa-comments"></i> <span>Pengaduan</span>
+            </a>
+        </li>
+        <li class="sidebar-item-wrapper">
+            <a href="{{ route('masyarakat.bansos.index') }}" class="sidebar-item d-flex align-items-center gap-3 px-3 py-2 text-decoration-none {{ request()->routeIs('masyarakat.bansos*') ? 'active' : '' }}">
+                <i class="fas fa-hand-holding-heart"></i> <span>Bansos</span>
+            </a>
+        </li>
         <li class="sidebar-item-wrapper border-top border-secondary mt-2 pt-2" style="border-color: rgba(255,255,255,0.05) !important;">
             <a href="{{ route('masyarakat.profil') }}" class="sidebar-item d-flex align-items-center gap-3 px-3 py-2 text-decoration-none {{ request()->routeIs('masyarakat.profil*') ? 'active' : '' }}">
                 <i class="fas fa-user-cog"></i> <span>Pengaturan Akun</span>
