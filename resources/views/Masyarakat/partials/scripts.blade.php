@@ -7,8 +7,19 @@ document.addEventListener('DOMContentLoaded', function() {
     if (sidebarToggle && sidebar && mainContent) {
         sidebarToggle.addEventListener('click', function(e) {
             e.preventDefault();
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('show-sidebar');
+            } else {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+            }
+        });
+
+        // Close sidebar on mobile when clicking main content
+        mainContent.addEventListener('click', function() {
+            if (window.innerWidth <= 768 && sidebar.classList.contains('show-sidebar')) {
+                sidebar.classList.remove('show-sidebar');
+            }
         });
     }
 });

@@ -102,6 +102,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PengaduanSeeder::class,
             BansosSeeder::class,
+            InformasiDesaSeeder::class,
         ]);
     }
 }

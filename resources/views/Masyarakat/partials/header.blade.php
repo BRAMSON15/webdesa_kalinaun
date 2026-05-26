@@ -1,7 +1,7 @@
 <header class="main-header">
     <a href="{{ route('home') }}" class="logo d-flex align-items-center" style="justify-content: center; padding: 0;">
-        <img src="{{ asset('img/logo.png') }}" alt="Logo" width="30" class="me-2">
-        <b>Desa</b> Kalinaun
+        <img src="{{ asset('img/logo.png') }}" alt="Logo" width="30" class="logo-img me-2">
+        <span class="logo-text"><b>Desa</b> Kalinaun</span>
     </a>
     <nav class="navbar">
         <a href="#" class="sidebar-toggle">
