@@ -69,7 +69,7 @@
 </section>
 
 <!-- Stats Section -->
-<section class="py-5" style="background-color: var(--primary-dark); color: white;">
+<!-- <section class="py-5" style="background-color: var(--primary-dark); color: white;">
     <div class="container py-4">
         <div class="row g-4 text-center">
             <div class="col-6 col-md-3">
@@ -90,7 +90,7 @@
             </div>
         </div>
     </div>
-</section>
+</section> -->
 <!-- Call to Action -->
 <section class="py-5" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);">
     <div class="container py-4 text-center">

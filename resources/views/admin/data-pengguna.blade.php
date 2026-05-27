@@ -2,6 +2,188 @@
 
 @section('body')
 <link rel="stylesheet" href="{{ asset('css/dashboardadmin.css') }}">
+<style>
+    .dashboard-content {
+        padding: 2rem;
+        background-color: #f8f9fa;
+    }
+
+    .dashboard-header {
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .card {
+        border: none;
+        border-radius: 0.75rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        margin-bottom: 2rem;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 0.75rem 0.75rem 0 0;
+        padding: 1.5rem;
+        border: none;
+    }
+
+    .card-header h5 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .card-header i {
+        margin-right: 0.5rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+        transition: background-color 0.2s ease;
+    }
+
+    .avatar-sm {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background-color: #e9ecef;
+        border-radius: 50%;
+    }
+
+    .badge {
+        padding: 0.5rem 0.75rem;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-sm {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .btn-sm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-info {
+        background-color: #0dcaf0;
+        border-color: #0dcaf0;
+    }
+
+    .btn-info:hover {
+        background-color: #0aa2c0;
+        border-color: #0aa2c0;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #000;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800;
+        border-color: #e0a800;
+    }
+
+    .alert {
+        border-radius: 0.75rem;
+        border: none;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-success {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: #adb5bd;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-content {
+            padding: 1rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .table {
+            font-size: 0.9rem;
+        }
+
+        .btn-group {
+            flex-direction: column;
+        }
+
+        .btn-sm {
+            width: 100%;
+        }
+    }
+</style>
 
 <div class="wrapper">
     <aside class="dashboard-sidebar">
@@ -13,11 +195,15 @@
 
         <section class="dashboard-content">
             <div class="dashboard-header">
-                <h1>Kelola Data Pengguna</h1>
+                <h1><i class="fas fa-users me-2"></i>Kelola Data Pengguna</h1>
             </div>
 
             @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             @endif
 
             <div class="card">
@@ -30,13 +216,13 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Nama</th>
-                                        <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Status</th>
-                                        <th>Terdaftar</th>
-                                        <th>Aksi</th>
+                                        <th style="width: 5%;">No</th>
+                                        <th style="width: 25%;">Nama</th>
+                                        <th style="width: 20%;">Email</th>
+                                        <th style="width: 12%;">Role</th>
+                                        <th style="width: 12%;">Status</th>
+                                        <th style="width: 13%;">Terdaftar</th>
+                                        <th style="width: 13%;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -46,7 +232,7 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="avatar-sm me-2">
-                                                    <i class="fas fa-user-circle fa-2x text-muted"></i>
+                                                    <i class="fas fa-user-circle fa-lg text-muted"></i>
                                                 </div>
                                                 <div>
                                                     <strong>{{ $user->name }}</strong>
@@ -56,12 +242,14 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>{{ $user->email }}</td>
+                                        <td>
+                                            <small>{{ $user->email }}</small>
+                                        </td>
                                         <td>
                                             @if($user->role == 'admin')
                                                 <span class="badge bg-danger">Admin</span>
                                             @elseif($user->role == 'kades')
-                                                <span class="badge bg-warning">Kepala Desa</span>
+                                                <span class="badge bg-warning text-dark">Kepala Desa</span>
                                             @else
                                                 <span class="badge bg-info">Masyarakat</span>
                                             @endif
@@ -71,15 +259,17 @@
                                                 <i class="fas fa-check-circle"></i> Aktif
                                             </span>
                                         </td>
-                                        <td>{{ $user->created_at->format('d/m/Y') }}</td>
+                                        <td>
+                                            <small>{{ $user->created_at->format('d/m/Y') }}</small>
+                                        </td>
                                         <td>
                                             <div class="btn-group">
-                                                <button class="btn btn-sm btn-info" onclick="showUserDetail({{ $user->id }})" data-bs-toggle="modal" data-bs-target="#userDetailModal">
-                                                    <i class="fas fa-eye"></i> Detail
+                                                <button class="btn btn-sm btn-info" onclick="showUserDetail({{ $user->id }})" data-bs-toggle="modal" data-bs-target="#userDetailModal" title="Lihat Detail">
+                                                    <i class="fas fa-eye"></i> <span class="d-none d-md-inline">Detail</span>
                                                 </button>
                                                 @if($user->role != 'admin')
-                                                    <button class="btn btn-sm btn-warning" onclick="editUser({{ $user->id }})" data-bs-toggle="modal" data-bs-target="#editUserModal">
-                                                        <i class="fas fa-edit"></i> Edit
+                                                    <button class="btn btn-sm btn-warning" onclick="editUser({{ $user->id }})" data-bs-toggle="modal" data-bs-target="#editUserModal" title="Edit Pengguna">
+                                                        <i class="fas fa-edit"></i> <span class="d-none d-md-inline">Edit</span>
                                                     </button>
                                                 @endif
                                             </div>
@@ -90,8 +280,8 @@
                             </table>
                         </div>
                     @else
-                        <div class="text-center py-4">
-                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <div class="empty-state">
+                            <i class="fas fa-users"></i>
                             <p class="text-muted">Belum ada data pengguna.</p>
                         </div>
                     @endif
@@ -107,9 +297,9 @@
         <div class="modal-content">
             <div class="modal-header bg-info text-white sticky-top">
                 <h5 class="modal-title" id="userDetailModalLabel">
-                    <i class="fas fa-user"></i> Detail Pengguna
+                    <i class="fas fa-user-circle me-2"></i> Detail Pengguna
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="userDetailContent" style="max-height: 70vh; overflow-y: auto;">
                 <div class="text-center py-5">
@@ -131,9 +321,9 @@
         <div class="modal-content">
             <div class="modal-header bg-warning text-dark sticky-top">
                 <h5 class="modal-title" id="editUserModalLabel">
-                    <i class="fas fa-edit"></i> Edit Pengguna
+                    <i class="fas fa-edit me-2"></i> Edit Pengguna
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="editUserContent" style="max-height: 70vh; overflow-y: auto;">
                 <div class="text-center py-5">
@@ -145,6 +335,75 @@
         </div>
     </div>
 </div>
+
+<style>
+    .modal-content {
+        border: none;
+        border-radius: 0.75rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid #dee2e6;
+        padding: 1.5rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #dee2e6;
+        padding: 1rem 1.5rem;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 0.5rem;
+        border: 1px solid #dee2e6;
+        padding: 0.75rem;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    .user-avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        color: white;
+    }
+
+    .table-borderless td {
+        padding: 0.75rem 0;
+        border: none;
+    }
+
+    .table-borderless tr {
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .table-borderless tr:last-child {
+        border-bottom: none;
+    }
+
+    .text-danger {
+        color: #dc3545;
+    }
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
@@ -181,10 +440,10 @@ function showUserDetail(userId) {
     const content = `
         <div class="row">
             <div class="col-md-4 text-center mb-4">
-                <div class="user-avatar">
-                    <i class="fas fa-user-circle fa-5x text-muted"></i>
+                <div class="user-avatar mb-3">
+                    <i class="fas fa-user-circle fa-4x"></i>
                 </div>
-                <h5 class="mt-3">${user.name}</h5>
+                <h5 class="mt-3 fw-bold">${user.name}</h5>
                 <span class="badge bg-${getRoleBadgeColor(user.role)} fs-6">${getRoleLabel(user.role)}</span>
             </div>
             <div class="col-md-8">
@@ -195,11 +454,11 @@ function showUserDetail(userId) {
                     </tr>
                     <tr>
                         <td><strong>Email:</strong></td>
-                        <td>${user.email}</td>
+                        <td><a href="mailto:${user.email}">${user.email}</a></td>
                     </tr>
                     <tr>
                         <td><strong>No. HP:</strong></td>
-                        <td>${user.no_hp || '-'}</td>
+                        <td>${user.no_hp ? '<a href="tel:' + user.no_hp + '">' + user.no_hp + '</a>' : '-'}</td>
                     </tr>
                     <tr>
                         <td><strong>NIK:</strong></td>
