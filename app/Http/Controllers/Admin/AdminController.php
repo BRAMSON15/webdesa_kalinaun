@@ -111,6 +111,57 @@ class AdminController extends Controller
         return redirect()->route('admin.informasi-desa')->with('success', 'Informasi berhasil ditambahkan');
     }
 
+    public function showInformasi($id)
+    {
+        $informasi = InformasiDesa::with('creator')->findOrFail($id);
+        return view('admin.informasi-desa.show', compact('informasi'));
+    }
+
+    public function editInformasi($id)
+    {
+        $informasi = InformasiDesa::findOrFail($id);
+        return view('admin.informasi-desa.edit', compact('informasi'));
+    }
+
+    public function updateInformasi(Request $request, $id)
+    {
+        $request->validate([
+            'judul' => 'required|string',
+            'konten' => 'required|string',
+            'kategori' => 'required|in:berita,pengumuman,kegiatan,lainnya',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $informasi = InformasiDesa::findOrFail($id);
+        $data = $request->all();
+
+        if ($request->hasFile('gambar')) {
+            // Delete old image if exists
+            if ($informasi->gambar) {
+                \Storage::disk('public')->delete($informasi->gambar);
+            }
+            $data['gambar'] = $request->file('gambar')->store('informasi', 'public');
+        }
+
+        $informasi->update($data);
+
+        return redirect()->route('admin.informasi-desa')->with('success', 'Informasi berhasil diperbarui');
+    }
+
+    public function destroyInformasi($id)
+    {
+        $informasi = InformasiDesa::findOrFail($id);
+        
+        // Delete image if exists
+        if ($informasi->gambar) {
+            \Storage::disk('public')->delete($informasi->gambar);
+        }
+        
+        $informasi->delete();
+
+        return redirect()->route('admin.informasi-desa')->with('success', 'Informasi berhasil dihapus');
+    }
+
     // Kelola Data Pengguna
     public function dataPengguna()
     {
@@ -172,6 +223,41 @@ class AdminController extends Controller
         JenisSurat::create($request->all());
 
         return redirect()->route('admin.jenis-surat')->with('success', 'Jenis surat berhasil ditambahkan');
+    }
+
+    public function showJenisSurat($id)
+    {
+        $jenisSurat = JenisSurat::findOrFail($id);
+        return view('admin.jenis-surat.show', compact('jenisSurat'));
+    }
+
+    public function editJenisSurat($id)
+    {
+        $jenisSurat = JenisSurat::findOrFail($id);
+        return view('admin.jenis-surat.edit', compact('jenisSurat'));
+    }
+
+    public function updateJenisSurat(Request $request, $id)
+    {
+        $request->validate([
+            'nama_surat' => 'required|string',
+            'deskripsi' => 'nullable|string',
+            'persyaratan' => 'nullable|array',
+            'is_active' => 'nullable|boolean',
+        ]);
+
+        $jenisSurat = JenisSurat::findOrFail($id);
+        $jenisSurat->update($request->all());
+
+        return redirect()->route('admin.jenis-surat')->with('success', 'Jenis surat berhasil diperbarui');
+    }
+
+    public function destroyJenisSurat($id)
+    {
+        $jenisSurat = JenisSurat::findOrFail($id);
+        $jenisSurat->delete();
+
+        return redirect()->route('admin.jenis-surat')->with('success', 'Jenis surat berhasil dihapus');
     }
 
     // Mencetak Surat

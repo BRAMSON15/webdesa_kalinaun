@@ -102,12 +102,27 @@ class KadesController extends Controller
         return view('kades.monitoring-pengaduan', compact('pengajuans'));
     }
 
-    public function laporanArsip()
+    public function laporanArsip(Request $request)
     {
-        $pengajuans = PengajuanSurat::with(['user', 'jenisSurat'])
-            ->where('status', '!=', 'diproses')
-            ->latest()
-            ->get();
+        $query = PengajuanSurat::with(['user', 'jenisSurat'])
+            ->where('status', '!=', 'diproses');
+
+        // Filter berdasarkan bulan
+        if ($request->filled('bulan')) {
+            $query->whereMonth('created_at', $request->bulan);
+        }
+
+        // Filter berdasarkan tahun
+        if ($request->filled('tahun')) {
+            $query->whereYear('created_at', $request->tahun);
+        }
+
+        // Filter berdasarkan status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $pengajuans = $query->latest()->get();
 
         return view('kades.laporan-arsip', compact('pengajuans'));
     }

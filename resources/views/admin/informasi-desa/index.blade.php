@@ -2,6 +2,195 @@
 
 @section('body')
 <link rel="stylesheet" href="{{ asset('css/dashboardadmin.css') }}">
+<style>
+    .dashboard-content {
+        padding: 2rem;
+        background-color: #f8f9fa;
+    }
+
+    .dashboard-header {
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .card {
+        border: none;
+        border-radius: 0.75rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        margin-bottom: 2rem;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 0.75rem 0.75rem 0 0;
+        padding: 1.5rem;
+        border: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-header h5 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .card-header i {
+        margin-right: 0.5rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+        transition: background-color 0.2s ease;
+    }
+
+    .badge {
+        padding: 0.5rem 0.75rem;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-sm {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .btn-sm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-info {
+        background-color: #0dcaf0;
+        color: white;
+    }
+
+    .btn-info:hover {
+        background-color: #0aa2c0;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+    .btn-primary {
+        background-color: #667eea;
+        color: white;
+        padding: 0.75rem 1.5rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 0.25rem 0.5rem rgba(102, 126, 234, 0.3);
+    }
+
+    .alert {
+        border-radius: 0.75rem;
+        border: none;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-success {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: #adb5bd;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .btn-group {
+            flex-direction: column;
+        }
+
+        .btn-sm {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
 
 <div class="wrapper">
     <aside class="dashboard-sidebar">
@@ -13,16 +202,20 @@
 
         <section class="dashboard-content">
             <div class="dashboard-header">
-                <h1>Kelola Informasi Desa</h1>
+                <h1><i class="fas fa-info-circle me-2"></i>Kelola Informasi Desa</h1>
             </div>
 
             @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             @endif
 
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5><i class="fas fa-info-circle"></i> Daftar Informasi Desa</h5>
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> Daftar Informasi Desa</h5>
                     <a href="{{ route('admin.informasi-desa.create') }}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Tambah Informasi
                     </a>
@@ -33,19 +226,21 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Judul</th>
-                                        <th>Kategori</th>
-                                        <th>Status</th>
-                                        <th>Tanggal Dibuat</th>
-                                        <th>Aksi</th>
+                                        <th style="width: 5%;">No</th>
+                                        <th style="width: 30%;">Judul</th>
+                                        <th style="width: 15%;">Kategori</th>
+                                        <th style="width: 10%;">Status</th>
+                                        <th style="width: 15%;">Tanggal Dibuat</th>
+                                        <th style="width: 25%;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($informasis as $index => $informasi)
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
-                                        <td>{{ $informasi->judul }}</td>
+                                        <td>
+                                            <strong>{{ Str::limit($informasi->judul, 40) }}</strong>
+                                        </td>
                                         <td>
                                             <span class="badge bg-info">{{ ucfirst($informasi->kategori) }}</span>
                                         </td>
@@ -56,18 +251,33 @@
                                                 <span class="badge bg-warning">Draft</span>
                                             @endif
                                         </td>
-                                        <td>{{ $informasi->created_at->format('d/m/Y H:i') }}</td>
+                                        <td>
+                                            <small>{{ $informasi->created_at->format('d/m/Y H:i') }}</small>
+                                        </td>
                                         <td>
                                             <div class="btn-group">
-                                                <a href="#" class="btn btn-sm btn-info" onclick="viewInformasi({{ $informasi->id }})" data-bs-toggle="modal" data-bs-target="#informasiDetailModal">
-                                                    <i class="fas fa-eye"></i> Lihat
+                                                <a href="{{ route('admin.informasi-desa.show', $informasi->id) }}" 
+                                                   class="btn btn-sm btn-info" 
+                                                   title="Lihat Detail">
+                                                    <i class="fas fa-eye"></i> <span class="d-none d-md-inline">Lihat</span>
                                                 </a>
-                                                <a href="#" class="btn btn-sm btn-warning" onclick="editInformasi({{ $informasi->id }})">
-                                                    <i class="fas fa-edit"></i> Edit
+                                                <a href="{{ route('admin.informasi-desa.edit', $informasi->id) }}" 
+                                                   class="btn btn-sm btn-warning" 
+                                                   title="Edit">
+                                                    <i class="fas fa-edit"></i> <span class="d-none d-md-inline">Edit</span>
                                                 </a>
-                                                <button class="btn btn-sm btn-danger" onclick="deleteInformasi({{ $informasi->id }})">
-                                                    <i class="fas fa-trash"></i> Hapus
-                                                </button>
+                                                <form action="{{ route('admin.informasi-desa.destroy', $informasi->id) }}" 
+                                                      method="POST" 
+                                                      style="display: inline;" 
+                                                      onsubmit="return confirm('Yakin ingin menghapus informasi ini?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" 
+                                                            class="btn btn-sm btn-danger" 
+                                                            title="Hapus">
+                                                        <i class="fas fa-trash"></i> <span class="d-none d-md-inline">Hapus</span>
+                                                    </button>
+                                                </form>
                                             </div>
                                         </td>
                                     </tr>
@@ -76,8 +286,8 @@
                             </table>
                         </div>
                     @else
-                        <div class="text-center py-4">
-                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
                             <p class="text-muted">Belum ada informasi desa.</p>
                             <a href="{{ route('admin.informasi-desa.create') }}" class="btn btn-primary">
                                 <i class="fas fa-plus"></i> Tambah Informasi Pertama
@@ -90,128 +300,5 @@
     </div>
 </div>
 
-<!-- Informasi Detail Modal -->
-<div class="modal fade" id="informasiDetailModal" tabindex="-1" aria-labelledby="informasiDetailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-info text-white sticky-top">
-                <h5 class="modal-title" id="informasiDetailModalLabel">
-                    <i class="fas fa-info-circle"></i> Detail Informasi
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="informasiDetailContent" style="max-height: 70vh; overflow-y: auto;">
-                <div class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer bg-light sticky-bottom">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-const informasis = @json($informasis);
-
-function viewInformasi(id) {
-    const informasi = informasis.find(i => i.id === id);
-    if (!informasi) return;
-    
-    const content = `
-        <div class="row">
-            <div class="col-12">
-                <table class="table table-borderless">
-                    <tr>
-                        <td width="150"><strong>Judul:</strong></td>
-                        <td>${informasi.judul}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Kategori:</strong></td>
-                        <td><span class="badge bg-info">${informasi.kategori.charAt(0).toUpperCase() + informasi.kategori.slice(1)}</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Status:</strong></td>
-                        <td><span class="badge bg-${informasi.status === 'published' ? 'success' : 'warning'}">${informasi.status === 'published' ? 'Published' : 'Draft'}</span></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Dibuat:</strong></td>
-                        <td>${formatDate(informasi.created_at)}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Diupdate:</strong></td>
-                        <td>${formatDate(informasi.updated_at)}</td>
-                    </tr>
-                </table>
-                <hr>
-                <h6><strong>Konten:</strong></h6>
-                <div class="border rounded p-3 bg-light">
-                    ${informasi.konten.replace(/\n/g, '<br>')}
-                </div>
-                ${informasi.gambar ? `
-                <hr>
-                <h6><strong>Gambar:</strong></h6>
-                <img src="/storage/${informasi.gambar}" class="img-fluid rounded" alt="Gambar Informasi">
-                ` : ''}
-            </div>
-        </div>
-    `;
-    
-    document.getElementById('informasiDetailContent').innerHTML = content;
-}
-
-function editInformasi(id) {
-    // Redirect to edit page (you can create this route)
-    window.location.href = `/admin/informasi-desa/${id}/edit`;
-}
-
-function deleteInformasi(id) {
-    if (confirm('Yakin ingin menghapus informasi ini?')) {
-        // Make AJAX call to delete
-        fetch(`/admin/informasi-desa/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Informasi berhasil dihapus!');
-                window.location.reload();
-            } else {
-                alert('Gagal menghapus informasi: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Terjadi kesalahan saat menghapus informasi');
-        });
-    }
-}
-
-function formatDate(dateString) {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('id-ID', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-}
-
-// Add CSRF token if not present
-if (!document.querySelector('meta[name="csrf-token"]')) {
-    const meta = document.createElement('meta');
-    meta.name = 'csrf-token';
-    meta.content = '{{ csrf_token() }}';
-    document.getElementsByTagName('head')[0].appendChild(meta);
-}
-</script>
 @endsection

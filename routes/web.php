@@ -45,6 +45,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/informasi-desa', [AdminController::class, 'informasiDesa'])->name('informasi-desa');
     Route::get('/informasi-desa/create', [AdminController::class, 'createInformasi'])->name('informasi-desa.create');
     Route::post('/informasi-desa', [AdminController::class, 'storeInformasi'])->name('informasi-desa.store');
+    Route::get('/informasi-desa/{id}', [AdminController::class, 'showInformasi'])->name('informasi-desa.show');
+    Route::get('/informasi-desa/{id}/edit', [AdminController::class, 'editInformasi'])->name('informasi-desa.edit');
+    Route::put('/informasi-desa/{id}', [AdminController::class, 'updateInformasi'])->name('informasi-desa.update');
+    Route::delete('/informasi-desa/{id}', [AdminController::class, 'destroyInformasi'])->name('informasi-desa.destroy');
     
     // Data Pengguna
     Route::get('/data-pengguna', [AdminController::class, 'dataPengguna'])->name('data-pengguna');
@@ -54,6 +58,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/jenis-surat', [AdminController::class, 'jenisSurat'])->name('jenis-surat');
     Route::get('/jenis-surat/create', [AdminController::class, 'createJenisSurat'])->name('jenis-surat.create');
     Route::post('/jenis-surat', [AdminController::class, 'storeJenisSurat'])->name('jenis-surat.store');
+    Route::get('/jenis-surat/{id}', [AdminController::class, 'showJenisSurat'])->name('jenis-surat.show');
+    Route::get('/jenis-surat/{id}/edit', [AdminController::class, 'editJenisSurat'])->name('jenis-surat.edit');
+    Route::put('/jenis-surat/{id}', [AdminController::class, 'updateJenisSurat'])->name('jenis-surat.update');
+    Route::delete('/jenis-surat/{id}', [AdminController::class, 'destroyJenisSurat'])->name('jenis-surat.destroy');
     
     // Arsip Dokumen
     Route::get('/arsip-dokumen', [AdminController::class, 'arsipDokumen'])->name('arsip-dokumen');

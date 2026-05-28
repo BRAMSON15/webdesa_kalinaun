@@ -2,6 +2,195 @@
 
 @section('body')
 <link rel="stylesheet" href="{{ asset('css/dashboardadmin.css') }}">
+<style>
+    .dashboard-content {
+        padding: 2rem;
+        background-color: #f8f9fa;
+    }
+
+    .dashboard-header {
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .card {
+        border: none;
+        border-radius: 0.75rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        margin-bottom: 2rem;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 0.75rem 0.75rem 0 0;
+        padding: 1.5rem;
+        border: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-header h5 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .card-header i {
+        margin-right: 0.5rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table thead th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        color: #495057;
+        padding: 1rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+        transition: background-color 0.2s ease;
+    }
+
+    .badge {
+        padding: 0.5rem 0.75rem;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-sm {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .btn-sm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-info {
+        background-color: #0dcaf0;
+        color: white;
+    }
+
+    .btn-info:hover {
+        background-color: #0aa2c0;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+    .btn-primary {
+        background-color: #667eea;
+        color: white;
+        padding: 0.75rem 1.5rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #5568d3;
+        transform: translateY(-2px);
+        box-shadow: 0 0.25rem 0.5rem rgba(102, 126, 234, 0.3);
+    }
+
+    .alert {
+        border-radius: 0.75rem;
+        border: none;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-success {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: #adb5bd;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .btn-group {
+            flex-direction: column;
+        }
+
+        .btn-sm {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
 
 <div class="wrapper">
     <aside class="dashboard-sidebar">
@@ -13,16 +202,20 @@
 
         <section class="dashboard-content">
             <div class="dashboard-header">
-                <h1>Kelola Jenis Surat</h1>
+                <h1><i class="fas fa-file-alt me-2"></i>Kelola Jenis Surat</h1>
             </div>
 
             @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             @endif
 
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5><i class="fas fa-file-alt"></i> Daftar Jenis Surat</h5>
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> Daftar Jenis Surat</h5>
                     <a href="{{ route('admin.jenis-surat.create') }}" class="btn btn-primary">
                         <i class="fas fa-plus"></i> Tambah Jenis Surat
                     </a>
@@ -33,12 +226,12 @@
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>No</th>
-                                        <th>Nama Surat</th>
-                                        <th>Deskripsi</th>
-                                        <th>Status</th>
-                                        <th>Dibuat</th>
-                                        <th>Aksi</th>
+                                        <th style="width: 5%;">No</th>
+                                        <th style="width: 25%;">Nama Surat</th>
+                                        <th style="width: 35%;">Deskripsi</th>
+                                        <th style="width: 10%;">Status</th>
+                                        <th style="width: 10%;">Dibuat</th>
+                                        <th style="width: 15%;">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -48,7 +241,9 @@
                                         <td>
                                             <strong>{{ $jenis->nama_surat }}</strong>
                                         </td>
-                                        <td>{{ Str::limit($jenis->deskripsi, 50) }}</td>
+                                        <td>
+                                            <small>{{ Str::limit($jenis->deskripsi, 50) }}</small>
+                                        </td>
                                         <td>
                                             @if($jenis->is_active)
                                                 <span class="badge bg-success">Aktif</span>
@@ -56,18 +251,33 @@
                                                 <span class="badge bg-secondary">Nonaktif</span>
                                             @endif
                                         </td>
-                                        <td>{{ $jenis->created_at->format('d/m/Y') }}</td>
+                                        <td>
+                                            <small>{{ $jenis->created_at->format('d/m/Y') }}</small>
+                                        </td>
                                         <td>
                                             <div class="btn-group">
-                                                <button class="btn btn-sm btn-info" onclick="viewJenis({{ $jenis->id }})">
-                                                    <i class="fas fa-eye"></i> Detail
-                                                </button>
-                                                <button class="btn btn-sm btn-warning" onclick="editJenis({{ $jenis->id }})">
-                                                    <i class="fas fa-edit"></i> Edit
-                                                </button>
-                                                <button class="btn btn-sm btn-danger" onclick="deleteJenis({{ $jenis->id }})">
-                                                    <i class="fas fa-trash"></i> Hapus
-                                                </button>
+                                                <a href="{{ route('admin.jenis-surat.show', $jenis->id) }}" 
+                                                   class="btn btn-sm btn-info" 
+                                                   title="Lihat Detail">
+                                                    <i class="fas fa-eye"></i> <span class="d-none d-md-inline">Detail</span>
+                                                </a>
+                                                <a href="{{ route('admin.jenis-surat.edit', $jenis->id) }}" 
+                                                   class="btn btn-sm btn-warning" 
+                                                   title="Edit">
+                                                    <i class="fas fa-edit"></i> <span class="d-none d-md-inline">Edit</span>
+                                                </a>
+                                                <form action="{{ route('admin.jenis-surat.destroy', $jenis->id) }}" 
+                                                      method="POST" 
+                                                      style="display: inline;" 
+                                                      onsubmit="return confirm('Yakin ingin menghapus jenis surat ini?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" 
+                                                            class="btn btn-sm btn-danger" 
+                                                            title="Hapus">
+                                                        <i class="fas fa-trash"></i> <span class="d-none d-md-inline">Hapus</span>
+                                                    </button>
+                                                </form>
                                             </div>
                                         </td>
                                     </tr>
@@ -76,8 +286,8 @@
                             </table>
                         </div>
                     @else
-                        <div class="text-center py-4">
-                            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                        <div class="empty-state">
+                            <i class="fas fa-file-alt"></i>
                             <p class="text-muted">Belum ada jenis surat.</p>
                             <a href="{{ route('admin.jenis-surat.create') }}" class="btn btn-primary">
                                 <i class="fas fa-plus"></i> Tambah Jenis Surat Pertama
@@ -90,19 +300,5 @@
     </div>
 </div>
 
-<script>
-function viewJenis(id) {
-    alert('Detail jenis surat ID: ' + id);
-}
-
-function editJenis(id) {
-    alert('Edit jenis surat ID: ' + id);
-}
-
-function deleteJenis(id) {
-    if(confirm('Yakin ingin menghapus jenis surat ini?')) {
-        alert('Hapus jenis surat ID: ' + id);
-    }
-}
-</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @endsection

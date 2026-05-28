@@ -86,22 +86,22 @@
             <div class="modal fade" id="pengajuanDetailModal" tabindex="-1" aria-labelledby="pengajuanDetailModalLabel" aria-hidden="true" style="z-index: 9999;">
                 <div class="modal-dialog modal-lg modal-dialog-scrollable" style="margin-top: 60px;">
                     <div class="modal-content">
-                        <!-- <div class="modal-header bg-info text-white">
+                        <div class="modal-header bg-info text-white">
                             <h5 class="modal-title" id="pengajuanDetailModalLabel">
                                 <i class="fas fa-file-alt"></i> Detail Pengajuan Surat
                             </h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                        </div> -->
-                        <!-- <div class="modal-body" id="pengajuanDetailContent" style="max-height: calc(100vh - 200px); overflow-y: auto;">
+                        </div>
+                        <div class="modal-body" id="pengajuanDetailContent" style="max-height: calc(100vh - 200px); overflow-y: auto;">
                             <div class="text-center py-5">
                                 <div class="spinner-border text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
                             </div>
-                        </div> -->
-                        <!-- <div class="modal-footer bg-light">
+                        </div>
+                        <div class="modal-footer bg-light">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        </div> -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -120,6 +120,84 @@
     
     .modal-dialog {
         margin-top: 60px !important;
+    }
+
+    .modal-content {
+        border: none;
+        border-radius: 0.75rem;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid #dee2e6;
+        padding: 1.5rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #dee2e6;
+        padding: 1rem 1.5rem;
+    }
+
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        margin-bottom: 1rem;
+    }
+
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        padding: 1rem;
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .table-borderless td {
+        padding: 0.75rem 0;
+        border: none;
+    }
+
+    .table-borderless tr {
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .table-borderless tr:last-child {
+        border-bottom: none;
+    }
+
+    .badge {
+        padding: 0.5rem 0.75rem;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+
+    pre {
+        background-color: #f8f9fa !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 0.5rem !important;
+        padding: 1rem !important;
+        font-size: 0.85rem !important;
+        overflow-x: auto !important;
+    }
+
+    .btn-outline-primary {
+        color: #667eea;
+        border-color: #667eea;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #667eea;
+        border-color: #667eea;
+        color: white;
     }
 </style>
 
@@ -140,8 +218,8 @@ function viewPengajuanDetail(id) {
         <div class="row">
             <div class="col-12">
                 <div class="card mb-3">
-                    <div class="card-header bg-light">
-                        <h6 class="mb-0"><strong>📋 Informasi Pengajuan</strong></h6>
+                    <div class="card-header">
+                        <strong>📋 Informasi Pengajuan</strong>
                     </div>
                     <div class="card-body">
                         <table class="table table-borderless table-sm mb-0">
@@ -158,7 +236,25 @@ function viewPengajuanDetail(id) {
                                 <td>${pengajuan.user && pengajuan.user.no_hp ? pengajuan.user.no_hp : '-'}</td>
                             </tr>
                             <tr>
-                                <td><strong>Jenis Surat:</strong></td>
+                                <td><strong>NIK:</strong></td>
+                                <td>${pengajuan.user && pengajuan.user.nik ? pengajuan.user.nik : '-'}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Alamat:</strong></td>
+                                <td>${pengajuan.user && pengajuan.user.alamat ? pengajuan.user.alamat : '-'}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <strong>📄 Detail Pengajuan</strong>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-borderless table-sm mb-0">
+                            <tr>
+                                <td width="150"><strong>Jenis Surat:</strong></td>
                                 <td>${pengajuan.jenis_surat ? pengajuan.jenis_surat.nama_surat : 'N/A'}</td>
                             </tr>
                             <tr>
@@ -169,13 +265,19 @@ function viewPengajuanDetail(id) {
                                 <td><strong>Status:</strong></td>
                                 <td><span class="badge bg-${getStatusBadgeColor(pengajuan.status)}">${getStatusLabel(pengajuan.status)}</span></td>
                             </tr>
+                            ${pengajuan.nomor_surat ? `
+                            <tr>
+                                <td><strong>Nomor Surat:</strong></td>
+                                <td><strong>${pengajuan.nomor_surat}</strong></td>
+                            </tr>
+                            ` : ''}
                         </table>
                     </div>
                 </div>
                 
                 <div class="card mb-3">
-                    <div class="card-header bg-light">
-                        <h6 class="mb-0"><strong>📝 Keperluan</strong></h6>
+                    <div class="card-header">
+                        <strong>📝 Keperluan</strong>
                     </div>
                     <div class="card-body">
                         <p class="mb-0">${pengajuan.keperluan || '<em class="text-muted">Tidak ada keterangan keperluan</em>'}</p>
@@ -186,13 +288,11 @@ function viewPengajuanDetail(id) {
     if (pengajuan.data_formulir) {
         content += `
                 <div class="card mb-3">
-                    <div class="card-header bg-light">
-                        <h6 class="mb-0"><strong>📊 Data Formulir</strong></h6>
+                    <div class="card-header">
+                        <strong>📊 Data Formulir</strong>
                     </div>
                     <div class="card-body">
-                        <div style="overflow-x: auto;">
-                            <pre style="margin: 0; font-size: 12px; background: #f8f9fa; padding: 10px; border-radius: 4px;">${JSON.stringify(pengajuan.data_formulir, null, 2)}</pre>
-                        </div>
+                        <pre>${JSON.stringify(pengajuan.data_formulir, null, 2)}</pre>
                     </div>
                 </div>
         `;
@@ -201,8 +301,8 @@ function viewPengajuanDetail(id) {
     if (pengajuan.dokumen_pendukung && pengajuan.dokumen_pendukung.length > 0) {
         content += `
                 <div class="card">
-                    <div class="card-header bg-light">
-                        <h6 class="mb-0"><strong>📎 Dokumen Pendukung</strong></h6>
+                    <div class="card-header">
+                        <strong>📎 Dokumen Pendukung</strong>
                     </div>
                     <div class="card-body">
                         <div class="row">

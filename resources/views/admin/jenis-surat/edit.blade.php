@@ -119,6 +119,13 @@
         font-size: 1.2rem;
     }
 
+    .helper-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+        display: block;
+    }
+
     .persyaratan-item {
         display: flex;
         gap: 0.5rem;
@@ -137,25 +144,6 @@
     }
 
     .persyaratan-item .btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
-    }
-
-    .btn-add-persyaratan {
-        background-color: #28a745;
-        border-color: #28a745;
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
-
-    .btn-add-persyaratan:hover {
-        background-color: #218838;
-        border-color: #218838;
         transform: translateY(-2px);
         box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
     }
@@ -249,18 +237,16 @@
         background-color: #218838;
     }
 
-    .helper-text {
-        font-size: 0.875rem;
-        color: #6c757d;
-        margin-top: 0.5rem;
-        display: block;
+    .alert {
+        border-radius: 0.75rem;
+        border: none;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
     }
 
-    .empty-persyaratan {
-        text-align: center;
-        padding: 1rem;
-        color: #6c757d;
-        font-style: italic;
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #842029;
     }
 
     @media (max-width: 768px) {
@@ -289,7 +275,7 @@
 
         <section class="dashboard-content">
             <div class="dashboard-header">
-                <h1><i class="fas fa-file-alt me-2"></i>Tambah Jenis Surat</h1>
+                <h1><i class="fas fa-file-alt me-2"></i>Edit Jenis Surat</h1>
             </div>
 
             @if ($errors->any())
@@ -307,11 +293,12 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h5><i class="fas fa-plus-circle"></i> Form Tambah Jenis Surat Baru</h5>
+                    <h5><i class="fas fa-edit"></i> Form Edit Jenis Surat</h5>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.jenis-surat.store') }}" method="POST" id="formJenisSurat">
+                    <form action="{{ route('admin.jenis-surat.update', $jenisSurat->id) }}" method="POST" id="formJenisSurat">
                         @csrf
+                        @method('PUT')
                         
                         <!-- Informasi Dasar -->
                         <div class="form-section">
@@ -325,10 +312,10 @@
                                 <input type="text" 
                                        class="form-control @error('nama_surat') is-invalid @enderror" 
                                        name="nama_surat" 
-                                       value="{{ old('nama_surat') }}" 
+                                       value="{{ old('nama_surat', $jenisSurat->nama_surat) }}" 
                                        required
                                        placeholder="Contoh: Surat Keterangan Domisili">
-                                <span class="helper-text">Masukkan nama jenis surat yang akan dibuat</span>
+                                <span class="helper-text">Masukkan nama jenis surat</span>
                                 @error('nama_surat')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -339,7 +326,7 @@
                                 <textarea class="form-control @error('deskripsi') is-invalid @enderror" 
                                           name="deskripsi" 
                                           rows="4" 
-                                          placeholder="Jelaskan tujuan dan kegunaan surat ini...">{{ old('deskripsi') }}</textarea>
+                                          placeholder="Jelaskan tujuan dan kegunaan surat ini...">{{ old('deskripsi', $jenisSurat->deskripsi) }}</textarea>
                                 <span class="helper-text">Deskripsi singkat tentang jenis surat ini (opsional)</span>
                                 @error('deskripsi')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -355,15 +342,30 @@
                             </div>
 
                             <div id="persyaratan-container">
-                                <div class="persyaratan-item">
-                                    <input type="text" 
-                                           class="form-control" 
-                                           name="persyaratan[]" 
-                                           placeholder="Contoh: Fotokopi KTP">
-                                    <button type="button" class="btn btn-success" onclick="addPersyaratan()" title="Tambah persyaratan">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
+                                @if($jenisSurat->persyaratan && count($jenisSurat->persyaratan) > 0)
+                                    @foreach($jenisSurat->persyaratan as $persyaratan)
+                                    <div class="persyaratan-item">
+                                        <input type="text" 
+                                               class="form-control" 
+                                               name="persyaratan[]" 
+                                               value="{{ $persyaratan }}"
+                                               placeholder="Masukkan persyaratan">
+                                        <button type="button" class="btn btn-danger" onclick="removePersyaratan(this)" title="Hapus persyaratan">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    @endforeach
+                                @else
+                                    <div class="persyaratan-item">
+                                        <input type="text" 
+                                               class="form-control" 
+                                               name="persyaratan[]" 
+                                               placeholder="Contoh: Fotokopi KTP">
+                                        <button type="button" class="btn btn-success" onclick="addPersyaratan()" title="Tambah persyaratan">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                @endif
                             </div>
                             <span class="helper-text">Tambahkan persyaratan yang diperlukan untuk surat ini. Kosongkan jika tidak ada persyaratan khusus.</span>
                         </div>
@@ -380,8 +382,8 @@
                                        type="checkbox" 
                                        name="is_active" 
                                        value="1" 
-                                       id="is_active" 
-                                       checked>
+                                       id="is_active"
+                                       {{ $jenisSurat->is_active ? 'checked' : '' }}>
                                 <label class="form-check-label" for="is_active">
                                     <strong>Aktifkan jenis surat ini</strong>
                                     <br>
@@ -393,7 +395,7 @@
                         <!-- Tombol Aksi -->
                         <div class="button-group">
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Simpan Jenis Surat
+                                <i class="fas fa-save"></i> Simpan Perubahan
                             </button>
                             <a href="{{ route('admin.jenis-surat') }}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Kembali
