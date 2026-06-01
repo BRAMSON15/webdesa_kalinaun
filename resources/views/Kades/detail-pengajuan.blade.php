@@ -1,16 +1,10 @@
 @extends('layouts.sipakal')
-
 @section('title', 'Detail Pengajuan Surat')
-
 @section('body')
 <link rel="stylesheet" href="{{ asset('css/dashboardkades.css') }}">
-
 <div class="wrapper" style="height: auto; min-height: 100%;">
-
     @include('Kades.partials.header')
-
     @include('Kades.partials.sidebar')
-
     <div class="dashboard-main">
         <section class="dashboard-header">
             <h1>
@@ -18,7 +12,6 @@
                 <small>Informasi lengkap pengajuan</small>
             </h1>
         </section>
-
         <section class="dashboard-content">
             <div style="display: flex; flex-wrap: wrap; margin: -10px;">
                 <div style="width: 66.666%; padding: 10px; min-width: 300px;">
@@ -37,7 +30,6 @@
                                     {{ $pengajuan->created_at->format('d/m/Y H:i') }}
                                 </div>
                             </div>
-
                             <div style="display: flex; flex-wrap: wrap; margin-bottom: 15px;">
                                 <div style="width: 50%; padding-right: 10px;">
                                     <strong>Status:</strong><br>
@@ -56,12 +48,10 @@
                                     @endif
                                 </div>
                             </div>
-
                             <div style="margin-bottom: 15px;">
                                 <strong>Keperluan:</strong><br>
                                 <p style="margin-top: 10px;">{{ $pengajuan->keperluan }}</p>
                             </div>
-
                             @if($pengajuan->catatan_kades)
                             <div style="margin-bottom: 15px;">
                                 <strong>Catatan Kepala Desa:</strong><br>
@@ -70,7 +60,6 @@
                             @endif
                         </div>
                     </div>
-
                     <div class="box" style="margin-top: 20px;">
                         <div class="box-header with-border">
                             <h3 class="box-title"><i class="fas fa-user"></i> Data Pemohon</h3>
@@ -103,7 +92,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div style="width: 33.333%; padding: 10px; min-width: 300px;">
                     @if($pengajuan->status == 'diproses')
                     <div class="box box-warning">
@@ -114,7 +102,6 @@
                             <form method="POST" action="{{ route('kades.proses-pengajuan', $pengajuan->id) }}">
                                 @csrf
                                 @method('PUT')
-
                                 <div style="margin-bottom: 15px;">
                                     <label for="status" style="display: block; margin-bottom: 5px; font-weight: 600;">
                                         Keputusan <span style="color: #dc3545;">*</span>
@@ -130,7 +117,6 @@
                                         <div style="color: #dc3545; font-size: 12px; margin-top: 5px;">{{ $message }}</div>
                                     @enderror
                                 </div>
-
                                 <div style="margin-bottom: 15px;">
                                     <label for="catatan_kades" style="display: block; margin-bottom: 5px; font-weight: 600;">Catatan</label>
                                     <textarea class="form-control @error('catatan_kades') is-invalid @enderror" 
@@ -141,15 +127,44 @@
                                         <div style="color: #dc3545; font-size: 12px; margin-top: 5px;">{{ $message }}</div>
                                     @enderror
                                 </div>
-
                                 <button type="submit" class="btn btn-primary" style="width: 100%;">
                                     <i class="fas fa-check"></i> Proses Pengajuan
                                 </button>
                             </form>
                         </div>
                     </div>
+                    @elseif(($pengajuan->status == 'disetujui' || $pengajuan->status == 'ditolak') && $pengajuan->user && $pengajuan->user->no_hp)
+                    <div class="box {{ $pengajuan->status == 'disetujui' ? 'box-success' : 'box-danger' }}">
+                        <div class="box-header with-border">
+                            <h3 class="box-title"><i class="fab fa-whatsapp"></i> Notifikasi WhatsApp</h3>
+                        </div>
+                        <div class="box-body">
+                            <p class="text-muted small mb-3">
+                                <i class="fas fa-info-circle"></i> Klik tombol di bawah untuk mengirim notifikasi via WhatsApp kepada pemohon.
+                            </p>
+                            @php
+                                if ($pengajuan->status == 'disetujui') {
+                                    $waLink = \App\Services\NotificationService::getWhatsAppLinkLetterCompleted($pengajuan);
+                                } else {
+                                    $waLink = \App\Services\NotificationService::getWhatsAppLinkLetterRejected($pengajuan);
+                                }
+                            @endphp
+                            @if ($waLink)
+                                <a href="{{ $waLink }}" target="_blank" class="btn {{ $pengajuan->status == 'disetujui' ? 'btn-success' : 'btn-danger' }}" style="width: 100%;">
+                                    <i class="fab fa-whatsapp"></i> Kirim Notifikasi WhatsApp
+                                </a>
+                                <div class="mt-3 p-2" style="background: #f8f9fa; border-radius: 4px; font-size: 12px;">
+                                    <strong>Kepada:</strong> {{ $pengajuan->user->name }}<br>
+                                    <strong>No. HP:</strong> {{ $pengajuan->user->no_hp }}
+                                </div>
+                            @else
+                                <div class="alert alert-warning small mb-0">
+                                    <i class="fas fa-exclamation-triangle"></i> Nomor HP pemohon tidak tersedia
+                                </div>
+                            @endif
+                        </div>
+                    </div>
                     @endif
-
                     <div class="box" style="margin-top: 20px;">
                         <div class="box-body" style="text-align: center;">
                             <a href="{{ route('kades.validasi-pengajuan') }}" class="btn btn-secondary" style="width: 100%;">
@@ -162,6 +177,5 @@
         </section>
     </div>
 </div>
-
 @include('Kades.partials.scripts')
 @endsection

@@ -267,20 +267,20 @@
 
                                             <div class="col-md-6 mb-3">
                                                 <label for="dokumen" class="form-label">Dokumen Persyaratan</label>
-                                                <input type="file" class="form-control @error('dokumen') is-invalid @enderror" 
-                                                       id="dokumen" name="dokumen" accept=".jpg,.jpeg,.png,.pdf">
+                                                <input type="file" class="form-control @error('dokumen_pendukung') is-invalid @enderror" 
+                                                       id="dokumen_pendukung" name="dokumen_pendukung[]" accept=".jpg,.jpeg,.png,.pdf" multiple>
                                                 <div class="form-text">Format: JPG, PNG, PDF. Maksimal 2MB</div>
-                                                @error('dokumen')
+                                                @error('dokumen_pendukung')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                         </div>
 
                                         <div class="mb-3">
-                                            <label for="keterangan" class="form-label">Tujuan Pengajuan <span class="text-danger">*</span></label>
-                                            <textarea name="keterangan" id="keterangan" class="form-control @error('keterangan') is-invalid @enderror" 
-                                                      rows="3" placeholder="Jelaskan tujuan pengajuan surat ini..." required>{{ old('keterangan') }}</textarea>
-                                            @error('keterangan')
+                                            <label for="keperluan" class="form-label">Tujuan Pengajuan <span class="text-danger">*</span></label>
+                                            <textarea name="keperluan" id="keperluan" class="form-control @error('keperluan') is-invalid @enderror" 
+                                                      rows="3" placeholder="Jelaskan tujuan pengajuan surat ini..." required>{{ old('keperluan') }}</textarea>
+                                            @error('keperluan')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>

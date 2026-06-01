@@ -1,25 +1,19 @@
 @extends('layouts.sipakal')
-
 @section('body')
 <link rel="stylesheet" href="{{ asset('css/dashboardadmin.css') }}">
-
 <div class="wrapper">
     <aside class="dashboard-sidebar">
         @include('admin.partials.sidebar')
     </aside>
-
     <div class="dashboard-main">
         @include('admin.partials.header')
-
         <section class="dashboard-content">
             <div class="dashboard-header">
                 <h1>Kelola Arsip Dokumen</h1>
             </div>
-
             @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
-
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5><i class="fas fa-archive"></i> Daftar Arsip Dokumen</h5>
@@ -95,16 +89,13 @@
         </section>
     </div>
 </div>
-
 <script>
 function downloadArsip(id) {
     window.open('/admin/arsip-dokumen/download/' + id, '_blank');
 }
-
 function viewArsip(id) {
     alert('Detail arsip ID: ' + id);
 }
-
 function deleteArsip(id) {
     if(confirm('Yakin ingin menghapus arsip dokumen ini?')) {
         alert('Hapus arsip ID: ' + id);

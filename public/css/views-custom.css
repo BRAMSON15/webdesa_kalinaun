@@ -1,0 +1,27 @@
+/* CSS Styles Extracted from Blade Views */
+
+/* General Admin Content */
+.dashboard-content {
+    padding: 2rem;
+    background-color: #f8f9fa;
+}
+
+/* Masyarakat Information & Profile */
+.hover-primary:hover {
+    color: var(--primary-color) !important;
+}
+.last-no-border:last-child {
+    border-bottom: none !important;
+}
+.nav-pills .nav-link {
+    color: #333;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+/* Timelines */
+.timeline {
+    position: relative;
+    padding: 10px 0;
+}

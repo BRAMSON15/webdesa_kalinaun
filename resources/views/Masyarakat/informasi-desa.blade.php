@@ -132,14 +132,4 @@
     </div>
 </div>
 
-<style>
-    .hover-primary:hover {
-        color: var(--primary-color) !important;
-    }
-    .last-no-border:last-child {
-        border-bottom: none !important;
-        margin-bottom: 0 !important;
-        padding-bottom: 0 !important;
-    }
-</style>
 @endsection

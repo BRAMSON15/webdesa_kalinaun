@@ -1,25 +1,19 @@
 @extends('layouts.sipakal')
-
 @section('body')
 <link rel="stylesheet" href="{{ asset('css/dashboardadmin.css') }}">
-
 <div class="wrapper">
     <aside class="dashboard-sidebar">
         @include('admin.partials.sidebar')
     </aside>
-
     <div class="dashboard-main">
         @include('admin.partials.header')
-
         <section class="dashboard-content">
             <div class="dashboard-header">
                 <h1>Status Pengajuan & Pengaduan</h1>
             </div>
-
             @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
             @endif
-
             <div class="card">
                 <div class="card-header">
                     <h5><i class="fas fa-file-alt"></i> Daftar Pengajuan Surat</h5>
@@ -81,7 +75,6 @@
                     @endif
                 </div>
             </div>
-
             <!-- Pengajuan Detail Modal -->
             <div class="modal fade" id="pengajuanDetailModal" tabindex="-1" aria-labelledby="pengajuanDetailModalLabel" aria-hidden="true" style="z-index: 9999;">
                 <div class="modal-dialog modal-lg modal-dialog-scrollable" style="margin-top: 60px;">
@@ -108,112 +101,15 @@
         </section>
     </div>
 </div>
-
-<style>
-    .modal-backdrop {
-        z-index: 9998 !important;
-    }
-    
-    .modal {
-        z-index: 9999 !important;
-    }
-    
-    .modal-dialog {
-        margin-top: 60px !important;
-    }
-
-    .modal-content {
-        border: none;
-        border-radius: 0.75rem;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-    }
-
-    .modal-header {
-        border-bottom: 1px solid #dee2e6;
-        padding: 1.5rem;
-    }
-
-    .modal-body {
-        padding: 1.5rem;
-    }
-
-    .modal-footer {
-        border-top: 1px solid #dee2e6;
-        padding: 1rem 1.5rem;
-    }
-
-    .card {
-        border: none;
-        border-radius: 0.5rem;
-        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        margin-bottom: 1rem;
-    }
-
-    .card-header {
-        background-color: #f8f9fa;
-        border-bottom: 1px solid #dee2e6;
-        padding: 1rem;
-        font-weight: 600;
-        color: #495057;
-    }
-
-    .card-body {
-        padding: 1rem;
-    }
-
-    .table-borderless td {
-        padding: 0.75rem 0;
-        border: none;
-    }
-
-    .table-borderless tr {
-        border-bottom: 1px solid #dee2e6;
-    }
-
-    .table-borderless tr:last-child {
-        border-bottom: none;
-    }
-
-    .badge {
-        padding: 0.5rem 0.75rem;
-        font-weight: 500;
-        font-size: 0.85rem;
-    }
-
-    pre {
-        background-color: #f8f9fa !important;
-        border: 1px solid #dee2e6 !important;
-        border-radius: 0.5rem !important;
-        padding: 1rem !important;
-        font-size: 0.85rem !important;
-        overflow-x: auto !important;
-    }
-
-    .btn-outline-primary {
-        color: #667eea;
-        border-color: #667eea;
-    }
-
-    .btn-outline-primary:hover {
-        background-color: #667eea;
-        border-color: #667eea;
-        color: white;
-    }
-</style>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 const pengajuans = @json($pengajuans);
-
 function viewPengajuanDetail(id) {
     const pengajuan = pengajuans.find(p => p.id === id);
     if (!pengajuan) {
         console.error('Pengajuan not found:', id);
         return;
     }
-    
     console.log('Pengajuan data:', pengajuan);
-    
     let content = `
         <div class="row">
             <div class="col-12">
@@ -246,7 +142,6 @@ function viewPengajuanDetail(id) {
                         </table>
                     </div>
                 </div>
-                
                 <div class="card mb-3">
                     <div class="card-header">
                         <strong>📄 Detail Pengajuan</strong>
@@ -274,7 +169,6 @@ function viewPengajuanDetail(id) {
                         </table>
                     </div>
                 </div>
-                
                 <div class="card mb-3">
                     <div class="card-header">
                         <strong>📝 Keperluan</strong>
@@ -284,7 +178,6 @@ function viewPengajuanDetail(id) {
                     </div>
                 </div>
     `;
-    
     if (pengajuan.data_formulir) {
         content += `
                 <div class="card mb-3">
@@ -297,7 +190,6 @@ function viewPengajuanDetail(id) {
                 </div>
         `;
     }
-    
     if (pengajuan.dokumen_pendukung && pengajuan.dokumen_pendukung.length > 0) {
         content += `
                 <div class="card">
@@ -307,7 +199,6 @@ function viewPengajuanDetail(id) {
                     <div class="card-body">
                         <div class="row">
         `;
-        
         pengajuan.dokumen_pendukung.forEach((doc, index) => {
             content += `
                             <div class="col-md-6 mb-2">
@@ -317,19 +208,16 @@ function viewPengajuanDetail(id) {
                             </div>
             `;
         });
-        
         content += `
                         </div>
                     </div>
                 </div>
         `;
     }
-    
     content += `
             </div>
         </div>
     `;
-    
     const contentElement = document.getElementById('pengajuanDetailContent');
     if (contentElement) {
         contentElement.innerHTML = content;
@@ -338,7 +226,6 @@ function viewPengajuanDetail(id) {
         console.error('Content element not found');
     }
 }
-
 function getStatusBadgeColor(status) {
     switch(status) {
         case 'pending': return 'warning';
@@ -348,7 +235,6 @@ function getStatusBadgeColor(status) {
         default: return 'secondary';
     }
 }
-
 function getStatusLabel(status) {
     switch(status) {
         case 'pending': return 'Pending';
@@ -358,7 +244,6 @@ function getStatusLabel(status) {
         default: return status;
     }
 }
-
 function formatDate(dateString) {
     if (!dateString) return '-';
     const date = new Date(dateString);

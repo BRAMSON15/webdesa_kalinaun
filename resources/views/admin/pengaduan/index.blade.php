@@ -1,18 +1,12 @@
 @extends('layouts.sipakal')
-
 @section('title', 'Kelola Pengaduan Masyarakat')
-
 @section('body')
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/dashboardadmin.css') }}">
-
 <div class="wrapper" style="height: auto; min-height: 100%;">
     @include('admin.partials.header')
-
     <aside class="dashboard-sidebar">
         @include('admin.partials.sidebar')
     </aside>
-
     <div class="dashboard-main">
         <section class="dashboard-header">
             <h1>
@@ -20,7 +14,6 @@
                 <small>Daftar Pengaduan</small>
             </h1>
         </section>
-
         <section class="dashboard-content">
             <div class="container-fluid">
                 @if ($errors->any())
@@ -34,14 +27,12 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
-
                 @if (session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         {{ session('success') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
-
                 <!-- Filter Section -->
                 <div class="card mb-4 shadow-sm">
                     <div class="card-header bg-primary text-white">
@@ -59,7 +50,6 @@
                                     <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                                 </select>
                             </div>
-
                             <div class="col-md-3">
                                 <label for="kategori" class="form-label">Kategori:</label>
                                 <select name="kategori" id="kategori" class="form-select">
@@ -71,12 +61,10 @@
                                     <option value="lainnya" {{ request('kategori') == 'lainnya' ? 'selected' : '' }}>Lainnya</option>
                                 </select>
                             </div>
-
                             <div class="col-md-4">
                                 <label for="search" class="form-label">Pencarian:</label>
                                 <input type="text" id="search" name="search" class="form-control" placeholder="Cari judul..." value="{{ request('search') }}">
                             </div>
-
                             <div class="col-md-2 d-flex align-items-end">
                                 <button type="submit" class="btn btn-primary me-2">
                                     <i class="fas fa-search"></i> Cari
@@ -88,7 +76,6 @@
                         </form>
                     </div>
                 </div>
-
                 <!-- Statistics -->
                 <div class="row mb-4">
                     <div class="col-md-3">
@@ -124,7 +111,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Table -->
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
@@ -205,14 +191,11 @@
         </section>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const sidebarToggle = document.querySelector('.sidebar-toggle');
         const sidebar = document.querySelector('.dashboard-sidebar');
         const mainContent = document.querySelector('.dashboard-main');
-        
         if (sidebarToggle && sidebar && mainContent) {
             sidebarToggle.addEventListener('click', function(e) {
                 e.preventDefault();

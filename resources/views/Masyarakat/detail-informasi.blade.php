@@ -94,17 +94,4 @@
     </div>
 </div>
 
-<style>
-    .hover-primary:hover {
-        color: #22c55e !important;
-    }
-    .last-no-border:last-child {
-        border-bottom: none !important;
-        margin-bottom: 0 !important;
-        padding-bottom: 0 !important;
-    }
-    .fs-7 {
-        font-size: 0.8rem;
-    }
-</style>
 @endsection

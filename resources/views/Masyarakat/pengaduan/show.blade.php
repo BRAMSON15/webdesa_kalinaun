@@ -13,6 +13,13 @@
         </div>
     </div>
 
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="row">
         <div class="col-md-8 mb-4">
             <div class="card shadow-sm mb-4">
@@ -133,19 +140,17 @@
                     <div class="card-header bg-warning text-dark">
                         <h5 class="mb-0 fs-6">Aksi</h5>
                     </div>
-                    <div class="card-body">
-                        <div class="d-grid gap-2">
-                            <a href="{{ route('masyarakat.pengaduan.edit', $pengaduan) }}" class="btn btn-warning text-dark">
-                                <i class="fas fa-edit"></i> Edit Pengaduan
-                            </a>
-                            <form action="{{ route('masyarakat.pengaduan.destroy', $pengaduan) }}" method="POST" class="d-grid">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('Yakin ingin menghapus pengaduan ini?')">
-                                    <i class="fas fa-trash"></i> Hapus Pengaduan
-                                </button>
-                            </form>
-                        </div>
+                    <div class="card-body text-center p-3">
+                        <a href="{{ route('masyarakat.pengaduan.edit', $pengaduan) }}" class="btn btn-warning text-dark w-100 mb-2" style="border-radius: 6px;">
+                            <i class="fas fa-edit"></i> Edit Pengaduan
+                        </a>
+                        <form action="{{ route('masyarakat.pengaduan.destroy', $pengaduan) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger w-100" style="border-radius: 6px;" onclick="return confirm('Yakin ingin menghapus pengaduan ini?')">
+                                <i class="fas fa-trash"></i> Hapus Pengaduan
+                            </button>
+                        </form>
                     </div>
                 </div>
             @endif
@@ -164,38 +169,4 @@
     </div>
 </div>
 
-<style>
-    .timeline {
-        position: relative;
-        padding: 10px 0;
-    }
-
-    .timeline-item {
-        display: flex;
-        margin-bottom: 30px;
-        position: relative;
-    }
-
-    .timeline-item:not(:last-child)::before {
-        content: '';
-        position: absolute;
-        left: 15px;
-        top: 30px;
-        width: 2px;
-        height: calc(100% - 10px);
-        background-color: #e0e0e0;
-    }
-
-    .timeline-marker {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        margin-right: 20px;
-        flex-shrink: 0;
-    }
-
-    .timeline-content h6 {
-        margin-bottom: 5px;
-    }
-</style>
 @endsection

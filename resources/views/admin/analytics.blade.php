@@ -1,178 +1,178 @@
 @extends('layouts.sipakal')
-
 @section('body')
-
 <link rel="stylesheet" href="{{ asset('css/dashboardadmin.css') }}">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<div class="wrapper" style="height: auto; min-height: 100%;">
-
-    @include('admin.partials.header')
-
+<link rel="stylesheet" href="{{ asset('css/analytics.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.css">
+<div class="wrapper">
     <aside class="dashboard-sidebar">
         @include('admin.partials.sidebar')
     </aside>
-
     <div class="dashboard-main">
-        <section class="dashboard-header">
-            <h1>
-                Analytics & Laporan
-                <small>Dashboard statistik lengkap</small>
-            </h1>
-        </section>
-
+        @include('admin.partials.header')
         <section class="dashboard-content">
-            <!-- Date Range Filter -->
-            <div class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-filter"></i> Filter Periode</h5>
+            <div class="dashboard-header">
+                <h1><i class="fas fa-chart-line me-2"></i>Analytics & Reporting</h1>
+            </div>
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <!-- Pengaduan Stats -->
+                <div class="stat-card">
+                    <h3>Total Pengaduan</h3>
+                    <p class="value">{{ $pengaduanStats['total'] }}</p>
+                    <p class="subtitle">Semua pengaduan</p>
+                </div>
+                <div class="stat-card success">
+                    <h3>Pengaduan Selesai</h3>
+                    <p class="value">{{ $pengaduanStats['selesai'] }}</p>
+                    <p class="subtitle">{{ round(($pengaduanStats['selesai'] / max($pengaduanStats['total'], 1)) * 100) }}% dari total</p>
+                </div>
+                <div class="stat-card warning">
+                    <h3>Pengaduan Diproses</h3>
+                    <p class="value">{{ $pengaduanStats['diproses'] }}</p>
+                    <p class="subtitle">Sedang ditangani</p>
+                </div>
+                <div class="stat-card danger">
+                    <h3>Pengaduan Ditolak</h3>
+                    <p class="value">{{ $pengaduanStats['ditolak'] }}</p>
+                    <p class="subtitle">Tidak dapat diproses</p>
+                </div>
+                <!-- Bansos Stats -->
+                <div class="stat-card info">
+                    <h3>Program Bansos</h3>
+                    <p class="value">{{ $bansosStats['total_program'] }}</p>
+                    <p class="subtitle">{{ $bansosStats['program_aktif'] }} aktif</p>
+                </div>
+                <div class="stat-card success">
+                    <h3>Total Penerima</h3>
+                    <p class="value">{{ $bansosStats['total_penerima'] }}</p>
+                    <p class="subtitle">{{ $bansosStats['penerima_disetujui'] }} disetujui</p>
+                </div>
+                <!-- Pengajuan Stats -->
+                <div class="stat-card">
+                    <h3>Pengajuan Surat</h3>
+                    <p class="value">{{ $pengajuanStats['total'] }}</p>
+                    <p class="subtitle">Semua pengajuan</p>
+                </div>
+                <div class="stat-card success">
+                    <h3>Surat Disetujui</h3>
+                    <p class="value">{{ $pengajuanStats['disetujui'] }}</p>
+                    <p class="subtitle">Selesai diproses</p>
+                </div>
+                <!-- User Stats -->
+                <div class="stat-card info">
+                    <h3>Total Pengguna</h3>
+                    <p class="value">{{ $userStats['total_user'] }}</p>
+                    <p class="subtitle">{{ $userStats['masyarakat'] }} masyarakat</p>
+                </div>
+            </div>
+            <!-- Charts -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-pie me-2"></i>Pengaduan by Kategori</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="pengaduanKategoriChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-pie me-2"></i>Pengaduan by Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="pengaduanStatusChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Top Programs -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-star me-2"></i>Top 5 Program Bansos</h5>
                 </div>
                 <div class="card-body">
-                    <form method="GET" action="{{ route('admin.analytics') }}" class="form-inline">
-                        <div class="form-group mr-3">
-                            <label for="start_date" class="mr-2">Dari Tanggal:</label>
-                            <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request('start_date') }}">
-                        </div>
-                        <div class="form-group mr-3">
-                            <label for="end_date" class="mr-2">Sampai Tanggal:</label>
-                            <input type="date" name="end_date" id="end_date" class="form-control" value="{{ request('end_date') }}">
-                        </div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-search"></i> Filter
-                        </button>
-                        <a href="{{ route('admin.analytics') }}" class="btn btn-secondary ml-2">
-                            <i class="fas fa-redo"></i> Reset
-                        </a>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Statistics Cards -->
-            <div style="display: flex; flex-wrap: wrap; margin: -10px;">
-                <div style="width: 25%; padding: 10px; min-width: 200px;">
-                    <div class="small-box bg-aqua">
-                        <div class="inner">
-                            <h3>{{ $stats['total_pengaduan'] ?? 0 }}</h3>
-                            <p>Total Pengaduan</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fa fa-comments"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="width: 25%; padding: 10px; min-width: 200px;">
-                    <div class="small-box bg-green">
-                        <div class="inner">
-                            <h3>{{ $stats['pengaduan_selesai'] ?? 0 }}</h3>
-                            <p>Pengaduan Selesai</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fa fa-check-circle"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="width: 25%; padding: 10px; min-width: 200px;">
-                    <div class="small-box bg-yellow">
-                        <div class="inner">
-                            <h3>{{ $stats['total_bansos'] ?? 0 }}</h3>
-                            <p>Program Bansos</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fa fa-hand-holding-heart"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="width: 25%; padding: 10px; min-width: 200px;">
-                    <div class="small-box bg-red">
-                        <div class="inner">
-                            <h3>{{ $stats['total_penerima_bansos'] ?? 0 }}</h3>
-                            <p>Penerima Bansos</p>
-                        </div>
-                        <div class="icon">
-                            <i class="fa fa-users"></i>
-                        </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Program</th>
+                                    <th>Penerima</th>
+                                    <th>Nominal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($topPrograms as $index => $program)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $program->nama_bansos }}</td>
+                                    <td>
+                                        <span class="badge bg-info">{{ $program->penerima_count }}</span>
+                                    </td>
+                                    <td>Rp {{ number_format($program->nominal, 0, ',', '.') }}</td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Tidak ada data</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-
-            <!-- Charts -->
-            <div style="display: flex; flex-wrap: wrap; margin: 10px -10px;">
-                <!-- Pengaduan Status Chart -->
-                <div style="width: 50%; padding: 10px; min-width: 300px;">
-                    <div class="box box-primary">
-                        <div class="box-header with-border">
-                            <i class="fa fa-bar-chart"></i>
-                            <h3 class="box-title">Status Pengaduan</h3>
-                        </div>
-                        <div class="box-body">
-                            <canvas id="pengaduanChart" height="300"></canvas>
-                        </div>
-                    </div>
+            <!-- Export Options -->
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-download me-2"></i>Export Data</h5>
                 </div>
-
-                <!-- Pengaduan Category Chart -->
-                <div style="width: 50%; padding: 10px; min-width: 300px;">
-                    <div class="box box-info">
-                        <div class="box-header with-border">
-                            <i class="fa fa-pie-chart"></i>
-                            <h3 class="box-title">Kategori Pengaduan</h3>
-                        </div>
-                        <div class="box-body">
-                            <canvas id="kategoriChart" height="300"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bansos Status Chart -->
-                <div style="width: 50%; padding: 10px; min-width: 300px;">
-                    <div class="box box-success">
-                        <div class="box-header with-border">
-                            <i class="fa fa-bar-chart"></i>
-                            <h3 class="box-title">Status Penerima Bansos</h3>
-                        </div>
-                        <div class="box-body">
-                            <canvas id="bansosChart" height="300"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pengajuan Status Chart -->
-                <div style="width: 50%; padding: 10px; min-width: 300px;">
-                    <div class="box box-warning">
-                        <div class="box-header with-border">
-                            <i class="fa fa-bar-chart"></i>
-                            <h3 class="box-title">Status Pengajuan Surat</h3>
-                        </div>
-                        <div class="box-body">
-                            <canvas id="pengajuanChart" height="300"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Export Buttons -->
-            <div style="display: flex; flex-wrap: wrap; margin: 10px -10px;">
-                <div style="width: 100%; padding: 10px;">
-                    <div class="box box-default">
-                        <div class="box-header with-border">
-                            <i class="fa fa-download"></i>
-                            <h3 class="box-title">Export Data</h3>
-                        </div>
-                        <div class="box-body">
-                            <a href="{{ route('admin.export.pengaduan', request()->query()) }}" class="btn btn-primary">
-                                <i class="fa fa-download"></i> Export Pengaduan
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ route('admin.export.pengaduan', ['format' => 'csv']) }}" class="btn btn-export w-100">
+                                <i class="fas fa-file-csv me-2"></i>Pengaduan CSV
                             </a>
-                            <a href="{{ route('admin.export.bansos', request()->query()) }}" class="btn btn-success">
-                                <i class="fa fa-download"></i> Export Bansos
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ route('admin.export.pengaduan', ['format' => 'pdf']) }}" class="btn btn-export w-100">
+                                <i class="fas fa-file-pdf me-2"></i>Pengaduan PDF
                             </a>
-                            <a href="{{ route('admin.export.penerima-bansos', request()->query()) }}" class="btn btn-info">
-                                <i class="fa fa-download"></i> Export Penerima Bansos
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ route('admin.export.bansos', ['format' => 'csv']) }}" class="btn btn-export w-100">
+                                <i class="fas fa-file-csv me-2"></i>Bansos CSV
                             </a>
-                            <a href="{{ route('admin.export.pengajuan-surat', request()->query()) }}" class="btn btn-warning">
-                                <i class="fa fa-download"></i> Export Pengajuan Surat
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ route('admin.export.bansos', ['format' => 'pdf']) }}" class="btn btn-export w-100">
+                                <i class="fas fa-file-pdf me-2"></i>Bansos PDF
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ route('admin.export.penerima-bansos', ['format' => 'csv']) }}" class="btn btn-export w-100">
+                                <i class="fas fa-file-csv me-2"></i>Penerima CSV
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ route('admin.export.penerima-bansos', ['format' => 'pdf']) }}" class="btn btn-export w-100">
+                                <i class="fas fa-file-pdf me-2"></i>Penerima PDF
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ route('admin.export.pengajuan-surat', ['format' => 'csv']) }}" class="btn btn-export w-100">
+                                <i class="fas fa-file-csv me-2"></i>Surat CSV
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <a href="{{ route('admin.export.pengajuan-surat', ['format' => 'pdf']) }}" class="btn btn-export w-100">
+                                <i class="fas fa-file-pdf me-2"></i>Surat PDF
                             </a>
                         </div>
                     </div>
@@ -181,131 +181,76 @@
         </section>
     </div>
 </div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <script>
-    // Pengaduan Status Chart
-    const pengaduanCtx = document.getElementById('pengaduanChart').getContext('2d');
-    new Chart(pengaduanCtx, {
-        type: 'bar',
-        data: {
-            labels: ['Baru', 'Diproses', 'Selesai', 'Ditolak'],
-            datasets: [{
-                label: 'Jumlah Pengaduan',
-                data: [
-                    {{ $chartData['pengaduan_baru'] ?? 0 }},
-                    {{ $chartData['pengaduan_diproses'] ?? 0 }},
-                    {{ $chartData['pengaduan_selesai'] ?? 0 }},
-                    {{ $chartData['pengaduan_ditolak'] ?? 0 }}
-                ],
-                backgroundColor: [
-                    '#FFC107',
-                    '#17A2B8',
-                    '#28A745',
-                    '#DC3545'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
+// Pengaduan by Kategori Chart
+const pengaduanKategoriCtx = document.getElementById('pengaduanKategoriChart').getContext('2d');
+new Chart(pengaduanKategoriCtx, {
+    type: 'doughnut',
+    data: {
+        labels: [
+            @foreach($pengaduanByKategori as $item)
+                '{{ ucfirst($item->kategori) }}',
+            @endforeach
+        ],
+        datasets: [{
+            data: [
+                @foreach($pengaduanByKategori as $item)
+                    {{ $item->total }},
+                @endforeach
+            ],
+            backgroundColor: [
+                '#667eea',
+                '#764ba2',
+                '#f093fb',
+                '#4facfe',
+                '#00f2fe',
+                '#43e97b',
+                '#fa709a',
+                '#fee140',
+            ],
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
             }
         }
-    });
-
-    // Kategori Chart
-    const kategoriCtx = document.getElementById('kategoriChart').getContext('2d');
-    new Chart(kategoriCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Layanan', 'Infrastruktur', 'Kesehatan', 'Pendidikan', 'Lainnya'],
-            datasets: [{
-                data: [
-                    {{ $chartData['kategori_layanan'] ?? 0 }},
-                    {{ $chartData['kategori_infrastruktur'] ?? 0 }},
-                    {{ $chartData['kategori_kesehatan'] ?? 0 }},
-                    {{ $chartData['kategori_pendidikan'] ?? 0 }},
-                    {{ $chartData['kategori_lainnya'] ?? 0 }}
-                ],
-                backgroundColor: [
-                    '#FF6384',
-                    '#36A2EB',
-                    '#FFCE56',
-                    '#4BC0C0',
-                    '#9966FF'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
-
-    // Bansos Status Chart
-    const bansosCtx = document.getElementById('bansosChart').getContext('2d');
-    new Chart(bansosCtx, {
-        type: 'bar',
-        data: {
-            labels: ['Menunggu', 'Disetujui', 'Ditolak'],
-            datasets: [{
-                label: 'Jumlah Penerima',
-                data: [
-                    {{ $chartData['bansos_menunggu'] ?? 0 }},
-                    {{ $chartData['bansos_disetujui'] ?? 0 }},
-                    {{ $chartData['bansos_ditolak'] ?? 0 }}
-                ],
-                backgroundColor: [
-                    '#FFC107',
-                    '#28A745',
-                    '#DC3545'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
+    }
+});
+// Pengaduan by Status Chart
+const pengaduanStatusCtx = document.getElementById('pengaduanStatusChart').getContext('2d');
+new Chart(pengaduanStatusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Baru', 'Diproses', 'Selesai', 'Ditolak'],
+        datasets: [{
+            data: [
+                {{ $pengaduanStats['baru'] }},
+                {{ $pengaduanStats['diproses'] }},
+                {{ $pengaduanStats['selesai'] }},
+                {{ $pengaduanStats['ditolak'] }},
+            ],
+            backgroundColor: [
+                '#17a2b8',
+                '#ffc107',
+                '#28a745',
+                '#dc3545',
+            ],
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
             }
         }
-    });
-
-    // Pengajuan Status Chart
-    const pengajuanCtx = document.getElementById('pengajuanChart').getContext('2d');
-    new Chart(pengajuanCtx, {
-        type: 'bar',
-        data: {
-            labels: ['Pending', 'Disetujui', 'Ditolak'],
-            datasets: [{
-                label: 'Jumlah Pengajuan',
-                data: [
-                    {{ $chartData['pengajuan_pending'] ?? 0 }},
-                    {{ $chartData['pengajuan_disetujui'] ?? 0 }},
-                    {{ $chartData['pengajuan_ditolak'] ?? 0 }}
-                ],
-                backgroundColor: [
-                    '#FFC107',
-                    '#28A745',
-                    '#DC3545'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
+    }
+});
 </script>
-
 @endsection

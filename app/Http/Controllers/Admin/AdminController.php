@@ -188,7 +188,7 @@ class AdminController extends Controller
         
         // Don't allow changing admin role
         if ($user->role === 'admin') {
-            return response()->json(['error' => 'Cannot modify admin user'], 403);
+            return response()->json(['success' => false, 'message' => 'Tidak dapat mengubah data admin'], 403);
         }
 
         $user->update($request->all());
@@ -197,6 +197,56 @@ class AdminController extends Controller
             'success' => true,
             'message' => 'Data pengguna berhasil diperbarui',
             'user' => $user
+        ]);
+    }
+
+    public function deletePengguna($id)
+    {
+        $user = User::findOrFail($id);
+        
+        // Don't allow deleting admin users
+        if ($user->role === 'admin') {
+            return response()->json(['success' => false, 'message' => 'Tidak dapat menghapus data admin'], 403);
+        }
+
+        // Don't allow deleting if user has active pengajuan
+        $activePengajuan = PengajuanSurat::where('user_id', $id)
+            ->whereIn('status', ['proses', 'diproses'])
+            ->count();
+
+        if ($activePengajuan > 0) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Tidak dapat menghapus pengguna yang memiliki pengajuan aktif'
+            ], 422);
+        }
+
+        $user->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data pengguna berhasil dihapus'
+        ]);
+    }
+
+    public function resetPasswordPengguna($id)
+    {
+        $user = User::findOrFail($id);
+        
+        // Don't allow resetting admin password
+        if ($user->role === 'admin') {
+            return response()->json(['success' => false, 'message' => 'Tidak dapat reset password admin'], 403);
+        }
+
+        // Generate temporary password
+        $tempPassword = 'Desa' . date('Ymd') . rand(1000, 9999);
+        $user->update(['password' => bcrypt($tempPassword)]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password berhasil direset',
+            'temp_password' => $tempPassword,
+            'note' => 'Berikan password sementara ini kepada pengguna. Pengguna dapat mengubahnya setelah login.'
         ]);
     }
 

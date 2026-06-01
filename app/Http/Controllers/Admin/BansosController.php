@@ -186,4 +186,46 @@ class BansosController extends Controller
 
         return back()->with('success', 'Penerima berhasil ditolak');
     }
+
+    /**
+     * Get WhatsApp link for approved recipient
+     */
+    public function getWhatsAppLinkApproved(PenerimaBansos $penerima)
+    {
+        $link = \App\Services\NotificationService::getWhatsAppLinkBansosApproved($penerima);
+        
+        if (!$link) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Nomor HP penerima tidak tersedia'
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'link' => $link,
+            'message' => 'Klik tombol di bawah untuk membuka WhatsApp'
+        ]);
+    }
+
+    /**
+     * Get WhatsApp link for rejected recipient
+     */
+    public function getWhatsAppLinkRejected(PenerimaBansos $penerima)
+    {
+        $link = \App\Services\NotificationService::getWhatsAppLinkBansosRejected($penerima);
+        
+        if (!$link) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Nomor HP penerima tidak tersedia'
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'link' => $link,
+            'message' => 'Klik tombol di bawah untuk membuka WhatsApp'
+        ]);
+    }
 }

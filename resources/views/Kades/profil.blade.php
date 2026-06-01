@@ -1,15 +1,10 @@
 @extends('layouts.sipakal')
-
 @section('title', 'Profil Sekdes - SIPAKAL')
-
 @section('body')
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/dashboardkades.css') }}">
-
 <div class="wrapper" style="height: auto; min-height: 100%;">
     @include('Kades.partials.header')
     @include('Kades.partials.sidebar')
-    
     <div class="dashboard-main">
         <div class="dashboard-content">
             <div class="container-fluid mt-4">
@@ -19,7 +14,6 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
-
                 @if($errors->any())
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         <ul class="mb-0">
@@ -30,7 +24,6 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 @endif
-
                 <div class="row">
                     <div class="col-md-8 mx-auto">
                         <div class="card shadow-sm">
@@ -41,7 +34,6 @@
                                 <form action="{{ route('kades.profil.update') }}" method="POST">
                                     @csrf
                                     @method('PUT')
-
                                     <div class="mb-3">
                                         <label for="name" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('name') is-invalid @enderror" 
@@ -50,7 +42,6 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-
                                     <div class="mb-3">
                                         <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
                                         <input type="email" class="form-control @error('email') is-invalid @enderror" 
@@ -59,7 +50,6 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-
                                     <div class="mb-3">
                                         <label for="no_hp" class="form-label">No. HP <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('no_hp') is-invalid @enderror" 
@@ -68,7 +58,6 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-
                                     <div class="mb-3">
                                         <label for="alamat" class="form-label">Alamat <span class="text-danger">*</span></label>
                                         <textarea class="form-control @error('alamat') is-invalid @enderror" 
@@ -77,7 +66,6 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
-
                                     <div class="d-grid gap-2">
                                         <button type="submit" class="btn btn-primary">
                                             <i class="fas fa-save"></i> Simpan Perubahan
@@ -89,7 +77,6 @@
                                 </form>
                             </div>
                         </div>
-
                         <!-- Info Card -->
                         <div class="card shadow-sm mt-4">
                             <div class="card-header bg-info text-white">
@@ -118,7 +105,5 @@
         </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @include('Kades.partials.scripts')
 @endsection

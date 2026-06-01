@@ -6,6 +6,7 @@ use App\Models\Pengaduan;
 use App\Models\Bansos;
 use App\Models\PenerimaBansos;
 use App\Models\PengajuanSurat;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class AnalyticsController extends Controller
@@ -13,53 +14,194 @@ class AnalyticsController extends Controller
     /**
      * Display analytics dashboard
      */
-    public function index(Request $request)
+    public function index()
     {
-        $startDate = $request->get('start_date');
-        $endDate = $request->get('end_date');
+        // Pengaduan Statistics
+        $pengaduanStats = [
+            'total' => Pengaduan::count(),
+            'baru' => Pengaduan::where('status', 'baru')->count(),
+            'diproses' => Pengaduan::where('status', 'diproses')->count(),
+            'selesai' => Pengaduan::where('status', 'selesai')->count(),
+            'ditolak' => Pengaduan::where('status', 'ditolak')->count(),
+        ];
 
-        // Build queries
-        $pengaduanQuery = Pengaduan::query();
-        $bansosQuery = PenerimaBansos::query();
-        $pengajuanQuery = PengajuanSurat::query();
+        // Pengaduan by kategori
+        $pengaduanByKategori = Pengaduan::selectRaw('kategori, COUNT(*) as total')
+            ->groupBy('kategori')
+            ->get();
 
-        // Apply date filters
-        if ($startDate && $endDate) {
-            $pengaduanQuery->whereBetween('tanggal_pengaduan', [$startDate, $endDate]);
-            $bansosQuery->whereBetween('created_at', [$startDate, $endDate]);
-            $pengajuanQuery->whereBetween('created_at', [$startDate, $endDate]);
+        // Bansos Statistics
+        $bansosStats = [
+            'total_program' => Bansos::count(),
+            'program_aktif' => Bansos::where('status', 'aktif')->count(),
+            'total_penerima' => PenerimaBansos::count(),
+            'penerima_disetujui' => PenerimaBansos::where('status', 'disetujui')->count(),
+            'total_nominal' => PenerimaBansos::where('status', 'disetujui')->sum('nominal_diterima'),
+        ];
+
+        // Pengajuan Surat Statistics
+        $pengajuanStats = [
+            'total' => PengajuanSurat::count(),
+            'proses' => PengajuanSurat::where('status', 'proses')->count(),
+            'disetujui' => PengajuanSurat::where('status', 'disetujui')->count(),
+            'ditolak' => PengajuanSurat::where('status', 'ditolak')->count(),
+        ];
+
+        // User Statistics
+        $userStats = [
+            'total_user' => User::count(),
+            'masyarakat' => User::where('role', 'masyarakat')->count(),
+            'kades' => User::where('role', 'kades')->count(),
+            'admin' => User::where('role', 'admin')->count(),
+        ];
+
+        // Pengaduan trend (last 7 days)
+        $pengaduanTrend = Pengaduan::selectRaw('DATE(tanggal_pengaduan) as date, COUNT(*) as total')
+            ->where('tanggal_pengaduan', '>=', now()->subDays(7))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        // Bansos trend (last 7 days)
+        $bansosTrend = PenerimaBansos::selectRaw('DATE(created_at) as date, COUNT(*) as total')
+            ->where('created_at', '>=', now()->subDays(7))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        // Top programs
+        $topPrograms = Bansos::withCount('penerima')
+            ->orderBy('penerima_count', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Top jenis surat
+        $topJenisSurat = PengajuanSurat::selectRaw('jenis_surat_id, COUNT(*) as total')
+            ->groupBy('jenis_surat_id')
+            ->orderBy('total', 'desc')
+            ->limit(5)
+            ->with('jenisSurat')
+            ->get();
+
+        return view('admin.analytics', compact(
+            'pengaduanStats',
+            'pengaduanByKategori',
+            'bansosStats',
+            'pengajuanStats',
+            'userStats',
+            'pengaduanTrend',
+            'bansosTrend',
+            'topPrograms',
+            'topJenisSurat'
+        ));
+    }
+
+    /**
+     * Get analytics data for API
+     */
+    public function getAnalyticsData(Request $request)
+    {
+        $type = $request->get('type', 'pengaduan');
+        $period = $request->get('period', '7'); // days
+
+        $data = [];
+
+        switch ($type) {
+            case 'pengaduan':
+                $data = $this->getPengaduanAnalytics($period);
+                break;
+            case 'bansos':
+                $data = $this->getBansosAnalytics($period);
+                break;
+            case 'pengajuan':
+                $data = $this->getPengajuanAnalytics($period);
+                break;
+            default:
+                $data = [];
         }
 
-        // Statistics
-        $stats = [
-            'total_pengaduan' => $pengaduanQuery->count(),
-            'pengaduan_selesai' => (clone $pengaduanQuery)->where('status', 'selesai')->count(),
-            'total_bansos' => Bansos::count(),
-            'total_penerima_bansos' => $bansosQuery->count(),
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ]);
+    }
+
+    /**
+     * Get pengaduan analytics
+     */
+    private function getPengaduanAnalytics($days)
+    {
+        return Pengaduan::selectRaw('DATE(tanggal_pengaduan) as date, status, COUNT(*) as total')
+            ->where('tanggal_pengaduan', '>=', now()->subDays($days))
+            ->groupBy('date', 'status')
+            ->orderBy('date')
+            ->get();
+    }
+
+    /**
+     * Get bansos analytics
+     */
+    private function getBansosAnalytics($days)
+    {
+        return PenerimaBansos::selectRaw('DATE(created_at) as date, status, COUNT(*) as total')
+            ->where('created_at', '>=', now()->subDays($days))
+            ->groupBy('date', 'status')
+            ->orderBy('date')
+            ->get();
+    }
+
+    /**
+     * Get pengajuan analytics
+     */
+    private function getPengajuanAnalytics($days)
+    {
+        return PengajuanSurat::selectRaw('DATE(created_at) as date, status, COUNT(*) as total')
+            ->where('created_at', '>=', now()->subDays($days))
+            ->groupBy('date', 'status')
+            ->orderBy('date')
+            ->get();
+    }
+
+    /**
+     * Export analytics to PDF
+     */
+    public function exportPDF()
+    {
+        $pengaduanStats = [
+            'total' => Pengaduan::count(),
+            'baru' => Pengaduan::where('status', 'baru')->count(),
+            'diproses' => Pengaduan::where('status', 'diproses')->count(),
+            'selesai' => Pengaduan::where('status', 'selesai')->count(),
+            'ditolak' => Pengaduan::where('status', 'ditolak')->count(),
         ];
 
-        // Chart data
-        $chartData = [
-            'pengaduan_baru' => (clone $pengaduanQuery)->where('status', 'baru')->count(),
-            'pengaduan_diproses' => (clone $pengaduanQuery)->where('status', 'diproses')->count(),
-            'pengaduan_selesai' => (clone $pengaduanQuery)->where('status', 'selesai')->count(),
-            'pengaduan_ditolak' => (clone $pengaduanQuery)->where('status', 'ditolak')->count(),
-            
-            'kategori_layanan' => (clone $pengaduanQuery)->where('kategori', 'layanan')->count(),
-            'kategori_infrastruktur' => (clone $pengaduanQuery)->where('kategori', 'infrastruktur')->count(),
-            'kategori_kesehatan' => (clone $pengaduanQuery)->where('kategori', 'kesehatan')->count(),
-            'kategori_pendidikan' => (clone $pengaduanQuery)->where('kategori', 'pendidikan')->count(),
-            'kategori_lainnya' => (clone $pengaduanQuery)->where('kategori', 'lainnya')->count(),
-            
-            'bansos_menunggu' => (clone $bansosQuery)->where('status', 'menunggu')->count(),
-            'bansos_disetujui' => (clone $bansosQuery)->where('status', 'disetujui')->count(),
-            'bansos_ditolak' => (clone $bansosQuery)->where('status', 'ditolak')->count(),
-            
-            'pengajuan_pending' => (clone $pengajuanQuery)->where('status', 'diproses')->count(),
-            'pengajuan_disetujui' => (clone $pengajuanQuery)->where('status', 'disetujui')->count(),
-            'pengajuan_ditolak' => (clone $pengajuanQuery)->where('status', 'ditolak')->count(),
+        $bansosStats = [
+            'total_program' => Bansos::count(),
+            'program_aktif' => Bansos::where('status', 'aktif')->count(),
+            'total_penerima' => PenerimaBansos::count(),
+            'penerima_disetujui' => PenerimaBansos::where('status', 'disetujui')->count(),
+            'total_nominal' => PenerimaBansos::where('status', 'disetujui')->sum('nominal_diterima'),
         ];
 
-        return view('admin.analytics', compact('stats', 'chartData'));
+        $pengajuanStats = [
+            'total' => PengajuanSurat::count(),
+            'proses' => PengajuanSurat::where('status', 'proses')->count(),
+            'disetujui' => PengajuanSurat::where('status', 'disetujui')->count(),
+            'ditolak' => PengajuanSurat::where('status', 'ditolak')->count(),
+        ];
+
+        $userStats = [
+            'total_user' => User::count(),
+            'masyarakat' => User::where('role', 'masyarakat')->count(),
+            'kades' => User::where('role', 'kades')->count(),
+            'admin' => User::where('role', 'admin')->count(),
+        ];
+
+        return view('admin.analytics-pdf', compact(
+            'pengaduanStats',
+            'bansosStats',
+            'pengajuanStats',
+            'userStats'
+        ));
     }
 }

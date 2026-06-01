@@ -176,4 +176,140 @@ class NotificationService
     {
         Notification::where('created_at', '<', now()->subDays($days))->delete();
     }
+
+    /**
+     * Generate WhatsApp message link for bansos approval
+     */
+    public static function getWhatsAppLinkBansosApproved($penerima)
+    {
+        $user = $penerima->user;
+        $bansos = $penerima->bansos;
+        
+        if (empty($user->no_hp)) {
+            return null;
+        }
+
+        $message = "*SELAMAT! BANSOS DISETUJUI* ✅\n\n";
+        $message .= "Yth. Bapak/Ibu *{$user->name}*\n\n";
+        $message .= "Kami informasikan bahwa pendaftaran Anda untuk program bantuan sosial telah *DISETUJUI*:\n\n";
+        $message .= "📋 *Program:* {$bansos->nama_bansos}\n";
+        $message .= "💰 *Nominal:* Rp " . number_format($penerima->nominal_diterima, 0, ',', '.') . "\n";
+        $message .= "📅 *Tanggal Persetujuan:* " . $penerima->tanggal_penerimaan->format('d/m/Y') . "\n\n";
+        $message .= "Silakan hubungi kantor desa untuk informasi lebih lanjut mengenai proses pencairan bantuan.\n\n";
+        $message .= "_Selamat dan semoga bermanfaat._\n";
+        $message .= "Sistem Informasi Desa";
+
+        return self::generateWhatsAppLink($user->no_hp, $message);
+    }
+
+    /**
+     * Generate WhatsApp message link for bansos rejection
+     */
+    public static function getWhatsAppLinkBansosRejected($penerima)
+    {
+        $user = $penerima->user;
+        $bansos = $penerima->bansos;
+        
+        if (empty($user->no_hp)) {
+            return null;
+        }
+
+        $message = "*PEMBERITAHUAN STATUS BANSOS* ❌\n\n";
+        $message .= "Yth. Bapak/Ibu *{$user->name}*\n\n";
+        $message .= "Kami informasikan bahwa pendaftaran Anda untuk program bantuan sosial tidak dapat disetujui:\n\n";
+        $message .= "📋 *Program:* {$bansos->nama_bansos}\n";
+        $message .= "❌ *Status:* Ditolak\n";
+        
+        if (!empty($penerima->alasan_penolakan)) {
+            $message .= "📝 *Alasan:* {$penerima->alasan_penolakan}\n";
+        }
+        
+        $message .= "\nAnda dapat mendaftar kembali pada program bantuan sosial lainnya yang sesuai dengan kriteria.\n\n";
+        $message .= "Untuk informasi lebih lanjut, silakan hubungi kantor desa.\n\n";
+        $message .= "_Terima kasih atas pengertiannya._\n";
+        $message .= "Sistem Informasi Desa";
+
+        return self::generateWhatsAppLink($user->no_hp, $message);
+    }
+
+    /**
+     * Generate WhatsApp message link for letter completion
+     */
+    public static function getWhatsAppLinkLetterCompleted($pengajuan)
+    {
+        $user = $pengajuan->user;
+        $jenisSurat = $pengajuan->jenisSurat;
+        
+        if (empty($user->no_hp)) {
+            return null;
+        }
+
+        $message = "*SURAT SUDAH SELESAI* ✅\n\n";
+        $message .= "Yth. Bapak/Ibu *{$user->name}*\n\n";
+        $message .= "Kami informasikan bahwa pengajuan surat Anda telah selesai diproses:\n\n";
+        $message .= "📄 *Jenis Surat:* {$jenisSurat->nama_surat}\n";
+        $message .= "📅 *Tanggal Pengajuan:* " . $pengajuan->created_at->format('d/m/Y') . "\n";
+        $message .= "✅ *Status:* Selesai\n";
+        $message .= "📥 *Nomor Surat:* {$pengajuan->nomor_surat}\n\n";
+        
+        if (!empty($pengajuan->catatan_kades)) {
+            $message .= "📝 *Catatan:* {$pengajuan->catatan_kades}\n\n";
+        }
+        
+        $message .= "Surat dapat diambil di kantor desa atau diunduh melalui sistem.\n\n";
+        $message .= "_Terima kasih._\n";
+        $message .= "Sistem Informasi Desa";
+
+        return self::generateWhatsAppLink($user->no_hp, $message);
+    }
+
+    /**
+     * Generate WhatsApp message link for letter rejection
+     */
+    public static function getWhatsAppLinkLetterRejected($pengajuan)
+    {
+        $user = $pengajuan->user;
+        $jenisSurat = $pengajuan->jenisSurat;
+        
+        if (empty($user->no_hp)) {
+            return null;
+        }
+
+        $message = "*PEMBERITAHUAN PENGAJUAN SURAT* ❌\n\n";
+        $message .= "Yth. Bapak/Ibu *{$user->name}*\n\n";
+        $message .= "Kami informasikan bahwa pengajuan surat Anda tidak dapat diproses:\n\n";
+        $message .= "📄 *Jenis Surat:* {$jenisSurat->nama_surat}\n";
+        $message .= "📅 *Tanggal Pengajuan:* " . $pengajuan->created_at->format('d/m/Y') . "\n";
+        $message .= "❌ *Status:* Ditolak\n";
+        
+        if (!empty($pengajuan->catatan_kades)) {
+            $message .= "📝 *Alasan:* {$pengajuan->catatan_kades}\n";
+        }
+        
+        $message .= "\nUntuk informasi lebih lanjut, silakan hubungi kantor desa.\n\n";
+        $message .= "_Terima kasih atas pengertiannya._\n";
+        $message .= "Sistem Informasi Desa";
+
+        return self::generateWhatsAppLink($user->no_hp, $message);
+    }
+
+    /**
+     * Generate wa.me link with message
+     */
+    protected static function generateWhatsAppLink($phoneNumber, $message)
+    {
+        // Format phone number (remove leading 0, add 62 for Indonesia)
+        $phoneNumber = preg_replace('/[^0-9]/', '', $phoneNumber);
+        
+        if (substr($phoneNumber, 0, 1) === '0') {
+            $phoneNumber = '62' . substr($phoneNumber, 1);
+        } elseif (substr($phoneNumber, 0, 2) !== '62') {
+            $phoneNumber = '62' . $phoneNumber;
+        }
+
+        // URL encode the message
+        $encodedMessage = urlencode($message);
+
+        return "https://wa.me/{$phoneNumber}?text={$encodedMessage}";
+    }
 }

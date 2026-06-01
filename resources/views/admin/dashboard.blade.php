@@ -1,17 +1,12 @@
 @extends('layouts.sipakal')
-
 @section('body')
-
 <link rel="stylesheet" href="{{ asset('css/dashboardadmin.css') }}">
 <!-- Full AdminLTE Structure -->
 <div class="wrapper" style="height: auto; min-height: 100%;">
-
     @include('admin.partials.header')
-
     <aside class="dashboard-sidebar">
         @include('admin.partials.sidebar')
     </aside>
-
     <div class="dashboard-main">
         <section class="dashboard-header">
             <h1>
@@ -19,11 +14,9 @@
                 <small>Control panel</small>
             </h1>
         </section>
-
         <section class="dashboard-content">
             <!-- Small boxes (Stat box) -->
             <div style="display: flex; flex-wrap: wrap; margin: -10px;">
-                
                 <div style="width: 25%; padding: 10px; min-width: 200px;">
                     <div class="small-box bg-aqua">
                         <div class="inner">
@@ -36,7 +29,6 @@
                         <a href="{{ route('admin.pengajuan-surat') }}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
-                
                 <div style="width: 25%; padding: 10px; min-width: 200px;">
                     <div class="small-box bg-green">
                         <div class="inner">
@@ -49,7 +41,6 @@
                         <a href="{{ route('admin.pengajuan-surat') }}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
-                
                 <div style="width: 25%; padding: 10px; min-width: 200px;">
                     <div class="small-box bg-yellow">
                         <div class="inner">
@@ -62,7 +53,6 @@
                         <a href="{{ route('admin.data-pengguna') }}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
-
                 <div style="width: 25%; padding: 10px; min-width: 200px;">
                     <div class="small-box bg-red">
                         <div class="inner">
@@ -75,9 +65,7 @@
                         <a href="{{ route('admin.informasi-desa') }}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
-
             </div>
-
             <!-- Main row -->
             <div style="display: flex; flex-wrap: wrap; margin: 10px -10px;">
                 <div style="width: 60%; padding: 10px; min-width: 300px;">
@@ -123,7 +111,6 @@
                     </div>
                 </div>
             </div>
-
         </section>
     </div>
 </div>

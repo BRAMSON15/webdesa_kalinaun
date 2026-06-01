@@ -1,16 +1,11 @@
 @extends('layouts.sipakal')
-
 @section('title', 'Laporan Arsip - SIPAKAL')
-
 @section('body')
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/dashboardkades.css') }}">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <div class="wrapper" style="height: auto; min-height: 100%;">
     @include('Kades.partials.header')
     @include('Kades.partials.sidebar')
-    
     <div class="dashboard-main">
         <div class="dashboard-content">
             <div class="container-fluid mt-4">
@@ -66,7 +61,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Statistics Cards -->
                 <div class="row mb-4">
                     <div class="col-md-4 mb-3">
@@ -84,7 +78,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-md-4 mb-3">
                         <div class="card text-white bg-success shadow-sm">
                             <div class="card-body">
@@ -100,7 +93,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-md-4 mb-3">
                         <div class="card text-white bg-danger shadow-sm">
                             <div class="card-body">
@@ -117,7 +109,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Chart Section -->
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-info text-white">
@@ -127,7 +118,6 @@
                         <canvas id="chartPengajuan" height="80"></canvas>
                     </div>
                 </div>
-
                 <!-- Table Section -->
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
@@ -182,6 +172,22 @@
                                                        class="btn btn-sm btn-info">
                                                         <i class="fas fa-eye"></i> Detail
                                                     </a>
+                                                    @if(($pengajuan->status == 'disetujui' || $pengajuan->status == 'ditolak') && $pengajuan->user && $pengajuan->user->no_hp)
+                                                        @php
+                                                            if ($pengajuan->status == 'disetujui') {
+                                                                $waLink = \App\Services\NotificationService::getWhatsAppLinkLetterCompleted($pengajuan);
+                                                            } else {
+                                                                $waLink = \App\Services\NotificationService::getWhatsAppLinkLetterRejected($pengajuan);
+                                                            }
+                                                        @endphp
+                                                        @if ($waLink)
+                                                            <a href="{{ $waLink }}" target="_blank" 
+                                                               class="btn btn-sm {{ $pengajuan->status == 'disetujui' ? 'btn-success' : 'btn-danger' }} no-print" 
+                                                               title="Kirim WhatsApp">
+                                                                <i class="fab fa-whatsapp"></i>
+                                                            </a>
+                                                        @endif
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -200,8 +206,6 @@
         </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     // Chart
     const ctx = document.getElementById('chartPengajuan').getContext('2d');
@@ -224,7 +228,6 @@
             borderWidth: 1
         }]
     };
-
     const myChart = new Chart(ctx, {
         type: 'bar',
         data: chartData,
@@ -248,16 +251,4 @@
     });
 </script>
 @include('Kades.partials.scripts')
-
-<style>
-    @media print {
-        .dashboard-sidebar, .main-header, .btn, .no-print {
-            display: none !important;
-        }
-        .dashboard-main {
-            margin-left: 0 !important;
-            width: 100% !important;
-        }
-    }
-</style>
 @endsection

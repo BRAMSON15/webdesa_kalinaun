@@ -8,7 +8,6 @@
         <a href="#"><i class="fa fa-circle text-success" style="color: #3c763d;"></i> Online</a>
     </div>
 </div>
-
 <!-- search form -->
 <form action="#" method="get" style="padding: 10px;">
     <div style="display: flex; background: #374850; border-radius: 3px;">
@@ -16,9 +15,7 @@
         <button type="submit" style="background: transparent; color: #999; border: none; padding: 10px; cursor: pointer;"><i class="fa fa-search"></i></button>
     </div>
 </form>
-
 <div class="sidebar-header">MAIN NAVIGATION</div>
-
 <ul class="sidebar-menu">
     <li class="sidebar-item {{ request()->routeIs('admin.dashboard') ? 'active-admin' : '' }}">
         <a href="{{ route('admin.dashboard') }}">
@@ -63,6 +60,11 @@
     <li class="sidebar-item {{ request()->routeIs('admin.bansos*') ? 'active-admin' : '' }}">
         <a href="{{ route('admin.bansos.index') }}">
             <i class="fa fa-hand-holding-heart"></i> <span>Kelola Bansos</span>
+        </a>
+    </li>
+    <li class="sidebar-item {{ request()->routeIs('admin.tanda-tangan*') ? 'active-admin' : '' }}">
+        <a href="{{ route('admin.tanda-tangan.index') }}">
+            <i class="fa fa-signature"></i> <span>Tanda Tangan (TTE)</span>
         </a>
     </li>
     <li class="sidebar-item {{ request()->routeIs('admin.analytics*') ? 'active-admin' : '' }}">

@@ -1,0 +1,66 @@
+/* Analytics Page Styling */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-top: 4px solid #3498db;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+.stat-card h3 {
+    font-size: 16px;
+    color: #6c757d;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.stat-card .value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.stat-card .subtitle {
+    font-size: 13px;
+    color: #858796;
+    margin: 0;
+}
+
+/* Card variants */
+.stat-card.success { border-top-color: #28a745; }
+.stat-card.warning { border-top-color: #ffc107; }
+.stat-card.danger { border-top-color: #dc3545; }
+.stat-card.info { border-top-color: #17a2b8; }
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+.btn-export {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    color: #444;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.btn-export:hover {
+    background: #e9ecef;
+    color: #333;
+}

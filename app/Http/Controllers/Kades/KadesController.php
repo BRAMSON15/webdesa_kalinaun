@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\PengajuanSurat;
 use App\Models\User;
+use App\Models\Bansos;
+use App\Models\PenerimaBansos;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\Mail;
 
 class KadesController extends Controller
@@ -17,6 +20,7 @@ class KadesController extends Controller
             'pengajuan_pending' => PengajuanSurat::where('status', 'diproses')->count(),
             'pengajuan_disetujui' => PengajuanSurat::where('status', 'disetujui')->count(),
             'pengajuan_ditolak' => PengajuanSurat::where('status', 'ditolak')->count(),
+            'bansos_pending' => PenerimaBansos::where('status', 'menunggu')->count(),
         ];
 
         $pengajuanTerbaru = PengajuanSurat::with(['user', 'jenisSurat'])
@@ -25,7 +29,13 @@ class KadesController extends Controller
             ->take(5)
             ->get();
 
-        return view('kades.dashboard', compact('stats', 'pengajuanTerbaru'));
+        $bansosTerbaru = PenerimaBansos::with(['user', 'bansos'])
+            ->where('status', 'menunggu')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('kades.dashboard', compact('stats', 'pengajuanTerbaru', 'bansosTerbaru'));
     }
 
     public function profilSekdes()
@@ -91,6 +101,68 @@ class KadesController extends Controller
 
         return redirect()->route('kades.validasi-pengajuan')
             ->with('success', 'Pengajuan berhasil ' . $request->status);
+    }
+
+    public function validasiBansos()
+    {
+        $penerimas = PenerimaBansos::with(['user', 'bansos'])
+            ->where('status', 'menunggu')
+            ->latest()
+            ->get();
+
+        return view('kades.validasi-bansos', compact('penerimas'));
+    }
+
+    public function approveBansos(Request $request, Bansos $bansos, PenerimaBansos $penerima)
+    {
+        $oldStatus = $penerima->status;
+        
+        // Cek kuota
+        if ($bansos->kuota_terpakai >= $bansos->kuota) {
+            return back()->with('error', 'Kuota program bansos ini sudah penuh');
+        }
+
+        $penerima->update([
+            'status' => 'disetujui',
+            'alasan_penolakan' => null,
+            'catatan' => $request->input('catatan', 'Disetujui oleh Kepala Desa'),
+        ]);
+
+        // Update kuota terpakai
+        $bansos->increment('kuota_terpakai');
+
+        // Send notification
+        try {
+            NotificationService::notifyBansosStatusChange($penerima, $oldStatus);
+        } catch (\Exception $e) {
+            \Log::error('Notification error: ' . $e->getMessage());
+        }
+
+        return back()->with('success', 'Permohonan bansos berhasil disetujui');
+    }
+
+    public function rejectBansos(Request $request, Bansos $bansos, PenerimaBansos $penerima)
+    {
+        $oldStatus = $penerima->status;
+        
+        $validated = $request->validate([
+            'alasan_penolakan' => 'required|string',
+        ]);
+
+        $penerima->update([
+            'status' => 'ditolak',
+            'alasan_penolakan' => $validated['alasan_penolakan'],
+            'catatan' => 'Ditolak oleh Kepala Desa',
+        ]);
+
+        // Send notification
+        try {
+            NotificationService::notifyBansosStatusChange($penerima, $oldStatus);
+        } catch (\Exception $e) {
+            \Log::error('Notification error: ' . $e->getMessage());
+        }
+
+        return back()->with('success', 'Permohonan bansos berhasil ditolak');
     }
 
     public function monitoringPengaduan()

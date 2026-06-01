@@ -213,38 +213,4 @@
     </div>
 </div>
 
-<style>
-    .timeline {
-        position: relative;
-        padding: 10px 0;
-    }
-
-    .timeline-item {
-        display: flex;
-        margin-bottom: 30px;
-        position: relative;
-    }
-
-    .timeline-item:not(:last-child)::before {
-        content: '';
-        position: absolute;
-        left: 15px;
-        top: 30px;
-        width: 2px;
-        height: calc(100% - 10px);
-        background-color: #e0e0e0;
-    }
-
-    .timeline-marker {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        margin-right: 20px;
-        flex-shrink: 0;
-    }
-
-    .timeline-content h6 {
-        margin-bottom: 5px;
-    }
-</style>
 @endsection

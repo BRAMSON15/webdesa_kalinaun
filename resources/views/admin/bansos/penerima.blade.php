@@ -1,18 +1,12 @@
 @extends('layouts.sipakal')
-
 @section('title', 'Kelola Penerima Bansos')
-
 @section('body')
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ asset('css/dashboardadmin.css') }}">
-
 <div class="wrapper" style="height: auto; min-height: 100%;">
     @include('admin.partials.header')
-
     <aside class="dashboard-sidebar">
         @include('admin.partials.sidebar')
     </aside>
-
     <div class="dashboard-main">
         <section class="dashboard-header d-flex justify-content-between align-items-center flex-wrap">
             <h1>
@@ -25,7 +19,6 @@
                 </a>
             </div>
         </section>
-
         <section class="dashboard-content">
             <div class="container-fluid">
                 @if (session('success'))
@@ -34,14 +27,12 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
-
                 @if (session('error'))
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         {{ session('error') }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 @endif
-
                 <!-- Statistik -->
                 <div class="row mb-4">
                     <div class="col-md-3 mb-3">
@@ -77,7 +68,6 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- Tabel Penerima -->
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
@@ -140,12 +130,33 @@
                                                     <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal{{ $item->id }}" title="Tolak">
                                                         <i class="fas fa-times"></i>
                                                     </button>
+                                                @elseif ($item->status == 'disetujui' && $item->user && $item->user->no_hp)
+                                                    @php
+                                                        $waLink = \App\Services\NotificationService::getWhatsAppLinkBansosApproved($item);
+                                                    @endphp
+                                                    @if ($waLink)
+                                                        <a href="{{ $waLink }}" target="_blank" class="btn btn-sm btn-success" title="Kirim WhatsApp">
+                                                            <i class="fab fa-whatsapp"></i> WA
+                                                        </a>
+                                                    @else
+                                                        <span class="text-muted small">No HP kosong</span>
+                                                    @endif
+                                                @elseif ($item->status == 'ditolak' && $item->user && $item->user->no_hp)
+                                                    @php
+                                                        $waLink = \App\Services\NotificationService::getWhatsAppLinkBansosRejected($item);
+                                                    @endphp
+                                                    @if ($waLink)
+                                                        <a href="{{ $waLink }}" target="_blank" class="btn btn-sm btn-danger" title="Kirim WhatsApp">
+                                                            <i class="fab fa-whatsapp"></i> WA
+                                                        </a>
+                                                    @else
+                                                        <span class="text-muted small">No HP kosong</span>
+                                                    @endif
                                                 @else
                                                     <span class="text-muted">-</span>
                                                 @endif
                                             </td>
                                         </tr>
-
                                         <!-- Reject Modal -->
                                         @if ($item->status == 'menunggu')
                                             <div class="modal fade" id="rejectModal{{ $item->id }}" tabindex="-1" aria-labelledby="rejectModalLabel{{ $item->id }}" aria-hidden="true">
@@ -192,14 +203,11 @@
         </section>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const sidebarToggle = document.querySelector('.sidebar-toggle');
         const sidebar = document.querySelector('.dashboard-sidebar');
         const mainContent = document.querySelector('.dashboard-main');
-        
         if (sidebarToggle && sidebar && mainContent) {
             sidebarToggle.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -210,4 +218,3 @@
     });
 </script>
 @endsection
-

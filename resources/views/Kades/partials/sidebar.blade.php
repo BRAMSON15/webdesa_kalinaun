@@ -9,7 +9,6 @@
             <a href="#"><i class="fa fa-circle text-success" style="color: #3c763d;"></i> Online</a>
         </div>
     </div>
-    
     <!-- search form -->
     <form action="#" method="get" style="padding: 10px;">
         <div style="display: flex; background: #374850; border-radius: 3px;">
@@ -17,9 +16,7 @@
             <button type="submit" style="background: transparent; color: #999; border: none; padding: 10px; cursor: pointer;"><i class="fa fa-search"></i></button>
         </div>
     </form>
-
     <div class="sidebar-header">MAIN NAVIGATION</div>
-
     <ul class="sidebar-menu">
         <li class="sidebar-item {{ request()->routeIs('kades.dashboard') ? 'active-admin' : '' }}">
             <a href="{{ route('kades.dashboard') }}" style="color: inherit; text-decoration: none; display: block;">
@@ -36,6 +33,14 @@
                 <i class="fa fa-check-circle"></i> <span>Validasi Pengajuan</span>
                 @if(isset($stats['pengajuan_pending']) && $stats['pengajuan_pending'] > 0)
                     <span style="background: #f39c12; color: white; padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 5px; position: absolute; right: 10px;">{{ $stats['pengajuan_pending'] }}</span>
+                @endif
+            </a>
+        </li>
+        <li class="sidebar-item {{ request()->routeIs('kades.validasi-bansos') ? 'active-admin' : '' }}">
+            <a href="{{ route('kades.validasi-bansos') }}" style="color: inherit; text-decoration: none; display: block; position: relative;">
+                <i class="fa fa-hand-holding-heart"></i> <span>Validasi Bansos</span>
+                @if(isset($stats['bansos_pending']) && $stats['bansos_pending'] > 0)
+                    <span style="background: #e74c3c; color: white; padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 5px; position: absolute; right: 10px;">{{ $stats['bansos_pending'] }}</span>
                 @endif
             </a>
         </li>

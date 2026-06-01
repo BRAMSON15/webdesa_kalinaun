@@ -6,10 +6,7 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Kades\KadesController;
 use App\Http\Controllers\Masyarakat\MasyarakatController;
 
-// Class Diagram Controllers
-use App\Http\Controllers\ClassDiagramAuthController;
-use App\Http\Controllers\ClassDiagram\MasyarakatController as ClassDiagramMasyarakatController;
-use App\Http\Controllers\ClassDiagram\SekdesController;
+
 
 // Public Routes
 Route::get('/', function () {
@@ -53,6 +50,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Data Pengguna
     Route::get('/data-pengguna', [AdminController::class, 'dataPengguna'])->name('data-pengguna');
     Route::put('/data-pengguna/{id}', [AdminController::class, 'updatePengguna'])->name('data-pengguna.update');
+    Route::delete('/data-pengguna/{id}', [AdminController::class, 'deletePengguna'])->name('data-pengguna.delete');
+    Route::post('/data-pengguna/{id}/reset-password', [AdminController::class, 'resetPasswordPengguna'])->name('data-pengguna.reset-password');
     
     // Jenis Surat
     Route::get('/jenis-surat', [AdminController::class, 'jenisSurat'])->name('jenis-surat');
@@ -72,10 +71,18 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('pengaduan', \App\Http\Controllers\Admin\PengaduanController::class);
     
     // Bansos Management
-    Route::resource('bansos', \App\Http\Controllers\Admin\BansosController::class);
+    Route::resource('bansos', \App\Http\Controllers\Admin\BansosController::class)->parameters([
+        'bansos' => 'bansos'
+    ]);
     Route::post('/bansos/{bansos}/penerima/{penerima}/approve', [\App\Http\Controllers\Admin\BansosController::class, 'approvePenerima'])->name('bansos.approve-penerima');
     Route::post('/bansos/{bansos}/penerima/{penerima}/reject', [\App\Http\Controllers\Admin\BansosController::class, 'rejectPenerima'])->name('bansos.reject-penerima');
     Route::get('/bansos/{bansos}/penerima', [\App\Http\Controllers\Admin\BansosController::class, 'managePenerima'])->name('bansos.manage-penerima');
+    Route::get('/bansos/penerima/{penerima}/whatsapp-approved', [\App\Http\Controllers\Admin\BansosController::class, 'getWhatsAppLinkApproved'])->name('bansos.whatsapp-approved');
+    Route::get('/bansos/penerima/{penerima}/whatsapp-rejected', [\App\Http\Controllers\Admin\BansosController::class, 'getWhatsAppLinkRejected'])->name('bansos.whatsapp-rejected');
+    
+    // Tanda Tangan Elektronik
+    Route::resource('tanda-tangan', \App\Http\Controllers\Admin\TandaTanganController::class);
+    Route::post('/tanda-tangan/{tandaTangan}/toggle', [\App\Http\Controllers\Admin\TandaTanganController::class, 'toggleActive'])->name('tanda-tangan.toggle');
     
     // Export
     Route::get('/export/pengaduan', [\App\Http\Controllers\ExportController::class, 'exportPengaduan'])->name('export.pengaduan');
@@ -95,10 +102,15 @@ Route::middleware(['auth', 'role:kades'])->prefix('kades')->name('kades.')->grou
     Route::get('/profil', [KadesController::class, 'profilSekdes'])->name('profil');
     Route::put('/profil', [KadesController::class, 'updateProfil'])->name('profil.update');
     
-    // Validasi Pengajuan
+    // Validasi Pengajuan Surat
     Route::get('/validasi-pengajuan', [KadesController::class, 'validasiPengajuan'])->name('validasi-pengajuan');
     Route::get('/pengajuan/{id}', [KadesController::class, 'detailPengajuan'])->name('detail-pengajuan');
     Route::put('/pengajuan/{id}/proses', [KadesController::class, 'prosesPengajuan'])->name('proses-pengajuan');
+    
+    // Validasi Bansos
+    Route::get('/validasi-bansos', [KadesController::class, 'validasiBansos'])->name('validasi-bansos');
+    Route::post('/bansos/{bansos}/penerima/{penerima}/approve', [KadesController::class, 'approveBansos'])->name('bansos.approve-penerima');
+    Route::post('/bansos/{bansos}/penerima/{penerima}/reject', [KadesController::class, 'rejectBansos'])->name('bansos.reject-penerima');
     
     // Monitoring
     Route::get('/monitoring-pengaduan', [KadesController::class, 'monitoringPengaduan'])->name('monitoring-pengaduan');
@@ -152,38 +164,3 @@ Route::middleware(['auth', 'role:masyarakat'])->prefix('masyarakat')->name('masy
     Route::delete('/notifications', [\App\Http\Controllers\NotificationController::class, 'deleteAll'])->name('notifications.delete-all');
 });
 
-// ========================================
-// CLASS DIAGRAM ROUTES (Sesuai Diagram)
-// ========================================
-
-// Class Diagram Authentication Routes
-Route::prefix('class-diagram')->name('class-diagram.')->group(function () {
-    Route::get('/login', [ClassDiagramAuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [ClassDiagramAuthController::class, 'login']);
-    Route::get('/register', [ClassDiagramAuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [ClassDiagramAuthController::class, 'register']);
-    Route::post('/logout', [ClassDiagramAuthController::class, 'logout'])->name('logout');
-
-    // Masyarakat Routes (Class Diagram)
-    Route::middleware(['auth:masyarakat'])->prefix('masyarakat')->name('masyarakat.')->group(function () {
-        Route::get('/dashboard', [ClassDiagramMasyarakatController::class, 'dashboard'])->name('dashboard');
-        Route::get('/form-pengajuan', [ClassDiagramMasyarakatController::class, 'formPengajuan'])->name('form-pengajuan');
-        Route::post('/buat-pengajuan', [ClassDiagramMasyarakatController::class, 'buatPengajuan'])->name('buat-pengajuan');
-        Route::get('/riwayat-pengajuan', [ClassDiagramMasyarakatController::class, 'riwayatPengajuan'])->name('riwayat-pengajuan');
-        Route::get('/cek-status/{id}', [ClassDiagramMasyarakatController::class, 'cekStatus'])->name('cek-status');
-        Route::get('/profil', [ClassDiagramMasyarakatController::class, 'profil'])->name('profil');
-        Route::put('/profil', [ClassDiagramMasyarakatController::class, 'updateProfil'])->name('profil.update');
-    });
-
-    // Sekdes Routes (Class Diagram)
-    Route::middleware(['auth:sekdes'])->prefix('sekdes')->name('sekdes.')->group(function () {
-        Route::get('/dashboard', [SekdesController::class, 'dashboard'])->name('dashboard');
-        Route::get('/daftar-pengajuan', [SekdesController::class, 'daftarPengajuan'])->name('daftar-pengajuan');
-        Route::get('/detail-pengajuan/{id}', [SekdesController::class, 'detailPengajuan'])->name('detail-pengajuan');
-        Route::post('/validasi-akhir/{id}', [SekdesController::class, 'validasiAkhir'])->name('validasi-akhir');
-        Route::get('/laporan-arsip', [SekdesController::class, 'laporanArsip'])->name('laporan-arsip');
-        Route::get('/export-laporan', [SekdesController::class, 'exportLaporan'])->name('export-laporan');
-        Route::get('/profil', [SekdesController::class, 'profil'])->name('profil');
-        Route::put('/profil', [SekdesController::class, 'updateProfil'])->name('profil.update');
-    });
-});

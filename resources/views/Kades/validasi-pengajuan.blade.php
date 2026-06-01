@@ -1,16 +1,10 @@
 @extends('layouts.sipakal')
-
 @section('title', 'Validasi Pengajuan Surat')
-
 @section('body')
 <link rel="stylesheet" href="{{ asset('css/dashboardkades.css') }}">
-
 <div class="wrapper" style="height: auto; min-height: 100%;">
-
     @include('Kades.partials.header')
-
     @include('Kades.partials.sidebar')
-
     <div class="dashboard-main">
         <section class="dashboard-header">
             <h1>
@@ -18,7 +12,6 @@
                 <small>Daftar pengajuan yang menunggu validasi</small>
             </h1>
         </section>
-
         <section class="dashboard-content">
             <div class="box box-warning">
                 <div class="box-header with-border">
@@ -76,6 +69,5 @@
         </section>
     </div>
 </div>
-
 @include('Kades.partials.scripts')
 @endsection

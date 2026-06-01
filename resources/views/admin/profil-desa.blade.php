@@ -1,18 +1,13 @@
 @extends('layouts.sipakal')
-
 @section('body')
 <link rel="stylesheet" href="{{ asset('css/dashboardadmin.css') }}">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 <div class="wrapper">
     <aside class="dashboard-sidebar">
         @include('admin.partials.sidebar')
     </aside>
-
     <div class="dashboard-main">
         @include('admin.partials.header')
-
         <section class="dashboard-content">
             <!-- Enhanced Header with Breadcrumb -->
             <div class="page-header">
@@ -39,7 +34,6 @@
                     </div>
                 </div>
             </div>
-
             @if(session('success'))
                 <div class="alert alert-success alert-modern alert-dismissible fade show" role="alert">
                     <div class="alert-icon">
@@ -51,7 +45,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
-
             @if($errors->any())
                 <div class="alert alert-danger alert-modern alert-dismissible fade show" role="alert">
                     <div class="alert-icon">
@@ -68,11 +61,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
-
             <form action="{{ route('admin.profil-desa.update') }}" method="POST" class="form-modern">
                 @csrf
                 @method('PUT')
-                
                 <div class="row">
                     <!-- Informasi Dasar -->
                     <div class="col-12 mb-4">
@@ -129,7 +120,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="row">
                                     <div class="col-12 mb-4">
                                         <div class="form-group-modern">
@@ -151,7 +141,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="row">
                                     <div class="col-md-4 mb-4">
                                         <div class="form-group-modern">
@@ -215,7 +204,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Visi -->
                     <div class="col-md-6 mb-4">
                         <div class="card card-modern h-100">
@@ -244,7 +232,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Misi -->
                     <div class="col-md-6 mb-4">
                         <div class="card card-modern h-100">
@@ -273,7 +260,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Sejarah -->
                     <div class="col-12 mb-4">
                         <div class="card card-modern">
@@ -302,7 +288,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Action Buttons -->
                     <div class="col-12">
                         <div class="card card-modern">
@@ -325,296 +310,4 @@
         </section>
     </div>
 </div>
-
-<style>
-/* Modern Form Styling */
-.form-modern {
-    --primary-color: #3498db;
-    --success-color: #2ecc71;
-    --info-color: #17a2b8;
-    --warning-color: #f39c12;
-    --danger-color: #e74c3c;
-    --light-color: #f8f9fa;
-    --dark-color: #2c3e50;
-}
-
-.page-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 15px;
-    padding: 30px;
-    margin-bottom: 30px;
-    color: white;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-
-.breadcrumb {
-    background: rgba(255,255,255,0.1);
-    border-radius: 25px;
-    padding: 8px 20px;
-    margin-bottom: 15px;
-}
-
-.breadcrumb-item a {
-    color: rgba(255,255,255,0.8);
-    text-decoration: none;
-}
-
-.breadcrumb-item.active {
-    color: white;
-}
-
-.page-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.gradient-icon {
-    background: linear-gradient(45deg, #fff, #f0f0f0);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-size: 2.2rem;
-}
-
-.page-subtitle {
-    margin: 10px 0 0 0;
-    opacity: 0.9;
-    font-size: 1.1rem;
-}
-
-.card-modern {
-    border: none;
-    border-radius: 20px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-    transition: all 0.3s ease;
-    overflow: hidden;
-}
-
-.card-modern:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
-}
-
-.card-header-gradient-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    padding: 25px 30px;
-}
-
-.card-header-gradient-success {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    border: none;
-    padding: 25px 30px;
-}
-
-.card-header-gradient-info {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    padding: 25px 30px;
-}
-
-.card-header-gradient-warning {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    border: none;
-    padding: 25px 30px;
-}
-
-.card-header-content {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    color: white;
-}
-
-.card-header-content i {
-    font-size: 1.5rem;
-    opacity: 0.9;
-}
-
-.card-title {
-    margin: 0;
-    font-size: 1.3rem;
-    font-weight: 600;
-}
-
-.card-subtitle {
-    margin: 5px 0 0 0;
-    opacity: 0.8;
-    font-size: 0.9rem;
-}
-
-.card-body {
-    padding: 30px;
-}
-
-.form-group-modern {
-    margin-bottom: 25px;
-}
-
-.form-label-modern {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-    color: var(--dark-color);
-    margin-bottom: 12px;
-    font-size: 0.95rem;
-}
-
-.label-icon {
-    color: var(--primary-color);
-    font-size: 1rem;
-}
-
-.required {
-    color: var(--danger-color);
-    font-weight: bold;
-}
-
-.input-wrapper {
-    position: relative;
-}
-
-.form-control-modern {
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
-    padding: 15px 20px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: #fff;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-
-.form-control-modern:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.15);
-    transform: translateY(-2px);
-}
-
-.input-focus-border {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary-color), var(--info-color));
-    transition: all 0.3s ease;
-    transform: translateX(-50%);
-    border-radius: 2px;
-}
-
-.form-control-modern:focus + .input-focus-border {
-    width: 100%;
-}
-
-.btn-modern {
-    border-radius: 12px;
-    padding: 15px 30px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    transition: all 0.3s ease;
-    border: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.btn-modern:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
-
-.btn-primary.btn-modern {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.btn-secondary.btn-modern {
-    background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%);
-}
-
-.action-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.alert-modern {
-    border: none;
-    border-radius: 15px;
-    padding: 20px;
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-}
-
-.alert-icon {
-    font-size: 1.5rem;
-    margin-top: 2px;
-}
-
-.alert-content {
-    flex: 1;
-}
-
-.alert-success.alert-modern {
-    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-    color: #155724;
-}
-
-.alert-danger.alert-modern {
-    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-    color: #721c24;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .page-title {
-        font-size: 2rem;
-    }
-    
-    .card-body {
-        padding: 20px;
-    }
-    
-    .action-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .btn-modern {
-        width: 100%;
-        max-width: 300px;
-        justify-content: center;
-    }
-}
-
-/* Animation */
-@keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.card-modern {
-    animation: slideInUp 0.6s ease-out;
-}
-
-.card-modern:nth-child(2) { animation-delay: 0.1s; }
-.card-modern:nth-child(3) { animation-delay: 0.2s; }
-.card-modern:nth-child(4) { animation-delay: 0.3s; }
-</style>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 @endsection

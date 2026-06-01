@@ -41,7 +41,9 @@ class MasyarakatController extends Controller
             ->take(3)
             ->get();
 
-        return view('masyarakat.dashboard', compact('stats', 'pengajuanTerbaru', 'informasiTerbaru'));
+        $jenisSurat = JenisSurat::active()->get();
+
+        return view('masyarakat.dashboard', compact('stats', 'pengajuanTerbaru', 'informasiTerbaru', 'jenisSurat'));
     }
 
     public function pengajuanSurat()
@@ -83,12 +85,26 @@ class MasyarakatController extends Controller
             ->with('success', 'Pengajuan surat berhasil disubmit');
     }
 
-    public function riwayatPengajuan()
+    public function riwayatPengajuan(Request $request)
     {
-        $pengajuans = auth()->user()->pengajuanSurats()
-            ->with('jenisSurat')
-            ->latest()
-            ->paginate(10);
+        $query = auth()->user()->pengajuanSurats()->with('jenisSurat');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('bulan')) {
+            $query->whereMonth('created_at', $request->bulan);
+        }
+
+        if ($request->filled('tahun')) {
+            $query->whereYear('created_at', $request->tahun);
+        }
+
+        $pengajuans = $query->latest()->paginate(10);
+        
+        // Append query strings to pagination links
+        $pengajuans->appends($request->all());
 
         return view('masyarakat.riwayat-pengajuan', compact('pengajuans'));
     }

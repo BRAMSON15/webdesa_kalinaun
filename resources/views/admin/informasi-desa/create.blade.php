@@ -1,21 +1,16 @@
 @extends('layouts.sipakal')
-
 @section('body')
 <link rel="stylesheet" href="{{ asset('css/dashboardadmin.css') }}">
-
 <div class="wrapper">
     <aside class="dashboard-sidebar">
         @include('admin.partials.sidebar')
     </aside>
-
     <div class="dashboard-main">
         @include('admin.partials.header')
-
         <section class="dashboard-content">
             <div class="dashboard-header">
                 <h1>Tambah Informasi Desa</h1>
             </div>
-
             <div class="card">
                 <div class="card-header">
                     <h5><i class="fas fa-plus"></i> Form Tambah Informasi</h5>
@@ -23,7 +18,6 @@
                 <div class="card-body">
                     <form action="{{ route('admin.informasi-desa.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        
                         <div class="row">
                             <div class="col-md-8 mb-3">
                                 <label class="form-label">Judul <span class="text-danger">*</span></label>
@@ -47,7 +41,6 @@
                                 @enderror
                             </div>
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Konten <span class="text-danger">*</span></label>
                             <textarea class="form-control @error('konten') is-invalid @enderror" 
@@ -56,7 +49,6 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-
                         <div class="mb-3">
                             <label class="form-label">Gambar</label>
                             <input type="file" class="form-control @error('gambar') is-invalid @enderror" 
@@ -66,7 +58,6 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-
                         <div class="mb-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" name="status" value="published" id="published">
@@ -75,7 +66,6 @@
                                 </label>
                             </div>
                         </div>
-
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Simpan Informasi

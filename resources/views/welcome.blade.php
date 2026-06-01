@@ -9,9 +9,9 @@
         <div class="hero-overlay"></div>
         <div class="container">
             <div class="hero-content">
-                <span class="badge bg-primary-premium mb-3 px-3 py-2" style="background-color: var(--primary-color);">Selamat Datang</span>
-                <h1 class="hero-title">Website Resmi<br>Desa Kalinaun</h1>
-                <p class="hero-subtitle">Mewujudkan tata kelola desa yang transparan, akuntabel, dan inovatif menuju masyarakat yang sejahtera nan mandiri.</p>
+                <span class="badge bg-primary-premium mb-3 px-3 py-2" style="background-color: var(--primary-color);">Selamat Datang di </span>
+                <h1 class="hero-title">SISTEM PELAYANAN ADMINISTRASI<br>KALINAUN</h1>
+                <p class="hero-subtitle">Membantu Masyarakat unutuk mewujudkan kehidupan yang sejahtera</p>
                 <div class="d-flex gap-3">
                     <a href="#layanan" class="btn btn-primary-premium shadow-lg">Layanan Publik</a>
                     <a href="#profil" class="btn btn-outline-light rounded-pill px-4 fw-bold border-2">Tentang Desa</a>
@@ -68,29 +68,7 @@
     </div>
 </section>
 
-<!-- Stats Section -->
-<!-- <section class="py-5" style="background-color: var(--primary-dark); color: white;">
-    <div class="container py-4">
-        <div class="row g-4 text-center">
-            <div class="col-6 col-md-3">
-                <div class="stat-number text-white">1,180</div>
-                <div class="stat-label text-white-50">Total Penduduk</div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="stat-number text-white">583</div>
-                <div class="stat-label text-white-50">Laki-laki</div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="stat-number text-white">597</div>
-                <div class="stat-label text-white-50">Perempuan</div>
-            </div>
-            <div class="col-6 col-md-3">
-                <div class="stat-number text-white">6</div>
-                <div class="stat-label text-white-50">Jumlah Jaga</div>
-            </div>
-        </div>
-    </div>
-</section> -->
+
 <!-- Call to Action -->
 <section class="py-5" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);">
     <div class="container py-4 text-center">

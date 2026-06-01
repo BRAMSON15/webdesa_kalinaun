@@ -125,28 +125,5 @@
     </div>
 </div>
 
-<style>
-    .nav-pills .nav-link {
-        color: #333;
-        font-weight: 600;
-        border-radius: 10px;
-        transition: all 0.3s;
-    }
-    .nav-pills .nav-link.active {
-        background-color: var(--bs-primary);
-        color: white;
-    }
-    .nav-pills .nav-link:hover:not(.active) {
-        background-color: #f8f9fa;
-        color: var(--bs-primary);
-    }
-    .list-misi ul {
-        padding-left: 20px;
-    }
-    .list-misi li {
-        margin-bottom: 10px;
-        font-size: 1.1rem;
-    }
-</style>
 @endsection
 
