@@ -15,6 +15,72 @@ class AuthController extends Controller
         $this->authService = $authService;
     }
 
+    // ===== ADMIN/KADES LOGIN =====
+    public function showAdminLogin()
+    {
+        return view('auth.admin-login');
+    }
+
+    public function adminLogin(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
+
+        try {
+            $user = $this->authService->loginAdmin($request->email, $request->password);
+
+            if ($user) {
+                $route = $this->authService->getRedirectRoute($user);
+                return redirect()->route($route);
+            }
+
+            return back()->withErrors([
+                'email' => 'Email atau password salah.',
+            ]);
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'email' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    // ===== MASYARAKAT LOGIN =====
+    public function showMasyarakatLogin()
+    {
+        return view('auth.masyarakat-login');
+    }
+
+    public function masyarakatLogin(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'nik' => 'required|string|size:16',
+        ], [
+            'name.required' => 'Nama lengkap harus diisi',
+            'nik.required' => 'NIK harus diisi',
+            'nik.size' => 'NIK harus 16 digit',
+        ]);
+
+        try {
+            $user = $this->authService->loginMasyarakat($request->name, $request->nik);
+
+            if ($user) {
+                return redirect()->route('masyarakat.dashboard');
+            }
+
+            return back()->withErrors([
+                'name' => 'Nama lengkap atau NIK tidak sesuai.',
+            ])->withInput();
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'name' => $e->getMessage(),
+            ])->withInput();
+        }
+    }
+
+    // ===== GENERIC LOGIN (DEPRECATED - kept for backward compatibility) =====
     public function showLogin()
     {
         return view('auth.login');
@@ -27,18 +93,25 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = $this->authService->login($request->email, $request->password);
+        try {
+            $user = $this->authService->login($request->email, $request->password);
 
-        if ($user) {
-            $route = $this->authService->getRedirectRoute($user);
-            return redirect()->route($route);
+            if ($user) {
+                $route = $this->authService->getRedirectRoute($user);
+                return redirect()->route($route);
+            }
+
+            return back()->withErrors([
+                'email' => 'Email atau password salah.',
+            ]);
+        } catch (\Exception $e) {
+            return back()->withErrors([
+                'email' => $e->getMessage(),
+            ]);
         }
-
-        return back()->withErrors([
-            'email' => 'Email atau password salah.',
-        ]);
     }
 
+    // ===== REGISTRATION (MASYARAKAT ONLY) =====
     public function showRegister()
     {
         return view('auth.register');
@@ -63,12 +136,14 @@ class AuthController extends Controller
         return redirect()->route('masyarakat.dashboard');
     }
 
+    // ===== LOGOUT =====
     public function logout()
     {
         $this->authService->logout();
         return redirect()->route('login');
     }
 
+    // ===== FORGOT PASSWORD =====
     public function showForgotPassword()
     {
         return view('auth.forgot-password');

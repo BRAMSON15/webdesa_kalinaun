@@ -40,16 +40,18 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('login') }}">
+            <form method="POST" action="{{ route('masyarakat-login.submit') }}" id="loginForm">
                 @csrf
+                <input type="hidden" name="role" id="loginRole" value="{{ old('role', 'masyarakat') }}">
+                
                 <div class="form-group">
-                    <i class="fas fa-envelope icon-left"></i>
-                    <input type="text" class="form-input" name="email" id="emailInput" placeholder="Masukan NIK atau Email" value="{{ old('email') }}" required>
+                    <i class="fas fa-user icon-left" id="iconUsername"></i>
+                    <input type="text" class="form-input" name="name" id="usernameInput" placeholder="Masukkan Nama Lengkap" value="{{ old('name') ?: old('email') }}" required>
                 </div>
 
                 <div class="form-group">
-                    <i class="fas fa-lock icon-left"></i>
-                    <input type="password" class="form-input" name="password" placeholder="masukkan kata sandi" required>
+                    <i class="fas fa-lock icon-left" id="iconPassword"></i>
+                    <input type="password" class="form-input" name="nik" id="passwordInput" placeholder="Masukkan NIK" required>
                     <i class="fas fa-eye icon-right" onclick="togglePassword(this)"></i>
                 </div>
 
@@ -84,9 +86,17 @@
         const page = document.getElementById('authPage');
         const btnMasyarakat = document.getElementById('btnMasyarakat');
         const btnAdmin = document.getElementById('btnAdmin');
-        const emailInput = document.getElementById('emailInput');
+        
+        const loginForm = document.getElementById('loginForm');
+        const loginRole = document.getElementById('loginRole');
+        const usernameInput = document.getElementById('usernameInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const iconUsername = document.getElementById('iconUsername');
+        
         const descText = document.getElementById('descText');
         const registerLink = document.getElementById('registerLink');
+
+        loginRole.value = role;
 
         if (role === 'admin') {
             page.classList.add('admin-mode');
@@ -95,7 +105,15 @@
             btnMasyarakat.classList.remove('active-role-masyarakat');
             btnMasyarakat.style.color = 'var(--text-muted)';
             
-            emailInput.placeholder = 'Masukkan Username / Email';
+            loginForm.action = "{{ route('admin-login.submit') }}";
+            
+            usernameInput.name = 'email';
+            usernameInput.placeholder = 'Masukkan Email';
+            iconUsername.className = 'fas fa-envelope icon-left';
+            
+            passwordInput.name = 'password';
+            passwordInput.placeholder = 'Masukkan Kata Sandi';
+            
             descText.textContent = 'masuk sebagai admin atau kades';
             registerLink.style.display = 'none';
 
@@ -106,10 +124,26 @@
             btnAdmin.classList.remove('active-role-admin');
             btnAdmin.style.color = 'var(--text-muted)';
             
-            emailInput.placeholder = 'Masukan NIK atau Email';
-            descText.textContent = 'gunakan NIK/Email untuk masuk';
+            loginForm.action = "{{ route('masyarakat-login.submit') }}";
+            
+            usernameInput.name = 'name';
+            usernameInput.placeholder = 'Masukkan Nama Lengkap';
+            iconUsername.className = 'fas fa-user icon-left';
+            
+            passwordInput.name = 'nik';
+            passwordInput.placeholder = 'Masukkan NIK';
+            
+            descText.textContent = 'gunakan Nama Lengkap & NIK untuk masuk';
             registerLink.style.display = 'block';
         }
     }
+
+    // Initialize state based on old input
+    window.onload = function() {
+        const currentRole = document.getElementById('loginRole').value;
+        if (currentRole === 'admin') {
+            switchRole('admin');
+        }
+    };
 </script>
 @endsection

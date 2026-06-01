@@ -6,7 +6,7 @@ use App\Models\Pengaduan;
 use App\Models\Bansos;
 use App\Models\PenerimaBansos;
 use App\Models\PengajuanSurat;
-use TCPDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ExportService
 {
@@ -28,44 +28,31 @@ class ExportService
     }
 
     /**
-     * Export pengaduan to CSV
+     * Export pengaduan to Excel (HTML table as .xls)
      */
     public function exportPengaduanCSV($pengaduans)
     {
-        $filename = 'pengaduan_' . now()->format('Y-m-d_H-i-s') . '.csv';
-        $handle = fopen('php://memory', 'w');
+        $filename = 'pengaduan_' . now()->format('Y-m-d_H-i-s') . '.xls';
 
-        fputcsv($handle, [
-            'ID',
-            'Tanggal',
-            'Judul',
-            'Kategori',
-            'Pelapor',
-            'Status',
-            'Catatan Admin',
-            'Tanggal Selesai'
-        ]);
+        $html = $this->buildExcelHtml('Laporan Pengaduan Masyarakat', [
+            'No', 'Tanggal', 'Judul', 'Kategori', 'Pelapor', 'Status', 'Catatan Admin', 'Tanggal Selesai'
+        ], $pengaduans->map(function ($p, $i) {
+            return [
+                $i + 1,
+                $p->tanggal_pengaduan->format('d/m/Y H:i'),
+                $p->judul,
+                ucfirst($p->kategori),
+                $p->user->name,
+                ucfirst($p->status),
+                $p->catatan_admin ?? '-',
+                $p->tanggal_selesai ? $p->tanggal_selesai->format('d/m/Y H:i') : '-',
+            ];
+        })->toArray());
 
-        foreach ($pengaduans as $pengaduan) {
-            fputcsv($handle, [
-                $pengaduan->id,
-                $pengaduan->tanggal_pengaduan->format('d/m/Y H:i'),
-                $pengaduan->judul,
-                ucfirst($pengaduan->kategori),
-                $pengaduan->user->name,
-                ucfirst($pengaduan->status),
-                $pengaduan->catatan_admin,
-                $pengaduan->tanggal_selesai ? $pengaduan->tanggal_selesai->format('d/m/Y H:i') : '-'
-            ]);
-        }
-
-        rewind($handle);
-        $csv = stream_get_contents($handle);
-        fclose($handle);
-
-        return response($csv, 200, [
-            'Content-Type' => 'text/csv',
+        return response($html, 200, [
+            'Content-Type' => 'application/vnd.ms-excel',
             'Content-Disposition' => "attachment; filename=\"$filename\"",
+            'Cache-Control' => 'max-age=0',
         ]);
     }
 
@@ -74,42 +61,26 @@ class ExportService
      */
     public function exportPengaduanPDF($pengaduans)
     {
-        $pdf = new TCPDF();
-        $pdf->AddPage();
-        $pdf->SetFont('Arial', 'B', 14);
-        $pdf->Cell(0, 10, 'LAPORAN PENGADUAN MASYARAKAT', 0, 1, 'C');
-        $pdf->SetFont('Arial', '', 10);
-        $pdf->Cell(0, 5, 'Tanggal: ' . now()->format('d/m/Y H:i'), 0, 1, 'C');
-        $pdf->Ln(5);
+        $data = [
+            'title'   => 'LAPORAN PENGADUAN MASYARAKAT',
+            'date'    => now()->format('d/m/Y H:i'),
+            'headers' => ['No', 'Tanggal', 'Judul', 'Kategori', 'Pelapor', 'Status'],
+            'rows'    => $pengaduans->map(function ($p, $i) {
+                return [
+                    $i + 1,
+                    $p->tanggal_pengaduan->format('d/m/Y'),
+                    $p->judul,
+                    ucfirst($p->kategori),
+                    $p->user->name,
+                    ucfirst($p->status),
+                ];
+            })->toArray(),
+        ];
 
-        $pdf->SetFont('Arial', 'B', 9);
-        $pdf->SetFillColor(102, 126, 234);
-        $pdf->SetTextColor(255, 255, 255);
-        $pdf->Cell(10, 7, 'No', 1, 0, 'C', true);
-        $pdf->Cell(30, 7, 'Tanggal', 1, 0, 'C', true);
-        $pdf->Cell(50, 7, 'Judul', 1, 0, 'C', true);
-        $pdf->Cell(25, 7, 'Kategori', 1, 0, 'C', true);
-        $pdf->Cell(35, 7, 'Pelapor', 1, 0, 'C', true);
-        $pdf->Cell(20, 7, 'Status', 1, 1, 'C', true);
-
-        $pdf->SetFont('Arial', '', 8);
-        $pdf->SetTextColor(0, 0, 0);
-        $no = 1;
-
-        foreach ($pengaduans as $pengaduan) {
-            $pdf->Cell(10, 6, $no++, 1, 0, 'C');
-            $pdf->Cell(30, 6, $pengaduan->tanggal_pengaduan->format('d/m/Y'), 1, 0, 'L');
-            $pdf->Cell(50, 6, substr($pengaduan->judul, 0, 20), 1, 0, 'L');
-            $pdf->Cell(25, 6, ucfirst($pengaduan->kategori), 1, 0, 'L');
-            $pdf->Cell(35, 6, substr($pengaduan->user->name, 0, 15), 1, 0, 'L');
-            $pdf->Cell(20, 6, ucfirst($pengaduan->status), 1, 1, 'C');
-        }
-
+        $pdf = Pdf::loadView('exports.pdf-table', $data)->setPaper('a4', 'landscape');
         $filename = 'pengaduan_' . now()->format('Y-m-d_H-i-s') . '.pdf';
-        return response($pdf->Output('', 'S'), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => "attachment; filename=\"$filename\"",
-        ]);
+
+        return $pdf->download($filename);
     }
 
     /**
@@ -127,46 +98,32 @@ class ExportService
     }
 
     /**
-     * Export bansos to CSV
+     * Export bansos to Excel
      */
     public function exportBansosCSV($bansos)
     {
-        $filename = 'bansos_' . now()->format('Y-m-d_H-i-s') . '.csv';
-        $handle = fopen('php://memory', 'w');
+        $filename = 'bansos_' . now()->format('Y-m-d_H-i-s') . '.xls';
 
-        fputcsv($handle, [
-            'ID',
-            'Nama Program',
-            'Jenis',
-            'Kuota',
-            'Kuota Terpakai',
-            'Nominal',
-            'Tanggal Mulai',
-            'Tanggal Selesai',
-            'Status'
-        ]);
+        $html = $this->buildExcelHtml('Laporan Program Bantuan Sosial', [
+            'No', 'Nama Program', 'Jenis', 'Kuota', 'Kuota Terpakai', 'Nominal', 'Tgl Mulai', 'Tgl Selesai', 'Status'
+        ], $bansos->map(function ($p, $i) {
+            return [
+                $i + 1,
+                $p->nama_bansos,
+                $p->jenis_bansos ?? '-',
+                $p->kuota,
+                $p->kuota_terpakai,
+                'Rp ' . number_format($p->nominal, 0, ',', '.'),
+                $p->tanggal_mulai ? $p->tanggal_mulai->format('d/m/Y') : '-',
+                $p->tanggal_selesai ? $p->tanggal_selesai->format('d/m/Y') : '-',
+                ucfirst($p->status),
+            ];
+        })->toArray());
 
-        foreach ($bansos as $program) {
-            fputcsv($handle, [
-                $program->id,
-                $program->nama_bansos,
-                $program->jenis_bansos,
-                $program->kuota,
-                $program->kuota_terpakai,
-                'Rp ' . number_format($program->nominal, 0, ',', '.'),
-                $program->tanggal_mulai->format('d/m/Y'),
-                $program->tanggal_selesai->format('d/m/Y'),
-                ucfirst($program->status)
-            ]);
-        }
-
-        rewind($handle);
-        $csv = stream_get_contents($handle);
-        fclose($handle);
-
-        return response($csv, 200, [
-            'Content-Type' => 'text/csv',
+        return response($html, 200, [
+            'Content-Type' => 'application/vnd.ms-excel',
             'Content-Disposition' => "attachment; filename=\"$filename\"",
+            'Cache-Control' => 'max-age=0',
         ]);
     }
 
@@ -175,42 +132,26 @@ class ExportService
      */
     public function exportBansosPDF($bansos)
     {
-        $pdf = new TCPDF();
-        $pdf->AddPage();
-        $pdf->SetFont('Arial', 'B', 14);
-        $pdf->Cell(0, 10, 'LAPORAN PROGRAM BANTUAN SOSIAL', 0, 1, 'C');
-        $pdf->SetFont('Arial', '', 10);
-        $pdf->Cell(0, 5, 'Tanggal: ' . now()->format('d/m/Y H:i'), 0, 1, 'C');
-        $pdf->Ln(5);
+        $data = [
+            'title'   => 'LAPORAN PROGRAM BANTUAN SOSIAL',
+            'date'    => now()->format('d/m/Y H:i'),
+            'headers' => ['No', 'Nama Program', 'Kuota', 'Terpakai', 'Nominal', 'Status'],
+            'rows'    => $bansos->map(function ($p, $i) {
+                return [
+                    $i + 1,
+                    $p->nama_bansos,
+                    $p->kuota,
+                    $p->kuota_terpakai,
+                    'Rp ' . number_format($p->nominal, 0, ',', '.'),
+                    ucfirst($p->status),
+                ];
+            })->toArray(),
+        ];
 
-        $pdf->SetFont('Arial', 'B', 9);
-        $pdf->SetFillColor(102, 126, 234);
-        $pdf->SetTextColor(255, 255, 255);
-        $pdf->Cell(10, 7, 'No', 1, 0, 'C', true);
-        $pdf->Cell(40, 7, 'Program', 1, 0, 'C', true);
-        $pdf->Cell(20, 7, 'Kuota', 1, 0, 'C', true);
-        $pdf->Cell(20, 7, 'Terpakai', 1, 0, 'C', true);
-        $pdf->Cell(35, 7, 'Nominal', 1, 0, 'C', true);
-        $pdf->Cell(25, 7, 'Status', 1, 1, 'C', true);
-
-        $pdf->SetFont('Arial', '', 8);
-        $pdf->SetTextColor(0, 0, 0);
-        $no = 1;
-
-        foreach ($bansos as $program) {
-            $pdf->Cell(10, 6, $no++, 1, 0, 'C');
-            $pdf->Cell(40, 6, substr($program->nama_bansos, 0, 20), 1, 0, 'L');
-            $pdf->Cell(20, 6, $program->kuota, 1, 0, 'C');
-            $pdf->Cell(20, 6, $program->kuota_terpakai, 1, 0, 'C');
-            $pdf->Cell(35, 6, 'Rp ' . number_format($program->nominal, 0, ',', '.'), 1, 0, 'R');
-            $pdf->Cell(25, 6, ucfirst($program->status), 1, 1, 'C');
-        }
-
+        $pdf = Pdf::loadView('exports.pdf-table', $data)->setPaper('a4', 'landscape');
         $filename = 'bansos_' . now()->format('Y-m-d_H-i-s') . '.pdf';
-        return response($pdf->Output('', 'S'), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => "attachment; filename=\"$filename\"",
-        ]);
+
+        return $pdf->download($filename);
     }
 
     /**
@@ -231,46 +172,32 @@ class ExportService
     }
 
     /**
-     * Export penerima bansos to CSV
+     * Export penerima bansos to Excel
      */
     public function exportPenerimaBansosCSV($penerima)
     {
-        $filename = 'penerima_bansos_' . now()->format('Y-m-d_H-i-s') . '.csv';
-        $handle = fopen('php://memory', 'w');
+        $filename = 'penerima_bansos_' . now()->format('Y-m-d_H-i-s') . '.xls';
 
-        fputcsv($handle, [
-            'ID',
-            'Program',
-            'Nama Penerima',
-            'NIK',
-            'No. HP',
-            'Alamat',
-            'Status',
-            'Nominal',
-            'Tanggal Penerimaan'
-        ]);
-
-        foreach ($penerima as $item) {
-            fputcsv($handle, [
-                $item->id,
-                $item->bansos->nama_bansos,
-                $item->user->name,
-                $item->user->nik,
-                $item->user->no_hp,
-                $item->user->alamat,
+        $html = $this->buildExcelHtml('Laporan Penerima Bantuan Sosial', [
+            'No', 'Program', 'Nama Penerima', 'NIK', 'No. HP', 'Alamat', 'Status', 'Nominal', 'Tgl Penerimaan'
+        ], $penerima->map(function ($item, $i) {
+            return [
+                $i + 1,
+                $item->bansos->nama_bansos ?? '-',
+                $item->nama_penerima ?? ($item->user->name ?? '-'),
+                $item->nik ?? ($item->user->nik ?? '-'),
+                $item->no_hp ?? ($item->user->no_hp ?? '-'),
+                $item->alamat ?? ($item->user->alamat ?? '-'),
                 ucfirst($item->status),
                 $item->nominal_diterima ? 'Rp ' . number_format($item->nominal_diterima, 0, ',', '.') : '-',
-                $item->tanggal_penerimaan ? $item->tanggal_penerimaan->format('d/m/Y') : '-'
-            ]);
-        }
+                $item->tanggal_penerimaan ? $item->tanggal_penerimaan->format('d/m/Y') : '-',
+            ];
+        })->toArray());
 
-        rewind($handle);
-        $csv = stream_get_contents($handle);
-        fclose($handle);
-
-        return response($csv, 200, [
-            'Content-Type' => 'text/csv',
+        return response($html, 200, [
+            'Content-Type' => 'application/vnd.ms-excel',
             'Content-Disposition' => "attachment; filename=\"$filename\"",
+            'Cache-Control' => 'max-age=0',
         ]);
     }
 
@@ -279,42 +206,26 @@ class ExportService
      */
     public function exportPenerimaBansosPDF($penerima)
     {
-        $pdf = new TCPDF();
-        $pdf->AddPage();
-        $pdf->SetFont('Arial', 'B', 14);
-        $pdf->Cell(0, 10, 'LAPORAN PENERIMA BANTUAN SOSIAL', 0, 1, 'C');
-        $pdf->SetFont('Arial', '', 10);
-        $pdf->Cell(0, 5, 'Tanggal: ' . now()->format('d/m/Y H:i'), 0, 1, 'C');
-        $pdf->Ln(5);
+        $data = [
+            'title'   => 'LAPORAN PENERIMA BANTUAN SOSIAL',
+            'date'    => now()->format('d/m/Y H:i'),
+            'headers' => ['No', 'Program', 'Nama Penerima', 'NIK', 'Status', 'Nominal'],
+            'rows'    => $penerima->map(function ($item, $i) {
+                return [
+                    $i + 1,
+                    $item->bansos->nama_bansos ?? '-',
+                    $item->nama_penerima ?? ($item->user->name ?? '-'),
+                    $item->nik ?? ($item->user->nik ?? '-'),
+                    ucfirst($item->status),
+                    $item->nominal_diterima ? 'Rp ' . number_format($item->nominal_diterima, 0, ',', '.') : '-',
+                ];
+            })->toArray(),
+        ];
 
-        $pdf->SetFont('Arial', 'B', 8);
-        $pdf->SetFillColor(102, 126, 234);
-        $pdf->SetTextColor(255, 255, 255);
-        $pdf->Cell(8, 7, 'No', 1, 0, 'C', true);
-        $pdf->Cell(30, 7, 'Program', 1, 0, 'C', true);
-        $pdf->Cell(30, 7, 'Nama', 1, 0, 'C', true);
-        $pdf->Cell(25, 7, 'NIK', 1, 0, 'C', true);
-        $pdf->Cell(20, 7, 'Status', 1, 0, 'C', true);
-        $pdf->Cell(30, 7, 'Nominal', 1, 1, 'C', true);
-
-        $pdf->SetFont('Arial', '', 7);
-        $pdf->SetTextColor(0, 0, 0);
-        $no = 1;
-
-        foreach ($penerima as $item) {
-            $pdf->Cell(8, 6, $no++, 1, 0, 'C');
-            $pdf->Cell(30, 6, substr($item->bansos->nama_bansos, 0, 15), 1, 0, 'L');
-            $pdf->Cell(30, 6, substr($item->user->name, 0, 15), 1, 0, 'L');
-            $pdf->Cell(25, 6, $item->user->nik, 1, 0, 'L');
-            $pdf->Cell(20, 6, ucfirst($item->status), 1, 0, 'C');
-            $pdf->Cell(30, 6, $item->nominal_diterima ? 'Rp ' . number_format($item->nominal_diterima, 0, ',', '.') : '-', 1, 1, 'R');
-        }
-
+        $pdf = Pdf::loadView('exports.pdf-table', $data)->setPaper('a4', 'landscape');
         $filename = 'penerima_bansos_' . now()->format('Y-m-d_H-i-s') . '.pdf';
-        return response($pdf->Output('', 'S'), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => "attachment; filename=\"$filename\"",
-        ]);
+
+        return $pdf->download($filename);
     }
 
     /**
@@ -332,40 +243,30 @@ class ExportService
     }
 
     /**
-     * Export pengajuan surat to CSV
+     * Export pengajuan surat to Excel
      */
     public function exportPengajuanSuratCSV($pengajuans)
     {
-        $filename = 'pengajuan_surat_' . now()->format('Y-m-d_H-i-s') . '.csv';
-        $handle = fopen('php://memory', 'w');
+        $filename = 'pengajuan_surat_' . now()->format('Y-m-d_H-i-s') . '.xls';
 
-        fputcsv($handle, [
-            'ID',
-            'Tanggal',
-            'Nama Pemohon',
-            'Jenis Surat',
-            'Keperluan',
-            'Status'
-        ]);
+        $html = $this->buildExcelHtml('Laporan Pengajuan Surat', [
+            'No', 'Tanggal', 'Nama Pemohon', 'NIK', 'Jenis Surat', 'Keperluan', 'Status'
+        ], $pengajuans->map(function ($p, $i) {
+            return [
+                $i + 1,
+                $p->created_at->format('d/m/Y H:i'),
+                $p->user->name,
+                $p->user->nik ?? '-',
+                $p->jenisSurat->nama_surat ?? '-',
+                $p->keperluan,
+                ucfirst($p->status),
+            ];
+        })->toArray());
 
-        foreach ($pengajuans as $pengajuan) {
-            fputcsv($handle, [
-                $pengajuan->id,
-                $pengajuan->created_at->format('d/m/Y H:i'),
-                $pengajuan->user->name,
-                $pengajuan->jenisSurat->nama_surat ?? '-',
-                $pengajuan->keperluan,
-                ucfirst($pengajuan->status)
-            ]);
-        }
-
-        rewind($handle);
-        $csv = stream_get_contents($handle);
-        fclose($handle);
-
-        return response($csv, 200, [
-            'Content-Type' => 'text/csv',
+        return response($html, 200, [
+            'Content-Type' => 'application/vnd.ms-excel',
             'Content-Disposition' => "attachment; filename=\"$filename\"",
+            'Cache-Control' => 'max-age=0',
         ]);
     }
 
@@ -374,39 +275,93 @@ class ExportService
      */
     public function exportPengajuanSuratPDF($pengajuans)
     {
-        $pdf = new TCPDF();
-        $pdf->AddPage();
-        $pdf->SetFont('Arial', 'B', 14);
-        $pdf->Cell(0, 10, 'LAPORAN PENGAJUAN SURAT', 0, 1, 'C');
-        $pdf->SetFont('Arial', '', 10);
-        $pdf->Cell(0, 5, 'Tanggal: ' . now()->format('d/m/Y H:i'), 0, 1, 'C');
-        $pdf->Ln(5);
+        $data = [
+            'title'   => 'LAPORAN PENGAJUAN SURAT',
+            'date'    => now()->format('d/m/Y H:i'),
+            'headers' => ['No', 'Tanggal', 'Nama Pemohon', 'Jenis Surat', 'Keperluan', 'Status'],
+            'rows'    => $pengajuans->map(function ($p, $i) {
+                return [
+                    $i + 1,
+                    $p->created_at->format('d/m/Y'),
+                    $p->user->name,
+                    $p->jenisSurat->nama_surat ?? '-',
+                    $p->keperluan,
+                    ucfirst($p->status),
+                ];
+            })->toArray(),
+        ];
 
-        $pdf->SetFont('Arial', 'B', 9);
-        $pdf->SetFillColor(102, 126, 234);
-        $pdf->SetTextColor(255, 255, 255);
-        $pdf->Cell(10, 7, 'No', 1, 0, 'C', true);
-        $pdf->Cell(30, 7, 'Tanggal', 1, 0, 'C', true);
-        $pdf->Cell(35, 7, 'Pemohon', 1, 0, 'C', true);
-        $pdf->Cell(40, 7, 'Jenis Surat', 1, 0, 'C', true);
-        $pdf->Cell(25, 7, 'Status', 1, 1, 'C', true);
+        $pdf = Pdf::loadView('exports.pdf-table', $data)->setPaper('a4', 'landscape');
+        $filename = 'pengajuan_surat_' . now()->format('Y-m-d_H-i-s') . '.pdf';
 
-        $pdf->SetFont('Arial', '', 8);
-        $pdf->SetTextColor(0, 0, 0);
-        $no = 1;
+        return $pdf->download($filename);
+    }
 
-        foreach ($pengajuans as $pengajuan) {
-            $pdf->Cell(10, 6, $no++, 1, 0, 'C');
-            $pdf->Cell(30, 6, $pengajuan->created_at->format('d/m/Y'), 1, 0, 'L');
-            $pdf->Cell(35, 6, substr($pengajuan->user->name, 0, 18), 1, 0, 'L');
-            $pdf->Cell(40, 6, substr($pengajuan->jenisSurat->nama_surat ?? '-', 0, 20), 1, 0, 'L');
-            $pdf->Cell(25, 6, ucfirst($pengajuan->status), 1, 1, 'C');
+    /**
+     * Build a styled HTML table for Excel export
+     */
+    private function buildExcelHtml(string $title, array $headers, array $rows): string
+    {
+        $headerCells = '';
+        foreach ($headers as $h) {
+            $headerCells .= "<th style=\"background-color:#2d6a4f;color:#ffffff;font-weight:bold;padding:8px 12px;border:1px solid #ccc;white-space:nowrap;\">$h</th>";
         }
 
-        $filename = 'pengajuan_surat_' . now()->format('Y-m-d_H-i-s') . '.pdf';
-        return response($pdf->Output('', 'S'), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => "attachment; filename=\"$filename\"",
-        ]);
+        $bodyRows = '';
+        foreach ($rows as $idx => $row) {
+            $bg = ($idx % 2 === 0) ? '#ffffff' : '#f0faf4';
+            $cells = '';
+            foreach ($row as $cell) {
+                $val = htmlspecialchars((string)$cell);
+                $cells .= "<td style=\"padding:6px 12px;border:1px solid #ddd;background-color:{$bg};\">$val</td>";
+            }
+            $bodyRows .= "<tr>$cells</tr>";
+        }
+
+        return <<<HTML
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:x="urn:schemas-microsoft-com:office:excel"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="UTF-8">
+<meta name="Generator" content="SIPAKAL Desa Kalinaun">
+<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+<x:Name>Laporan</x:Name>
+<x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
+</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+</head>
+<body>
+<table style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:12px;">
+  <tr>
+    <td colspan="{$this->count($headers)}" style="font-size:16px;font-weight:bold;color:#2d6a4f;padding:10px 12px;">
+      SIPAKAL – Desa Kalinaun
+    </td>
+  </tr>
+  <tr>
+    <td colspan="{$this->count($headers)}" style="font-size:13px;font-weight:bold;padding:4px 12px 10px;">
+      {$title}
+    </td>
+  </tr>
+  <tr>
+    <td colspan="{$this->count($headers)}" style="font-size:11px;color:#666;padding:0 12px 12px;">
+      Dicetak pada: {$this->nowFormatted()}
+    </td>
+  </tr>
+  <tr>$headerCells</tr>
+  $bodyRows
+</table>
+</body>
+</html>
+HTML;
+    }
+
+    private function count(array $arr): int
+    {
+        return count($arr);
+    }
+
+    private function nowFormatted(): string
+    {
+        return now()->format('d/m/Y H:i');
     }
 }

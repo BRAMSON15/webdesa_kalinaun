@@ -290,4 +290,34 @@ class AdminService
             'uploaded_by' => $userId,
         ]);
     }
+
+    /**
+     * Get login history
+     */
+    public function getLoginHistory($limit = 50)
+    {
+        return \DB::table('login_attempts')
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
+     * Get user login history
+     */
+    public function getUserLoginHistory($userId, $limit = 20)
+    {
+        $user = User::find($userId);
+        
+        if (!$user) {
+            return [];
+        }
+
+        return \DB::table('login_attempts')
+            ->where('identifier', $user->email)
+            ->where('success', true)
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
+    }
 }

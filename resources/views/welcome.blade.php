@@ -74,9 +74,11 @@
     <div class="container py-4 text-center">
         <h2 class="text-white fw-bold mb-4">Mari Bangun Desa Bersama Kami</h2>
         <p class="text-white-50 mb-5 max-w-2xl mx-auto">Suara Anda sangat berarti bagi kami. Gunakan fitur layanan mandiri untuk berinteraksi langsung dengan sistem informasi desa.</p>
-        <div class="d-flex justify-content-center gap-3">
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
             @guest
-                <a href="{{ route('register') }}" class="btn btn-light rounded-pill px-5 py-3 fw-bold text-primary shadow-lg">Daftar Akun Sekarang</a>
+                <a href="{{ route('masyarakat-login') }}" class="btn btn-light rounded-pill px-5 py-3 fw-bold text-primary shadow-lg">Login Masyarakat</a>
+                <a href="{{ route('admin-login') }}" class="btn btn-outline-light rounded-pill px-5 py-3 fw-bold border-2 shadow-lg">Login Admin/Kades</a>
+                <a href="{{ route('register') }}" class="btn btn-warning rounded-pill px-5 py-3 fw-bold shadow-lg">Daftar Akun Baru</a>
             @else
                 <a href="{{ route(auth()->user()->role . '.dashboard') }}" class="btn btn-light rounded-pill px-5 py-3 fw-bold text-primary shadow-lg">Kembali ke Dashboard</a>
             @endguest

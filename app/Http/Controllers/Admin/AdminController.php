@@ -287,4 +287,17 @@ class AdminController extends Controller
 
         return redirect()->route('admin.arsip-dokumen')->with('success', 'Dokumen berhasil diarsipkan');
     }
+
+    public function loginHistory()
+    {
+        $loginAttempts = $this->adminService->getLoginHistory();
+        return view('admin.login-history', compact('loginAttempts'));
+    }
+
+    public function userLoginHistory($userId)
+    {
+        $user = User::findOrFail($userId);
+        $loginHistory = $this->adminService->getUserLoginHistory($userId);
+        return view('admin.user-login-history', compact('user', 'loginHistory'));
+    }
 }

@@ -15,7 +15,16 @@ Route::get('/', function () {
 
 // Authentication Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+
+// Admin/Kades Login Routes
+Route::get('/admin-login', [AuthController::class, 'showAdminLogin'])->name('admin-login');
+Route::post('/admin-login', [AuthController::class, 'adminLogin'])->name('admin-login.submit')->middleware('throttle:5,1');
+
+// Masyarakat Login Routes
+Route::get('/masyarakat-login', [AuthController::class, 'showMasyarakatLogin'])->name('masyarakat-login');
+Route::post('/masyarakat-login', [AuthController::class, 'masyarakatLogin'])->name('masyarakat-login.submit')->middleware('throttle:5,1');
+
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -27,7 +36,7 @@ Route::get('/reset-password/{token}/{email}', [AuthController::class, 'showReset
 Route::post('/reset-password', [AuthController::class, 'updatePassword'])->name('reset-password.update');
 
 // Admin Routes
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin', 'check.account'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     
     // Profil Desa
@@ -98,8 +107,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/activity-logs/{id}', [\App\Http\Controllers\Admin\ActivityLogController::class, 'show'])->name('activity-logs.show');
     Route::get('/activity-logs/api/statistics', [\App\Http\Controllers\Admin\ActivityLogController::class, 'statistics'])->name('activity-logs.statistics');
     
-    // Bulk Actions
-    Route::post('/bulk/pengaduan/status', [\App\Http\Controllers\Admin\BulkActionController::class, 'updatePengaduanStatus'])->name('bulk.pengaduan.status');
+    // Login History
+    Route::get('/login-history', [\App\Http\Controllers\Admin\AdminController::class, 'loginHistory'])->name('login-history');
+    Route::get('/login-history/user/{userId}', [\App\Http\Controllers\Admin\AdminController::class, 'userLoginHistory'])->name('login-history.user');
     Route::post('/bulk/pengaduan/delete', [\App\Http\Controllers\Admin\BulkActionController::class, 'deletePengaduan'])->name('bulk.pengaduan.delete');
     Route::post('/bulk/penerima/approve', [\App\Http\Controllers\Admin\BulkActionController::class, 'approvePenerimaBansos'])->name('bulk.penerima.approve');
     Route::post('/bulk/penerima/reject', [\App\Http\Controllers\Admin\BulkActionController::class, 'rejectPenerimaBansos'])->name('bulk.penerima.reject');
@@ -107,7 +117,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 });
 
 // Kades Routes
-Route::middleware(['auth', 'role:kades'])->prefix('kades')->name('kades.')->group(function () {
+Route::middleware(['auth', 'role:kades', 'check.account'])->prefix('kades')->name('kades.')->group(function () {
     Route::get('/dashboard', [KadesController::class, 'dashboard'])->name('dashboard');
     
     // Profil Sekdes
@@ -138,7 +148,7 @@ Route::prefix('api')->group(function () {
     Route::get('/search/pengajuan-surat', [\App\Http\Controllers\Api\SearchController::class, 'searchPengajuanSurat']);
     Route::get('/filter-options', [\App\Http\Controllers\Api\SearchController::class, 'getFilterOptions']);
 });
-Route::middleware(['auth', 'role:masyarakat'])->prefix('masyarakat')->name('masyarakat.')->group(function () {
+Route::middleware(['auth', 'role:masyarakat', 'check.account'])->prefix('masyarakat')->name('masyarakat.')->group(function () {
     Route::get('/dashboard', [MasyarakatController::class, 'dashboard'])->name('dashboard');
     
     // Pengajuan Surat

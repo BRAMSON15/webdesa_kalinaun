@@ -10,17 +10,81 @@ use Carbon\Carbon;
 
 class AuthService
 {
-    /**
-     * Attempt user login
-     */
-    public function login($email, $password)
-    {
-        $credentials = [
-            'email' => $email,
-            'password' => $password,
-        ];
+    protected $auditService;
 
-        if (Auth::attempt($credentials)) {
+    public function __construct(LoginAuditService $auditService)
+    {
+        $this->auditService = $auditService;
+    }
+
+    /**
+     * Login masyarakat dengan nama lengkap dan NIK
+     */
+    public function loginMasyarakat($name, $nik)
+    {
+        // Check if login is blocked
+        if ($this->auditService->isLoginBlocked($name, 'masyarakat')) {
+            throw new \Exception('Terlalu banyak percobaan login gagal. Silakan coba lagi dalam 15 menit.');
+        }
+
+        $user = User::where('name', $name)
+            ->where('nik', $nik)
+            ->where('role', 'masyarakat')
+            ->first();
+
+        if (!$user) {
+            $this->auditService->recordLoginAttempt($name, 'masyarakat', false, 'Invalid credentials');
+            return null;
+        }
+
+        if (!$user->is_active) {
+            $this->auditService->recordLoginAttempt($name, 'masyarakat', false, 'Account inactive');
+            throw new \Exception('Akun Anda tidak aktif. Hubungi admin untuk informasi lebih lanjut.');
+        }
+
+        // Manual login
+        Auth::login($user);
+        $this->auditService->recordSuccessfulLogin($user);
+        $this->auditService->clearFailedAttempts($name, 'masyarakat');
+        
+        return $user;
+    }
+
+    /**
+     * Login admin/kades dengan email dan password
+     */
+    public function loginAdmin($email, $password)
+    {
+        // Check if login is blocked
+        if ($this->auditService->isLoginBlocked($email, 'admin')) {
+            throw new \Exception('Terlalu banyak percobaan login gagal. Silakan coba lagi dalam 15 menit.');
+        }
+
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            $this->auditService->recordLoginAttempt($email, 'admin', false, 'User not found');
+            return null;
+        }
+
+        if (!Hash::check($password, $user->password)) {
+            $this->auditService->recordLoginAttempt($email, 'admin', false, 'Invalid password');
+            return null;
+        }
+
+        if (!in_array($user->role, ['admin', 'kades'])) {
+            $this->auditService->recordLoginAttempt($email, 'admin', false, 'Invalid role');
+            throw new \Exception('Akses ditolak. Hanya admin dan kades yang dapat login di portal ini.');
+        }
+
+        if (!$user->is_active) {
+            $this->auditService->recordLoginAttempt($email, 'admin', false, 'Account inactive');
+            throw new \Exception('Akun Anda tidak aktif. Hubungi admin untuk informasi lebih lanjut.');
+        }
+
+        if (Auth::attempt(['email' => $email, 'password' => $password])) {
+            $this->auditService->recordSuccessfulLogin($user);
+            $this->auditService->clearFailedAttempts($email, 'admin');
             return Auth::user();
         }
 
@@ -28,7 +92,37 @@ class AuthService
     }
 
     /**
-     * Register new user
+     * Generic login (backward compatibility)
+     */
+    public function login($email, $password, $role = null)
+    {
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            $this->auditService->recordLoginAttempt($email, 'generic', false, 'User not found');
+            return null;
+        }
+
+        if (!Hash::check($password, $user->password)) {
+            $this->auditService->recordLoginAttempt($email, 'generic', false, 'Invalid password');
+            return null;
+        }
+
+        if ($role && $user->role !== $role) {
+            $this->auditService->recordLoginAttempt($email, 'generic', false, 'Invalid role');
+            throw new \Exception("User tidak memiliki akses ke portal {$role}. Silakan login dengan akun yang sesuai.");
+        }
+
+        if (Auth::attempt(['email' => $email, 'password' => $password])) {
+            $this->auditService->recordSuccessfulLogin($user);
+            return Auth::user();
+        }
+
+        return null;
+    }
+
+    /**
+     * Register new user (masyarakat only)
      */
     public function register($data)
     {
@@ -42,6 +136,7 @@ class AuthService
             'no_hp' => $data['no_hp'],
             'tanggal_lahir' => $data['tanggal_lahir'],
             'jenis_kelamin' => $data['jenis_kelamin'],
+            'is_active' => true,
         ]);
 
         return $user;
@@ -77,6 +172,7 @@ class AuthService
         return [
             'token' => $resetToken,
             'email' => $user->email,
+            'role' => $user->role,
         ];
     }
 
