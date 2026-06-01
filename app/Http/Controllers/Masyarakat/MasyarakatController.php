@@ -3,52 +3,34 @@
 namespace App\Http\Controllers\Masyarakat;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use App\Models\PengajuanSurat;
+use App\Services\MasyarakatService;
+use App\Services\NotificationService;
 use App\Models\JenisSurat;
-use App\Models\InformasiDesa;
-use App\Models\ProfilDesa;
-use App\Models\Pengaduan;
-use App\Models\Bansos;
-use App\Models\PenerimaBansos;
+use Illuminate\Http\Request;
 
 class MasyarakatController extends Controller
 {
+    private $masyarakatService;
+
+    public function __construct(MasyarakatService $masyarakatService)
+    {
+        $this->masyarakatService = $masyarakatService;
+    }
+
     public function dashboard()
     {
         $user = auth()->user();
-        
-        $stats = [
-            'total_pengajuan' => $user->pengajuanSurats()->count(),
-            'pengajuan_diproses' => $user->pengajuanSurats()->where('status', 'diproses')->count(),
-            'pengajuan_disetujui' => $user->pengajuanSurats()->where('status', 'disetujui')->count(),
-            'pengajuan_ditolak' => $user->pengajuanSurats()->where('status', 'ditolak')->count(),
-            'total_pengaduan' => Pengaduan::where('user_id', $user->id)->count(),
-            'pengaduan_diproses' => Pengaduan::where('user_id', $user->id)->where('status', 'diproses')->count(),
-            'bansos_aktif' => Bansos::aktif()->withQuota()->count(),
-            'bansos_terdaftar' => PenerimaBansos::where('user_id', $user->id)->count(),
-        ];
-
-        $pengajuanTerbaru = $user->pengajuanSurats()
-            ->with('jenisSurat')
-            ->latest()
-            ->take(5)
-            ->get();
-
-        $informasiTerbaru = InformasiDesa::published()
-            ->latest()
-            ->take(3)
-            ->get();
-
-        $jenisSurat = JenisSurat::active()->get();
+        $stats = $this->masyarakatService->getDashboardStats($user);
+        $pengajuanTerbaru = $this->masyarakatService->getRecentPengajuan($user);
+        $informasiTerbaru = $this->masyarakatService->getRecentInformasi();
+        $jenisSurat = $this->masyarakatService->getActiveJenisSurat();
 
         return view('masyarakat.dashboard', compact('stats', 'pengajuanTerbaru', 'informasiTerbaru', 'jenisSurat'));
     }
 
     public function pengajuanSurat()
     {
-        $jenisSurats = JenisSurat::active()->get();
+        $jenisSurats = $this->masyarakatService->getActiveJenisSurat();
         return view('masyarakat.pengajuan-surat.index', compact('jenisSurats'));
     }
 
@@ -68,9 +50,7 @@ class MasyarakatController extends Controller
         ]);
 
         $data = $request->only(['jenis_surat_id', 'keperluan', 'data_formulir']);
-        $data['user_id'] = auth()->id();
 
-        // Handle file uploads
         if ($request->hasFile('dokumen_pendukung')) {
             $dokumenPaths = [];
             foreach ($request->file('dokumen_pendukung') as $file) {
@@ -79,7 +59,7 @@ class MasyarakatController extends Controller
             $data['dokumen_pendukung'] = $dokumenPaths;
         }
 
-        PengajuanSurat::create($data);
+        $this->masyarakatService->createPengajuan(auth()->user(), $data);
 
         return redirect()->route('masyarakat.riwayat-pengajuan')
             ->with('success', 'Pengajuan surat berhasil disubmit');
@@ -87,23 +67,7 @@ class MasyarakatController extends Controller
 
     public function riwayatPengajuan(Request $request)
     {
-        $query = auth()->user()->pengajuanSurats()->with('jenisSurat');
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        if ($request->filled('bulan')) {
-            $query->whereMonth('created_at', $request->bulan);
-        }
-
-        if ($request->filled('tahun')) {
-            $query->whereYear('created_at', $request->tahun);
-        }
-
-        $pengajuans = $query->latest()->paginate(10);
-        
-        // Append query strings to pagination links
+        $pengajuans = $this->masyarakatService->getFilteredPengajuan(auth()->user(), $request->all());
         $pengajuans->appends($request->all());
 
         return view('masyarakat.riwayat-pengajuan', compact('pengajuans'));
@@ -111,43 +75,36 @@ class MasyarakatController extends Controller
 
     public function detailPengajuan($id)
     {
-        $pengajuan = auth()->user()->pengajuanSurats()
-            ->with(['jenisSurat', 'diproses'])
-            ->findOrFail($id);
-
+        $pengajuan = $this->masyarakatService->getPengajuanDetail(auth()->user(), $id);
         return view('masyarakat.detail-pengajuan', compact('pengajuan'));
     }
 
     public function downloadSurat($id)
     {
-        $pengajuan = auth()->user()->pengajuanSurats()->findOrFail($id);
+        $pengajuan = $this->masyarakatService->getPengajuanDetail(auth()->user(), $id);
         
         if ($pengajuan->status !== 'disetujui') {
             return redirect()->back()->with('error', 'Surat belum disetujui');
         }
 
-        // Generate PDF surat (implementasi sederhana)
         return view('masyarakat.download-surat', compact('pengajuan'));
     }
 
     public function informasiDesa()
     {
-        $informasis = InformasiDesa::published()
-            ->latest()
-            ->paginate(10);
-
+        $informasis = $this->masyarakatService->getInformasiDesa();
         return view('masyarakat.informasi-desa', compact('informasis'));
     }
 
     public function detailInformasi($id)
     {
-        $informasi = InformasiDesa::published()->findOrFail($id);
+        $informasi = $this->masyarakatService->getInformasiDetail($id);
         return view('masyarakat.detail-informasi', compact('informasi'));
     }
 
     public function profilDesa()
     {
-        $profil = ProfilDesa::first();
+        $profil = $this->masyarakatService->getProfilDesa();
         return view('masyarakat.profil-desa', compact('profil'));
     }
 
@@ -166,7 +123,7 @@ class MasyarakatController extends Controller
             'no_hp' => 'required|string',
         ]);
 
-        auth()->user()->update($request->only(['name', 'email', 'alamat', 'no_hp']));
+        $this->masyarakatService->updateProfile(auth()->user(), $request->only(['name', 'email', 'alamat', 'no_hp']));
 
         return redirect()->back()->with('success', 'Profil berhasil diupdate');
     }
@@ -178,18 +135,11 @@ class MasyarakatController extends Controller
             'password' => 'required|min:8|confirmed',
         ]);
 
-        $user = auth()->user();
-
-        // Verify current password
-        if (!Hash::check($request->current_password, $user->password)) {
-            return redirect()->back()->withErrors(['current_password' => 'Password saat ini tidak sesuai']);
+        try {
+            $this->masyarakatService->updatePassword(auth()->user(), $request->current_password, $request->password);
+            return redirect()->back()->with('success', 'Password berhasil diubah');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['current_password' => $e->getMessage()]);
         }
-
-        // Update password
-        $user->update([
-            'password' => Hash::make($request->password)
-        ]);
-
-        return redirect()->back()->with('success', 'Password berhasil diubah');
     }
 }

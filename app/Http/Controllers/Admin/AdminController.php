@@ -3,47 +3,33 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Services\AdminService;
 use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\PengajuanSurat;
-use App\Models\JenisSurat;
-use App\Models\ProfilDesa;
-use App\Models\InformasiDesa;
-use App\Models\ArsipDokumen;
-use App\Models\Pengaduan;
-use App\Models\Bansos;
-use App\Models\PenerimaBansos;
 
 class AdminController extends Controller
 {
+    protected $adminService;
+
+    public function __construct(AdminService $adminService)
+    {
+        $this->adminService = $adminService;
+    }
+
     public function dashboard()
     {
-        $stats = [
-            'total_users' => User::count(),
-            'total_pengajuan' => PengajuanSurat::count(),
-            'pengajuan_pending' => PengajuanSurat::where('status', 'diproses')->count(),
-            'total_informasi' => InformasiDesa::count(),
-            'total_pengaduan' => Pengaduan::count(),
-            'pengaduan_baru' => Pengaduan::where('status', 'baru')->count(),
-            'pengaduan_diproses' => Pengaduan::where('status', 'diproses')->count(),
-            'pengaduan_selesai' => Pengaduan::where('status', 'selesai')->count(),
-            'total_bansos' => Bansos::count(),
-            'bansos_aktif' => Bansos::where('status', 'aktif')->count(),
-            'total_penerima_bansos' => PenerimaBansos::count(),
-            'penerima_disetujui' => PenerimaBansos::where('status', 'disetujui')->count(),
-        ];
+        $stats = $this->adminService->getDashboardStats();
+        $data = $this->adminService->getRecentData();
 
-        $pengajuanTerbaru = PengajuanSurat::with(['user', 'jenisSurat'])->latest()->take(5)->get();
-        $pengaduanTerbaru = Pengaduan::with('user')->latest()->take(5)->get();
-        $bansosAktif = Bansos::where('status', 'aktif')->latest()->take(5)->get();
-
-        return view('admin.dashboard', compact('stats', 'pengajuanTerbaru', 'pengaduanTerbaru', 'bansosAktif'));
+        return view('admin.dashboard', array_merge(
+            compact('stats'),
+            $data
+        ));
     }
 
     // Kelola Profil Desa
     public function profilDesa()
     {
-        $profil = ProfilDesa::first();
+        $profil = $this->adminService->getProfilDesa();
         return view('admin.profil-desa', compact('profil'));
     }
 
@@ -61,12 +47,7 @@ class AdminController extends Controller
             'sejarah' => 'nullable|string',
         ]);
 
-        $profil = ProfilDesa::first();
-        if ($profil) {
-            $profil->update($request->all());
-        } else {
-            ProfilDesa::create($request->all());
-        }
+        $this->adminService->updateProfilDesa($request->all());
 
         return redirect()->back()->with('success', 'Profil desa berhasil diupdate');
     }
@@ -74,14 +55,14 @@ class AdminController extends Controller
     // Kelola Status Pengajuan Surat
     public function pengajuanSurat()
     {
-        $pengajuans = PengajuanSurat::with(['user', 'jenisSurat'])->latest()->get();
+        $pengajuans = $this->adminService->getPengajuanSurat();
         return view('admin.pengajuan-surat', compact('pengajuans'));
     }
 
     // Kelola Informasi Desa
     public function informasiDesa()
     {
-        $informasis = InformasiDesa::with('creator')->latest()->get();
+        $informasis = $this->adminService->getInformasiDesa();
         return view('admin.informasi-desa.index', compact('informasis'));
     }
 
@@ -100,26 +81,24 @@ class AdminController extends Controller
         ]);
 
         $data = $request->all();
-        $data['created_by'] = auth()->id();
-
         if ($request->hasFile('gambar')) {
-            $data['gambar'] = $request->file('gambar')->store('informasi', 'public');
+            $data['gambar'] = $request->file('gambar');
         }
 
-        InformasiDesa::create($data);
+        $this->adminService->createInformasi($data, auth()->id());
 
         return redirect()->route('admin.informasi-desa')->with('success', 'Informasi berhasil ditambahkan');
     }
 
     public function showInformasi($id)
     {
-        $informasi = InformasiDesa::with('creator')->findOrFail($id);
+        $informasi = $this->adminService->getInformasiById($id);
         return view('admin.informasi-desa.show', compact('informasi'));
     }
 
     public function editInformasi($id)
     {
-        $informasi = InformasiDesa::findOrFail($id);
+        $informasi = $this->adminService->getInformasiById($id);
         return view('admin.informasi-desa.edit', compact('informasi'));
     }
 
@@ -132,32 +111,19 @@ class AdminController extends Controller
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $informasi = InformasiDesa::findOrFail($id);
         $data = $request->all();
-
         if ($request->hasFile('gambar')) {
-            // Delete old image if exists
-            if ($informasi->gambar) {
-                \Storage::disk('public')->delete($informasi->gambar);
-            }
-            $data['gambar'] = $request->file('gambar')->store('informasi', 'public');
+            $data['gambar'] = $request->file('gambar');
         }
 
-        $informasi->update($data);
+        $this->adminService->updateInformasi($id, $data);
 
         return redirect()->route('admin.informasi-desa')->with('success', 'Informasi berhasil diperbarui');
     }
 
     public function destroyInformasi($id)
     {
-        $informasi = InformasiDesa::findOrFail($id);
-        
-        // Delete image if exists
-        if ($informasi->gambar) {
-            \Storage::disk('public')->delete($informasi->gambar);
-        }
-        
-        $informasi->delete();
+        $this->adminService->deleteInformasi($id);
 
         return redirect()->route('admin.informasi-desa')->with('success', 'Informasi berhasil dihapus');
     }
@@ -165,7 +131,7 @@ class AdminController extends Controller
     // Kelola Data Pengguna
     public function dataPengguna()
     {
-        $users = User::latest()->get();
+        $users = $this->adminService->getAllUsers();
         return view('admin.data-pengguna', compact('users'));
     }
 
@@ -184,76 +150,51 @@ class AdminController extends Controller
             'role' => 'nullable|in:masyarakat,kades',
         ]);
 
-        $user = User::findOrFail($id);
-        
-        // Don't allow changing admin role
-        if ($user->role === 'admin') {
-            return response()->json(['success' => false, 'message' => 'Tidak dapat mengubah data admin'], 403);
+        try {
+            $user = $this->adminService->updateUser($id, $request->all());
+            return response()->json([
+                'success' => true,
+                'message' => 'Data pengguna berhasil diperbarui',
+                'user' => $user
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 403);
         }
-
-        $user->update($request->all());
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Data pengguna berhasil diperbarui',
-            'user' => $user
-        ]);
     }
 
     public function deletePengguna($id)
     {
-        $user = User::findOrFail($id);
-        
-        // Don't allow deleting admin users
-        if ($user->role === 'admin') {
-            return response()->json(['success' => false, 'message' => 'Tidak dapat menghapus data admin'], 403);
-        }
-
-        // Don't allow deleting if user has active pengajuan
-        $activePengajuan = PengajuanSurat::where('user_id', $id)
-            ->whereIn('status', ['proses', 'diproses'])
-            ->count();
-
-        if ($activePengajuan > 0) {
+        try {
+            $this->adminService->deleteUser($id);
             return response()->json([
-                'success' => false, 
-                'message' => 'Tidak dapat menghapus pengguna yang memiliki pengajuan aktif'
-            ], 422);
+                'success' => true,
+                'message' => 'Data pengguna berhasil dihapus'
+            ]);
+        } catch (\Exception $e) {
+            $code = strpos($e->getMessage(), 'pengajuan aktif') !== false ? 422 : 403;
+            return response()->json(['success' => false, 'message' => $e->getMessage()], $code);
         }
-
-        $user->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Data pengguna berhasil dihapus'
-        ]);
     }
 
     public function resetPasswordPengguna($id)
     {
-        $user = User::findOrFail($id);
-        
-        // Don't allow resetting admin password
-        if ($user->role === 'admin') {
-            return response()->json(['success' => false, 'message' => 'Tidak dapat reset password admin'], 403);
+        try {
+            $tempPassword = $this->adminService->resetUserPassword($id);
+            return response()->json([
+                'success' => true,
+                'message' => 'Password berhasil direset',
+                'temp_password' => $tempPassword,
+                'note' => 'Berikan password sementara ini kepada pengguna. Pengguna dapat mengubahnya setelah login.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 403);
         }
-
-        // Generate temporary password
-        $tempPassword = 'Desa' . date('Ymd') . rand(1000, 9999);
-        $user->update(['password' => bcrypt($tempPassword)]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Password berhasil direset',
-            'temp_password' => $tempPassword,
-            'note' => 'Berikan password sementara ini kepada pengguna. Pengguna dapat mengubahnya setelah login.'
-        ]);
     }
 
     // Kelola Jenis Surat
     public function jenisSurat()
     {
-        $jenisSurats = JenisSurat::latest()->get();
+        $jenisSurats = $this->adminService->getJenisSurat();
         return view('admin.jenis-surat.index', compact('jenisSurats'));
     }
 
@@ -270,20 +211,20 @@ class AdminController extends Controller
             'persyaratan' => 'nullable|array',
         ]);
 
-        JenisSurat::create($request->all());
+        $this->adminService->createJenisSurat($request->all());
 
         return redirect()->route('admin.jenis-surat')->with('success', 'Jenis surat berhasil ditambahkan');
     }
 
     public function showJenisSurat($id)
     {
-        $jenisSurat = JenisSurat::findOrFail($id);
+        $jenisSurat = $this->adminService->getJenisSuratById($id);
         return view('admin.jenis-surat.show', compact('jenisSurat'));
     }
 
     public function editJenisSurat($id)
     {
-        $jenisSurat = JenisSurat::findOrFail($id);
+        $jenisSurat = $this->adminService->getJenisSuratById($id);
         return view('admin.jenis-surat.edit', compact('jenisSurat'));
     }
 
@@ -296,16 +237,14 @@ class AdminController extends Controller
             'is_active' => 'nullable|boolean',
         ]);
 
-        $jenisSurat = JenisSurat::findOrFail($id);
-        $jenisSurat->update($request->all());
+        $this->adminService->updateJenisSurat($id, $request->all());
 
         return redirect()->route('admin.jenis-surat')->with('success', 'Jenis surat berhasil diperbarui');
     }
 
     public function destroyJenisSurat($id)
     {
-        $jenisSurat = JenisSurat::findOrFail($id);
-        $jenisSurat->delete();
+        $this->adminService->deleteJenisSurat($id);
 
         return redirect()->route('admin.jenis-surat')->with('success', 'Jenis surat berhasil dihapus');
     }
@@ -313,19 +252,18 @@ class AdminController extends Controller
     // Mencetak Surat
     public function cetakSurat($id)
     {
-        $pengajuan = PengajuanSurat::with(['user', 'jenisSurat'])->findOrFail($id);
-        
-        if ($pengajuan->status !== 'disetujui') {
-            return redirect()->back()->with('error', 'Surat belum disetujui');
+        try {
+            $pengajuan = $this->adminService->getPengajuanForPrint($id);
+            return view('admin.cetak-surat', compact('pengajuan'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         }
-
-        return view('admin.cetak-surat', compact('pengajuan'));
     }
 
     // Kelola Arsip Dokumen
     public function arsipDokumen()
     {
-        $arsips = ArsipDokumen::with('uploader')->latest()->get();
+        $arsips = $this->adminService->getArsipDokumen();
         return view('admin.arsip-dokumen.index', compact('arsips'));
     }
 
@@ -345,20 +283,7 @@ class AdminController extends Controller
             'file' => 'required|file|mimes:pdf,doc,docx|max:10240',
         ]);
 
-        $file = $request->file('file');
-        $filePath = $file->store('arsip', 'public');
-
-        ArsipDokumen::create([
-            'nama_dokumen' => $request->nama_dokumen,
-            'nomor_dokumen' => $request->nomor_dokumen,
-            'deskripsi' => $request->deskripsi,
-            'file_path' => $filePath,
-            'file_type' => $file->getClientOriginalExtension(),
-            'file_size' => $file->getSize(),
-            'kategori' => $request->kategori,
-            'tanggal_dokumen' => $request->tanggal_dokumen,
-            'uploaded_by' => auth()->id(),
-        ]);
+        $this->adminService->createArsip($request->all(), auth()->id());
 
         return redirect()->route('admin.arsip-dokumen')->with('success', 'Dokumen berhasil diarsipkan');
     }

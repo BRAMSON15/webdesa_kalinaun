@@ -4,13 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
+use App\Services\AuthService;
 
 class AuthController extends Controller
 {
+    protected $authService;
+
+    public function __construct(AuthService $authService)
+    {
+        $this->authService = $authService;
+    }
+
     public function showLogin()
     {
         return view('auth.login');
@@ -23,22 +27,11 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $credentials = $request->only('email', 'password');
+        $user = $this->authService->login($request->email, $request->password);
 
-        if (Auth::attempt($credentials)) {
-            $user = Auth::user();
-            
-            // Redirect berdasarkan role
-            switch ($user->role) {
-                case 'admin':
-                    return redirect()->route('admin.dashboard');
-                case 'kades':
-                    return redirect()->route('kades.dashboard');
-                case 'masyarakat':
-                    return redirect()->route('masyarakat.dashboard');
-                default:
-                    return redirect()->route('home');
-            }
+        if ($user) {
+            $route = $this->authService->getRedirectRoute($user);
+            return redirect()->route($route);
         }
 
         return back()->withErrors([
@@ -64,18 +57,7 @@ class AuthController extends Controller
             'jenis_kelamin' => 'required|in:L,P',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'masyarakat', // Default role
-            'nik' => $request->nik,
-            'alamat' => $request->alamat,
-            'no_hp' => $request->no_hp,
-            'tanggal_lahir' => $request->tanggal_lahir,
-            'jenis_kelamin' => $request->jenis_kelamin,
-        ]);
-
+        $user = $this->authService->register($request->all());
         Auth::login($user);
 
         return redirect()->route('masyarakat.dashboard');
@@ -83,11 +65,10 @@ class AuthController extends Controller
 
     public function logout()
     {
-        Auth::logout();
+        $this->authService->logout();
         return redirect()->route('login');
     }
 
-    // Forgot Password Methods
     public function showForgotPassword()
     {
         return view('auth.forgot-password');
@@ -101,42 +82,24 @@ class AuthController extends Controller
             'email.exists' => 'Email tidak ditemukan dalam sistem.',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $result = $this->authService->sendResetToken($request->email);
 
-        if (!$user) {
+        if (!$result) {
             return back()->withErrors(['email' => 'Email tidak ditemukan.']);
         }
 
-        // Generate token reset
-        $resetToken = Str::random(32);
-        $expiresAt = Carbon::now()->addHours(24); // Token berlaku 24 jam
-
-        // Simpan token ke database
-        $user->update([
-            'reset_token' => $resetToken,
-            'reset_token_expires_at' => $expiresAt,
-        ]);
-
-        // Redirect ke halaman reset password dengan token
         return redirect()->route('reset-password', [
-            'token' => $resetToken,
-            'email' => $user->email,
+            'token' => $result['token'],
+            'email' => $result['email'],
         ])->with('success', 'Token reset telah dikirim. Silakan gunakan token di bawah untuk reset password Anda.');
     }
 
     public function showResetPassword($token, $email)
     {
-        $user = User::where('email', $email)
-            ->where('reset_token', $token)
-            ->first();
+        $user = $this->authService->validateResetToken($token, $email);
 
         if (!$user) {
-            return redirect()->route('login')->withErrors(['error' => 'Token tidak valid.']);
-        }
-
-        // Cek apakah token sudah expired
-        if ($user->reset_token_expires_at && Carbon::now()->isAfter($user->reset_token_expires_at)) {
-            return redirect()->route('login')->withErrors(['error' => 'Token sudah kadaluarsa. Silakan minta token baru.']);
+            return redirect()->route('login')->withErrors(['error' => 'Token tidak valid atau sudah kadaluarsa.']);
         }
 
         return view('auth.reset-password', [
@@ -154,25 +117,11 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = User::where('email', $request->email)
-            ->where('reset_token', $request->token)
-            ->first();
+        $success = $this->authService->updatePassword($request->token, $request->email, $request->password);
 
-        if (!$user) {
-            return back()->withErrors(['error' => 'Token tidak valid.']);
+        if (!$success) {
+            return back()->withErrors(['error' => 'Token tidak valid atau sudah kadaluarsa.']);
         }
-
-        // Cek apakah token sudah expired
-        if ($user->reset_token_expires_at && Carbon::now()->isAfter($user->reset_token_expires_at)) {
-            return back()->withErrors(['error' => 'Token sudah kadaluarsa.']);
-        }
-
-        // Update password dan hapus token
-        $user->update([
-            'password' => Hash::make($request->password),
-            'reset_token' => null,
-            'reset_token_expires_at' => null,
-        ]);
 
         return redirect()->route('login')->with('success', 'Password berhasil direset. Silakan login dengan password baru Anda.');
     }

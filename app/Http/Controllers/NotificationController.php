@@ -2,20 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Notification;
+use App\Services\NotificationManagementService;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
+    protected $notificationService;
+
+    public function __construct(NotificationManagementService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     /**
      * Get unread notifications count
      */
     public function getUnreadCount()
     {
-        $count = Notification::where('user_id', auth()->id())
-            ->whereNull('read_at')
-            ->count();
-
+        $count = $this->notificationService->getUnreadCount(auth()->id());
         return response()->json(['count' => $count]);
     }
 
@@ -24,12 +28,7 @@ class NotificationController extends Controller
      */
     public function getUnread()
     {
-        $notifications = Notification::where('user_id', auth()->id())
-            ->whereNull('read_at')
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get();
-
+        $notifications = $this->notificationService->getUnread(auth()->id());
         return response()->json($notifications);
     }
 
@@ -38,25 +37,21 @@ class NotificationController extends Controller
      */
     public function index()
     {
-        $notifications = Notification::where('user_id', auth()->id())
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
-
+        $notifications = $this->notificationService->getAllNotifications(auth()->id());
         return view('notifications.index', compact('notifications'));
     }
 
     /**
      * Mark notification as read
      */
-    public function markAsRead(Notification $notification)
+    public function markAsRead($notificationId)
     {
-        if ($notification->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized');
+        try {
+            $this->notificationService->markAsRead($notificationId, auth()->id());
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 403);
         }
-
-        $notification->markAsRead();
-
-        return response()->json(['success' => true]);
     }
 
     /**
@@ -64,25 +59,21 @@ class NotificationController extends Controller
      */
     public function markAllAsRead()
     {
-        Notification::where('user_id', auth()->id())
-            ->whereNull('read_at')
-            ->update(['read_at' => now()]);
-
+        $this->notificationService->markAllAsRead(auth()->id());
         return response()->json(['success' => true]);
     }
 
     /**
      * Delete notification
      */
-    public function destroy(Notification $notification)
+    public function destroy($notificationId)
     {
-        if ($notification->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized');
+        try {
+            $this->notificationService->deleteNotification($notificationId, auth()->id());
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 403);
         }
-
-        $notification->delete();
-
-        return response()->json(['success' => true]);
     }
 
     /**
@@ -90,8 +81,7 @@ class NotificationController extends Controller
      */
     public function deleteAll()
     {
-        Notification::where('user_id', auth()->id())->delete();
-
+        $this->notificationService->deleteAllNotifications(auth()->id());
         return response()->json(['success' => true]);
     }
 }
