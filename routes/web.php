@@ -92,6 +92,18 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     
     // Analytics
     Route::get('/analytics', [\App\Http\Controllers\AnalyticsController::class, 'index'])->name('analytics');
+    
+    // Activity Logs
+    Route::get('/activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
+    Route::get('/activity-logs/{id}', [\App\Http\Controllers\Admin\ActivityLogController::class, 'show'])->name('activity-logs.show');
+    Route::get('/activity-logs/api/statistics', [\App\Http\Controllers\Admin\ActivityLogController::class, 'statistics'])->name('activity-logs.statistics');
+    
+    // Bulk Actions
+    Route::post('/bulk/pengaduan/status', [\App\Http\Controllers\Admin\BulkActionController::class, 'updatePengaduanStatus'])->name('bulk.pengaduan.status');
+    Route::post('/bulk/pengaduan/delete', [\App\Http\Controllers\Admin\BulkActionController::class, 'deletePengaduan'])->name('bulk.pengaduan.delete');
+    Route::post('/bulk/penerima/approve', [\App\Http\Controllers\Admin\BulkActionController::class, 'approvePenerimaBansos'])->name('bulk.penerima.approve');
+    Route::post('/bulk/penerima/reject', [\App\Http\Controllers\Admin\BulkActionController::class, 'rejectPenerimaBansos'])->name('bulk.penerima.reject');
+    Route::post('/bulk/export', [\App\Http\Controllers\Admin\BulkActionController::class, 'export'])->name('bulk.export');
 });
 
 // Kades Routes
@@ -119,7 +131,13 @@ Route::middleware(['auth', 'role:kades'])->prefix('kades')->name('kades.')->grou
     Route::get('/laporan-arsip', [KadesController::class, 'laporanArsip'])->name('laporan-arsip');
 });
 
-// Masyarakat Routes
+// API Routes
+Route::prefix('api')->group(function () {
+    Route::get('/search/pengaduan', [\App\Http\Controllers\Api\SearchController::class, 'searchPengaduan']);
+    Route::get('/search/penerima-bansos', [\App\Http\Controllers\Api\SearchController::class, 'searchPenerimaBansos']);
+    Route::get('/search/pengajuan-surat', [\App\Http\Controllers\Api\SearchController::class, 'searchPengajuanSurat']);
+    Route::get('/filter-options', [\App\Http\Controllers\Api\SearchController::class, 'getFilterOptions']);
+});
 Route::middleware(['auth', 'role:masyarakat'])->prefix('masyarakat')->name('masyarakat.')->group(function () {
     Route::get('/dashboard', [MasyarakatController::class, 'dashboard'])->name('dashboard');
     

@@ -4,6 +4,11 @@ namespace App\Services;
 
 use App\Models\Notification;
 use App\Models\User;
+use App\Mail\BansosApprovedMail;
+use App\Mail\BansosRejectedMail;
+use App\Mail\LetterCompletedMail;
+use App\Mail\LetterRejectedMail;
+use Illuminate\Support\Facades\Mail;
 
 class NotificationService
 {
@@ -107,8 +112,20 @@ class NotificationService
         
         if ($penerima->status === 'disetujui') {
             $message .= ' Nominal yang akan Anda terima adalah Rp ' . number_format($penerima->nominal_diterima, 0, ',', '.');
+            // Send email
+            try {
+                Mail::to($penerima->user->email)->send(new BansosApprovedMail($penerima));
+            } catch (\Exception $e) {
+                \Log::error('Email error: ' . $e->getMessage());
+            }
         } elseif ($penerima->status === 'ditolak' && $penerima->alasan_penolakan) {
             $message .= ' Alasan: ' . $penerima->alasan_penolakan;
+            // Send email
+            try {
+                Mail::to($penerima->user->email)->send(new BansosRejectedMail($penerima));
+            } catch (\Exception $e) {
+                \Log::error('Email error: ' . $e->getMessage());
+            }
         }
 
         return self::send(
@@ -194,7 +211,13 @@ class NotificationService
         $message .= "Kami informasikan bahwa pendaftaran Anda untuk program bantuan sosial telah *DISETUJUI*:\n\n";
         $message .= "📋 *Program:* {$bansos->nama_bansos}\n";
         $message .= "💰 *Nominal:* Rp " . number_format($penerima->nominal_diterima, 0, ',', '.') . "\n";
-        $message .= "📅 *Tanggal Persetujuan:* " . $penerima->tanggal_penerimaan->format('d/m/Y') . "\n\n";
+        
+        if ($penerima->tanggal_penerimaan) {
+            $message .= "📅 *Tanggal Persetujuan:* " . $penerima->tanggal_penerimaan->format('d/m/Y') . "\n\n";
+        } else {
+            $message .= "📅 *Tanggal Persetujuan:* " . now()->format('d/m/Y') . "\n\n";
+        }
+        
         $message .= "Silakan hubungi kantor desa untuk informasi lebih lanjut mengenai proses pencairan bantuan.\n\n";
         $message .= "_Selamat dan semoga bermanfaat._\n";
         $message .= "Sistem Informasi Desa";
@@ -312,4 +335,61 @@ class NotificationService
 
         return "https://wa.me/{$phoneNumber}?text={$encodedMessage}";
     }
+
+    /**
+     * Send email notification for letter completion
+     */
+    public static function sendLetterCompletedEmail($pengajuan)
+    {
+        try {
+            Mail::to($pengajuan->user->email)->send(new LetterCompletedMail($pengajuan));
+            return true;
+        } catch (\Exception $e) {
+            \Log::error('Email error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Send email notification for letter rejection
+     */
+    public static function sendLetterRejectedEmail($pengajuan)
+    {
+        try {
+            Mail::to($pengajuan->user->email)->send(new LetterRejectedMail($pengajuan));
+            return true;
+        } catch (\Exception $e) {
+            \Log::error('Email error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Send email notification for bansos approval
+     */
+    public static function sendBansosApprovedEmail($penerima)
+    {
+        try {
+            Mail::to($penerima->user->email)->send(new BansosApprovedMail($penerima));
+            return true;
+        } catch (\Exception $e) {
+            \Log::error('Email error: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Send email notification for bansos rejection
+     */
+    public static function sendBansosRejectedEmail($penerima)
+    {
+        try {
+            Mail::to($penerima->user->email)->send(new BansosRejectedMail($penerima));
+            return true;
+        } catch (\Exception $e) {
+            \Log::error('Email error: ' . $e->getMessage());
+            return false;
+        }
+    }
 }
+

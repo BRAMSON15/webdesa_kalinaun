@@ -72,6 +72,11 @@
             <i class="fa fa-chart-line"></i> <span>Analytics & Laporan</span>
         </a>
     </li>
+    <li class="sidebar-item {{ request()->routeIs('admin.activity-logs*') ? 'active-admin' : '' }}">
+        <a href="{{ route('admin.activity-logs.index') }}">
+            <i class="fa fa-history"></i> <span>Activity Log</span>
+        </a>
+    </li>
     <li>
         <form action="{{ route('logout') }}" method="POST">
             @csrf
