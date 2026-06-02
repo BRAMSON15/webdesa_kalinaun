@@ -35,9 +35,9 @@
             <form method="POST" action="{{ route('admin-login.submit') }}">
                 @csrf
                 <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <i class="fas fa-envelope icon-left"></i>
-                    <input type="email" class="form-input @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autofocus>
+                    <label class="form-label">Username</label>
+                    <i class="fas fa-user icon-left"></i>
+                    <input type="text" class="form-input @error('email') is-invalid @enderror" name="email" placeholder="Masukkan username Anda" value="{{ old('email') }}" required autofocus>
                     @error('email')
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
@@ -60,6 +60,13 @@
 
             <div class="register-link">
                 Kembali ke <a href="{{ route('masyarakat-login') }}">Portal Masyarakat</a>
+            </div>
+
+            <div class="back-home-button-container">
+                <a href="{{ route('home') }}" class="btn-back-home">
+                    <i class="fas fa-home"></i>
+                    <span>Kembali ke Beranda</span>
+                </a>
             </div>
 
         </div>
@@ -88,6 +95,69 @@
         font-weight: 500;
         color: #333;
         margin-bottom: 0.5rem;
+    }
+
+    .back-home-button-container {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #e8e8e8;
+    }
+
+    .btn-back-home {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 14px 20px;
+        background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+        color: #333;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.95rem;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        gap: 10px;
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-back-home:hover {
+        background: linear-gradient(135deg, #eeeeee 0%, #f5f5f5 100%);
+        border-color: #999;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .btn-back-home:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-back-home i {
+        font-size: 18px;
+        color: #28a745;
+    }
+
+    .btn-back-home span {
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    @media (max-width: 576px) {
+        .back-home-button-container {
+            margin-top: 20px;
+            padding-top: 15px;
+        }
+
+        .btn-back-home {
+            padding: 12px 16px;
+            font-size: 0.9rem;
+        }
+
+        .btn-back-home i {
+            font-size: 16px;
+        }
     }
 </style>
 @endsection

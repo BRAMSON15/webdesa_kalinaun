@@ -415,22 +415,28 @@
                     <div class="stat-item-label">Total Kuota</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-item-value">{{ $bansos->penerimaBansos()->whereIn('status', ['disetujui', 'diterima'])->count() ?? 0 }}</div>
+                    <div class="stat-item-value">{{ $bansos->penerima->whereIn('status', ['disetujui', 'diterima'])->count() ?? 0 }}</div>
                     <div class="stat-item-label">Sudah Diterima</div>
                 </div>
             </div>
+
+            @php
+                $totalReceived = $bansos->penerima->whereIn('status', ['disetujui', 'diterima'])->count();
+                $percentage = $bansos->kuota > 0 ? round(($totalReceived / $bansos->kuota) * 100) : 0;
+                $percentageDisplay = min($percentage, 100);
+            @endphp
 
             <div class="progress-section" style="margin-top: 20px;">
                 <div class="progress-header">
                     <span class="progress-header-title">Persentase Penerima</span>
                     <span class="progress-header-value">
-                        {{ $bansos->kuota > 0 ? round(($bansos->penerimaBansos()->whereIn('status', ['disetujui', 'diterima'])->count() / $bansos->kuota) * 100) : 0 }}%
+                        {{ $percentage }}%
                     </span>
                 </div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: {{ $bansos->kuota > 0 ? min(($bansos->penerimaBansos()->whereIn('status', ['disetujui', 'diterima'])->count() / $bansos->kuota) * 100, 100) : 0 }}%;">
-                        @if ($bansos->kuota > 0 && ($bansos->penerimaBansos()->whereIn('status', ['disetujui', 'diterima'])->count() / $bansos->kuota) * 100 >= 20)
-                            {{ round(($bansos->penerimaBansos()->whereIn('status', ['disetujui', 'diterima'])->count() / $bansos->kuota) * 100) }}%
+                    <div class="progress-fill" style="width: {{ $percentageDisplay }}%;">
+                        @if ($percentage >= 20)
+                            {{ $percentage }}%
                         @endif
                     </div>
                 </div>
