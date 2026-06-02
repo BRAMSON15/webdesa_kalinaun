@@ -3,109 +3,197 @@
 @section('title', 'Pengajuan Surat - SIPAKAL')
 
 @section('content')
-                    <!-- Page Header -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <h4 class="card-title text-primary">
-                                        <i class="fas fa-plus-circle"></i> Buat Pengajuan Surat
-                                    </h4>
-                                    <p class="card-text">Pilih jenis surat yang ingin Anda ajukan</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<style>
+    :root {
+        --primary-green: #28a745;
+        --primary-dark: #1f7e34;
+        --light-green: #c8e6c9;
+        --very-light-green: #e8f5e9;
+        --text-dark: #2d5016;
+        --text-gray: #666;
+        --border-light: #e0e0e0;
+    }
 
-                    <!-- Available Letter Types -->
-                    <div class="row">
-                        @if($jenisSurats->count() > 0)
-                            @foreach($jenisSurats as $jenis)
-                                <div class="col-md-6 mb-4">
-                                    <div class="card h-100 shadow-sm">
-                                        <div class="card-body">
-                                            <h5 class="card-title">
-                                                <i class="fas fa-file-alt text-primary"></i> 
-                                                {{ $jenis->nama_surat }}
-                                            </h5>
-                                            <p class="card-text">{{ $jenis->deskripsi ?? 'Surat keterangan resmi dari desa' }}</p>
-                                            
-                                            @if($jenis->persyaratan)
-                                                <div class="mb-3">
-                                                    <strong>Persyaratan:</strong>
-                                                    <ul class="mt-2">
-                                                        @foreach($jenis->persyaratan as $syarat)
-                                                            <li>{{ $syarat }}</li>
-                                                        @endforeach
-                                                    </ul>
-                                                </div>
-                                            @endif
-                                            
-                                            <a href="{{ route('masyarakat.pengajuan-surat.create', $jenis->id) }}" 
-                                               class="btn btn-primary">
-                                                <i class="fas fa-plus"></i> Ajukan Surat
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        @else
-                            <!-- Default letter types if no data -->
-                            <div class="col-md-6 mb-4">
-                                <div class="card h-100 shadow-sm">
-                                    <div class="card-body">
-                                        <h5 class="card-title">
-                                            <i class="fas fa-home text-primary"></i> 
-                                            Surat Keterangan Domisili
-                                        </h5>
-                                        <p class="card-text">Surat keterangan tempat tinggal</p>
-                                        <div class="mb-3">
-                                            <strong>Persyaratan:</strong>
-                                            <ul class="mt-2">
-                                                <li>KTP</li>
-                                                <li>KK</li>
-                                                <li>Surat Pengantar RT/RW</li>
-                                            </ul>
-                                        </div>
-                                        <button class="btn btn-primary" onclick="alert('Silakan hubungi admin untuk mengaktifkan fitur ini')">
-                                            <i class="fas fa-plus"></i> Ajukan Surat
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-4">
-                                <div class="card h-100 shadow-sm">
-                                    <div class="card-body">
-                                        <h5 class="card-title">
-                                            <i class="fas fa-user text-primary"></i> 
-                                            Surat Keterangan Usaha
-                                        </h5>
-                                        <p class="card-text">Surat keterangan memiliki usaha</p>
-                                        <div class="mb-3">
-                                            <strong>Persyaratan:</strong>
-                                            <ul class="mt-2">
-                                                <li>KTP</li>
-                                                <li>KK</li>
-                                                <li>Foto Tempat Usaha</li>
-                                            </ul>
-                                        </div>
-                                        <button class="btn btn-primary" onclick="alert('Silakan hubungi admin untuk mengaktifkan fitur ini')">
-                                            <i class="fas fa-plus"></i> Ajukan Surat
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
+    .page-container {
+        background: #f5f5f5;
+        padding-bottom: 100px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
 
-                    @if($jenisSurats->count() == 0)
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="alert alert-info text-center">
-                                    <i class="fas fa-info-circle"></i>
-                                    Belum ada jenis surat yang tersedia. Silakan hubungi admin desa.
-                                </div>
-                            </div>
-                        </div>
-                    @endif
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-green) 0%, #20c997 100%);
+        color: white;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-header h4 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .page-header p {
+        margin: 5px 0 0 0;
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .content-section {
+        padding: 15px;
+        margin-bottom: 10px;
+        background: white;
+        border-radius: 8px;
+    }
+
+    .section-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .jenis-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+    }
+
+    .jenis-card {
+        background: var(--very-light-green);
+        border: 2px solid transparent;
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+        text-decoration: none;
+        color: var(--text-dark);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .jenis-card:hover {
+        border-color: var(--primary-green);
+        background: #d4edda;
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+        transform: translateY(-3px);
+    }
+
+    .jenis-card i {
+        font-size: 32px;
+        color: var(--primary-green);
+        margin-bottom: 10px;
+    }
+
+    .jenis-card h6 {
+        margin: 0;
+        font-size: 0.85rem;
+        font-weight: 600;
+        line-height: 1.3;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+    }
+
+    .empty-state i {
+        font-size: 64px;
+        color: #ddd;
+        margin-bottom: 15px;
+    }
+
+    .empty-state p {
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 15px;
+        background: var(--light-green);
+        color: var(--text-dark);
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+    }
+
+    .back-btn:hover {
+        background: #a5d6a7;
+        transform: translateX(-3px);
+    }
+
+    @media (max-width: 768px) {
+        .jenis-grid {
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        }
+    }
+
+    @media (max-width: 576px) {
+        .jenis-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .page-header h4 {
+            font-size: 1.1rem;
+        }
+
+        .jenis-card i {
+            font-size: 28px;
+        }
+
+        .jenis-card h6 {
+            font-size: 0.75rem;
+        }
+    }
+</style>
+
+<div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+        <h4><i class="fas fa-file-alt"></i> Pilih Jenis Surat</h4>
+        <p>Silakan pilih jenis surat yang ingin Anda ajukan</p>
+    </div>
+
+    <!-- Back Button -->
+    <div style="padding: 0 15px;">
+        <a href="{{ route('masyarakat.dashboard') }}" class="back-btn">
+            <i class="fas fa-chevron-left"></i> Kembali
+        </a>
+    </div>
+
+    <!-- Content Section -->
+    <div class="content-section">
+        @if(isset($jenisSurats) && $jenisSurats->count() > 0)
+            <div class="section-title">
+                <i class="fas fa-list"></i> Daftar Jenis Surat
+            </div>
+            <div class="jenis-grid">
+                @foreach($jenisSurats as $jenis)
+                <a href="{{ route('masyarakat.pengajuan-surat.create', $jenis->id) }}" class="jenis-card">
+                    <i class="fas fa-file-contract"></i>
+                    <h6>{{ $jenis->nama_surat }}</h6>
+                </a>
+                @endforeach
+            </div>
+        @else
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>Tidak ada jenis surat yang tersedia</p>
+        </div>
+        @endif
+    </div>
+</div>
+
 @endsection

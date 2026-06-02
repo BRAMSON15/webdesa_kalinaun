@@ -1,6 +1,6 @@
 @extends('layouts.masyarakat')
 
-@section('title', 'Detail Pendaftaran Bansos')
+@section('title', 'Detail Pengajuan Surat')
 
 @section('content')
 <style>
@@ -205,15 +205,11 @@
         margin-top: 2px;
     }
 
-    .action-buttons {
-        display: flex;
-        gap: 10px;
-        margin-top: 20px;
-    }
-
-    .btn {
-        flex: 1;
+    .download-btn {
+        width: 100%;
         padding: 12px 15px;
+        background: linear-gradient(135deg, var(--primary-green) 0%, #1f7e34 100%);
+        color: white;
         border: none;
         border-radius: 8px;
         font-weight: 600;
@@ -225,42 +221,38 @@
         justify-content: center;
         gap: 8px;
         text-decoration: none;
+        margin-top: 20px;
     }
 
-    .btn-primary {
-        background: linear-gradient(135deg, var(--primary-green) 0%, #1f7e34 100%);
-        color: white;
-        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
-    }
-
-    .btn-primary:hover {
+    .download-btn:hover {
         background: linear-gradient(135deg, #1f7e34 0%, #15572e 100%);
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
     }
 
-    .btn-secondary {
+    .back-btn {
+        width: 100%;
+        padding: 12px 15px;
         background: #e0e0e0;
         color: #333;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+        margin-top: 10px;
     }
 
-    .btn-secondary:hover {
+    .back-btn:hover {
         background: #d0d0d0;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    }
-
-    .btn-danger {
-        background: #dc3545;
-        color: white;
-        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.2);
-    }
-
-    .btn-danger:hover {
-        background: #c82333;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
     }
 
     .alert-custom {
@@ -279,23 +271,63 @@
         border-left: 4px solid #28a745;
     }
 
-    .alert-info-custom {
-        background: #d1ecf1;
-        color: #0c5460;
-        border-left: 4px solid #17a2b8;
+    .documents-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .documents-list li {
+        padding: 12px;
+        background: var(--very-light-green);
+        border-radius: 8px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-left: 3px solid var(--primary-green);
+    }
+
+    .documents-list li:last-child {
+        margin-bottom: 0;
+    }
+
+    .documents-list li i {
+        font-size: 18px;
+        color: var(--primary-green);
+        min-width: 20px;
+        text-align: center;
+    }
+
+    .documents-list li a {
+        color: var(--primary-green);
+        text-decoration: none;
+        flex: 1;
+        font-size: 0.9rem;
+        font-weight: 600;
+        word-break: break-all;
+    }
+
+    .documents-list li a:hover {
+        color: var(--primary-dark);
+        text-decoration: underline;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 20px;
+        color: #999;
+        font-size: 0.9rem;
+    }
+
+    .empty-state i {
+        font-size: 32px;
+        color: #ddd;
+        margin-bottom: 10px;
     }
 
     @media (max-width: 768px) {
         .page-header h1 {
             font-size: 1.3rem;
-        }
-
-        .action-buttons {
-            flex-direction: column;
-        }
-
-        .btn {
-            width: 100%;
         }
     }
 </style>
@@ -303,12 +335,12 @@
 <div class="mobile-page">
     <!-- Header -->
     <div class="page-header">
-        <a href="{{ route('masyarakat.bansos.applications') }}" class="page-header-back">
+        <a href="{{ route('masyarakat.riwayat-pengajuan') }}" class="page-header-back">
             <i class="fas fa-arrow-left"></i>
         </a>
         <div class="page-header-title">
-            <h1>Detail Pendaftaran</h1>
-            <p>{{ $penerima->bansos->nama_bansos ?? 'Bansos' }}</p>
+            <h1>Detail Pengajuan</h1>
+            <p>{{ $pengajuan->jenisSurat->nama_surat ?? 'Surat Keterangan' }}</p>
         </div>
     </div>
 
@@ -324,54 +356,30 @@
         <!-- Main Detail Card -->
         <div class="detail-card">
             <div class="detail-card-header">
-                <i class="fas fa-hand-holding-heart"></i>
-                <h2>Informasi Program</h2>
+                <i class="fas fa-file-alt"></i>
+                <h2>Informasi Pengajuan</h2>
             </div>
 
             <div class="detail-section">
                 <div class="detail-label">
-                    <i class="fas fa-heading"></i> Nama Program
+                    <i class="fas fa-heading"></i> Jenis Surat
                 </div>
                 <div class="detail-value">
-                    {{ $penerima->bansos->nama_bansos ?? 'N/A' }}
+                    {{ $pengajuan->jenisSurat->nama_surat ?? 'N/A' }}
                 </div>
             </div>
 
             <div class="detail-section">
                 <div class="detail-label">
-                    <i class="fas fa-coins"></i> Nominal Bantuan
-                </div>
-                <div class="detail-value">
-                    Rp{{ number_format($penerima->bansos->nominal ?? 0, 0, ',', '.') }}
-                </div>
-            </div>
-
-            <div class="detail-section">
-                <div class="detail-label">
-                    <i class="fas fa-calendar-alt"></i> Periode Program
-                </div>
-                <div class="detail-value">
-                    {{ \Carbon\Carbon::parse($penerima->bansos->tanggal_mulai ?? now())->format('d M Y') }} - 
-                    {{ \Carbon\Carbon::parse($penerima->bansos->tanggal_selesai ?? now())->format('d M Y') }}
-                </div>
-            </div>
-        </div>
-
-        <!-- Application Status Card -->
-        <div class="detail-card">
-            <div class="detail-card-header">
-                <i class="fas fa-info-circle"></i>
-                <h2>Status Pendaftaran</h2>
-            </div>
-
-            <div class="detail-section">
-                <div class="detail-label">
-                    <i class="fas fa-tasks"></i> Status Saat Ini
+                    <i class="fas fa-info-circle"></i> Status
                 </div>
                 <div style="margin-bottom: 0;">
-                    @switch($penerima->status)
-                        @case('menunggu')
-                            <span class="badge badge-warning">Menunggu Verifikasi</span>
+                    @switch($pengajuan->status)
+                        @case('baru')
+                            <span class="badge badge-warning">Baru</span>
+                            @break
+                        @case('diproses')
+                            <span class="badge badge-info">Diproses</span>
                             @break
                         @case('disetujui')
                             <span class="badge badge-success">Disetujui</span>
@@ -379,77 +387,50 @@
                         @case('ditolak')
                             <span class="badge badge-danger">Ditolak</span>
                             @break
-                        @case('diterima')
-                            <span class="badge badge-success">Sudah Diterima</span>
-                            @break
                     @endswitch
                 </div>
             </div>
 
             <div class="detail-section">
                 <div class="detail-label">
-                    <i class="fas fa-calendar-check"></i> Tanggal Pendaftaran
+                    <i class="fas fa-pencil-alt"></i> Tujuan Pengajuan
                 </div>
                 <div class="detail-value">
-                    {{ $penerima->created_at->format('d M Y, H:i') }}
+                    {{ $pengajuan->keperluan ?? 'N/A' }}
                 </div>
             </div>
 
-            @if ($penerima->keterangan)
             <div class="detail-section">
                 <div class="detail-label">
-                    <i class="fas fa-comment"></i> Keterangan
+                    <i class="fas fa-calendar-alt"></i> Tanggal
                 </div>
                 <div class="detail-value">
-                    {{ $penerima->keterangan }}
+                    Dibuat: {{ $pengajuan->created_at->format('d M Y, H:i') }}<br>
+                    Diubah: {{ $pengajuan->updated_at->format('d M Y, H:i') }}
                 </div>
             </div>
-            @endif
         </div>
 
-        <!-- Applicant Info Card -->
+        <!-- Documents Card -->
+        @if ($pengajuan->dokumen_pendukung && is_array($pengajuan->dokumen_pendukung) && count($pengajuan->dokumen_pendukung) > 0)
         <div class="detail-card">
             <div class="detail-card-header">
-                <i class="fas fa-user"></i>
-                <h2>Data Penerima</h2>
+                <i class="fas fa-paperclip"></i>
+                <h2>Dokumen Pendukung</h2>
             </div>
 
-            <div class="detail-section">
-                <div class="detail-label">
-                    <i class="fas fa-user-circle"></i> Nama
-                </div>
-                <div class="detail-value">
-                    {{ $penerima->user->name ?? 'N/A' }}
-                </div>
-            </div>
-
-            <div class="detail-section">
-                <div class="detail-label">
-                    <i class="fas fa-envelope"></i> Email
-                </div>
-                <div class="detail-value">
-                    {{ $penerima->user->email ?? 'N/A' }}
-                </div>
-            </div>
-
-            <div class="detail-section">
-                <div class="detail-label">
-                    <i class="fas fa-phone"></i> Nomor HP
-                </div>
-                <div class="detail-value">
-                    {{ $penerima->user->no_hp ?? 'N/A' }}
-                </div>
-            </div>
-
-            <div class="detail-section">
-                <div class="detail-label">
-                    <i class="fas fa-map-marker-alt"></i> Alamat
-                </div>
-                <div class="detail-value">
-                    {{ $penerima->user->alamat ?? 'N/A' }}
-                </div>
-            </div>
+            <ul class="documents-list">
+                @foreach ($pengajuan->dokumen_pendukung as $dokumen)
+                <li>
+                    <i class="fas fa-file"></i>
+                    <a href="{{ asset('storage/' . $dokumen) }}" download>
+                        {{ basename($dokumen) }}
+                    </a>
+                </li>
+                @endforeach
+            </ul>
         </div>
+        @endif
 
         <!-- Timeline Card -->
         <div class="detail-card">
@@ -464,15 +445,15 @@
                         <i class="fas fa-check"></i>
                     </div>
                     <div class="status-text">
-                        <div class="status-text-title">Pendaftaran Diterima</div>
-                        <div class="status-text-desc">{{ $penerima->created_at->format('d M Y, H:i') }}</div>
+                        <div class="status-text-title">Pengajuan Diterima</div>
+                        <div class="status-text-desc">{{ $pengajuan->created_at->format('d M Y, H:i') }}</div>
                     </div>
                 </div>
 
-                @if ($penerima->updated_at && $penerima->updated_at != $penerima->created_at)
+                @if ($pengajuan->status !== 'baru')
                 <div class="status-item">
-                    <div class="status-icon" style="background: @if($penerima->status === 'ditolak') #dc3545 @else var(--primary-green) @endif;">
-                        @if($penerima->status === 'ditolak')
+                    <div class="status-icon" style="background: @if($pengajuan->status === 'ditolak') #dc3545 @else var(--primary-green) @endif;">
+                        @if($pengajuan->status === 'ditolak')
                             <i class="fas fa-times"></i>
                         @else
                             <i class="fas fa-check"></i>
@@ -480,45 +461,35 @@
                     </div>
                     <div class="status-text">
                         <div class="status-text-title">
-                            @switch($penerima->status)
+                            @switch($pengajuan->status)
+                                @case('diproses')
+                                    Sedang Diproses
+                                    @break
                                 @case('disetujui')
-                                    Disetujui oleh Admin
+                                    Disetujui
                                     @break
                                 @case('ditolak')
-                                    Ditolak oleh Admin
+                                    Ditolak
                                     @break
-                                @case('diterima')
-                                    Bantuan Diterima
-                                    @break
-                                @default
-                                    Diperbarui
                             @endswitch
                         </div>
-                        <div class="status-text-desc">{{ $penerima->updated_at->format('d M Y, H:i') }}</div>
+                        <div class="status-text-desc">{{ $pengajuan->updated_at->format('d M Y, H:i') }}</div>
                     </div>
                 </div>
                 @endif
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        @if ($penerima->status === 'menunggu')
-        <div class="action-buttons">
-            <form action="{{ route('masyarakat.bansos.cancel-application', $penerima) }}" method="POST" style="flex: 1;" onsubmit="return confirm('Yakin ingin membatalkan pendaftaran ini?');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-danger" style="width: 100%;">
-                    <i class="fas fa-times-circle"></i> Batalkan Pendaftaran
-                </button>
-            </form>
-        </div>
+        <!-- Download Button (if approved) -->
+        @if ($pengajuan->status === 'disetujui')
+        <a href="{{ route('masyarakat.download-surat', $pengajuan->id) }}" class="download-btn">
+            <i class="fas fa-download"></i> Unduh Surat
+        </a>
         @endif
 
-        <div class="action-buttons" style="margin-top: 10px;">
-            <a href="{{ route('masyarakat.bansos.applications') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Kembali
-            </a>
-        </div>
+        <a href="{{ route('masyarakat.riwayat-pengajuan') }}" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Kembali
+        </a>
     </div>
 </div>
 @endsection

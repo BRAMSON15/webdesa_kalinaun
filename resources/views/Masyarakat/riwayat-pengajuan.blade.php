@@ -3,220 +3,306 @@
 @section('title', 'Riwayat Pengajuan - SIPAKAL')
 
 @section('content')
-                    <!-- Page Header -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <h4 class="card-title text-primary">
-                                        <i class="fas fa-history"></i> Riwayat Pengajuan Surat
-                                    </h4>
-                                    <p class="card-text">Daftar semua pengajuan surat yang pernah Anda ajukan beserta statusnya.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<style>
+    :root {
+        --primary-green: #28a745;
+        --primary-dark: #1f7e34;
+        --light-green: #c8e6c9;
+        --very-light-green: #e8f5e9;
+        --text-dark: #2d5016;
+        --text-gray: #666;
+        --border-light: #e0e0e0;
+    }
 
-                    <!-- Quick Stats -->
-                    <div class="row mb-4">
-                        <div class="col-md-3 mb-3">
-                            <div class="card text-white bg-primary shadow-sm">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h6 class="card-title">Total Pengajuan</h6>
-                                            <h2 class="mb-0">{{ auth()->user()->pengajuanSurats()->count() }}</h2>
-                                        </div>
-                                        <div>
-                                            <i class="fas fa-file-alt fa-3x opacity-50"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="card text-white bg-warning shadow-sm">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h6 class="card-title">Sedang Diproses</h6>
-                                            <h2 class="mb-0">{{ auth()->user()->pengajuanSurats()->where('status', 'diproses')->count() }}</h2>
-                                        </div>
-                                        <div>
-                                            <i class="fas fa-clock fa-3x opacity-50"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="card text-white bg-success shadow-sm">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h6 class="card-title">Disetujui</h6>
-                                            <h2 class="mb-0">{{ auth()->user()->pengajuanSurats()->where('status', 'disetujui')->count() }}</h2>
-                                        </div>
-                                        <div>
-                                            <i class="fas fa-check-circle fa-3x opacity-50"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="card text-white bg-danger shadow-sm">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h6 class="card-title">Ditolak</h6>
-                                            <h2 class="mb-0">{{ auth()->user()->pengajuanSurats()->where('status', 'ditolak')->count() }}</h2>
-                                        </div>
-                                        <div>
-                                            <i class="fas fa-times-circle fa-3x opacity-50"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    .page-container {
+        background: #f5f5f5;
+        padding-bottom: 100px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
 
-                    <!-- Filter Section -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="card shadow-sm">
-                                <div class="card-body">
-                                    <form method="GET" action="{{ route('masyarakat.riwayat-pengajuan') }}" class="row g-3">
-                                        <div class="col-md-3">
-                                            <label for="status" class="form-label">Status</label>
-                                            <select class="form-select" id="status" name="status">
-                                                <option value="">Semua Status</option>
-                                                <option value="diproses" {{ request('status') == 'diproses' ? 'selected' : '' }}>Diproses</option>
-                                                <option value="disetujui" {{ request('status') == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
-                                                <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label for="bulan" class="form-label">Bulan</label>
-                                            <select class="form-select" id="bulan" name="bulan">
-                                                <option value="">Semua Bulan</option>
-                                                @for($i = 1; $i <= 12; $i++)
-                                                    <option value="{{ $i }}" {{ request('bulan') == $i ? 'selected' : '' }}>
-                                                        {{ DateTime::createFromFormat('!m', $i)->format('F') }}
-                                                    </option>
-                                                @endfor
-                                            </select>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <label for="tahun" class="form-label">Tahun</label>
-                                            <select class="form-select" id="tahun" name="tahun">
-                                                <option value="">Semua Tahun</option>
-                                                @for($y = date('Y'); $y >= date('Y') - 3; $y--)
-                                                    <option value="{{ $y }}" {{ request('tahun') == $y ? 'selected' : '' }}>{{ $y }}</option>
-                                                @endfor
-                                            </select>
-                                        </div>
-                                        <div class="col-md-3 d-flex align-items-end">
-                                            <button type="submit" class="btn btn-primary me-2">
-                                                <i class="fas fa-filter"></i> Filter
-                                            </button>
-                                            <a href="{{ route('masyarakat.riwayat-pengajuan') }}" class="btn btn-secondary">
-                                                <i class="fas fa-redo"></i> Reset
-                                            </a>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-green) 0%, #20c997 100%);
+        color: white;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
 
-                    <!-- Table Section -->
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card shadow-sm">
-                                <div class="card-header bg-primary text-white">
-                                    <h5 class="mb-0"><i class="fas fa-list"></i> Daftar Pengajuan Surat</h5>
-                                </div>
-                                <div class="card-body">
-                                    @if($pengajuans->count() > 0)
-                                        <div class="table-responsive">
-                                            <table class="table table-hover">
-                                                <thead class="table-light">
-                                                    <tr>
-                                                        <th>No</th>
-                                                        <th>Tanggal Pengajuan</th>
-                                                        <th>Jenis Surat</th>
-                                                        <th>Keperluan</th>
-                                                        <th>Status</th>
-                                                        <th>Nomor Surat</th>
-                                                        <th>Aksi</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($pengajuans as $index => $pengajuan)
-                                                        <tr>
-                                                            <td>{{ $pengajuans->firstItem() + $index }}</td>
-                                                            <td>{{ $pengajuan->created_at->format('d/m/Y H:i') }}</td>
-                                                            <td>{{ $pengajuan->jenisSurat->nama_surat }}</td>
-                                                            <td>{{ Str::limit($pengajuan->keperluan, 50) }}</td>
-                                                            <td>
-                                                                @if($pengajuan->status == 'diproses')
-                                                                    <span class="badge bg-warning text-dark">
-                                                                        <i class="fas fa-clock"></i> Sedang Diproses
-                                                                    </span>
-                                                                @elseif($pengajuan->status == 'disetujui')
-                                                                    <span class="badge bg-success">
-                                                                        <i class="fas fa-check-circle"></i> Disetujui
-                                                                    </span>
-                                                                @else
-                                                                    <span class="badge bg-danger">
-                                                                        <i class="fas fa-times-circle"></i> Ditolak
-                                                                    </span>
-                                                                @endif
-                                                            </td>
-                                                            <td>
-                                                                @if($pengajuan->nomor_surat)
-                                                                    <code>{{ $pengajuan->nomor_surat }}</code>
-                                                                @else
-                                                                    <span class="text-muted">-</span>
-                                                                @endif
-                                                            </td>
-                                                            <td>
-                                                                <div class="btn-group" role="group">
-                                                                    <a href="{{ route('masyarakat.detail-pengajuan', $pengajuan->id) }}" 
-                                                                       class="btn btn-sm btn-info">
-                                                                        <i class="fas fa-eye"></i> Detail
-                                                                    </a>
-                                                                    @if($pengajuan->status == 'disetujui' && $pengajuan->nomor_surat)
-                                                                        <a href="{{ route('masyarakat.download-surat', $pengajuan->id) }}" 
-                                                                           class="btn btn-sm btn-success" target="_blank">
-                                                                            <i class="fas fa-download"></i> Download
-                                                                        </a>
-                                                                    @endif
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
+    .page-header h4 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-                                        <!-- Pagination -->
-                                        <div class="d-flex justify-content-center mt-3">
-                                            {{ $pengajuans->links() }}
-                                        </div>
-                                    @else
-                                        <div class="text-center py-5">
-                                            <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
-                                            <h5 class="text-muted">Belum ada pengajuan surat</h5>
-                                            <p class="text-muted">Anda belum pernah mengajukan surat apapun</p>
-                                            <a href="{{ route('masyarakat.pengajuan-surat') }}" class="btn btn-primary">
-                                                <i class="fas fa-plus"></i> Buat Pengajuan Pertama
-                                            </a>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    .page-header p {
+        margin: 5px 0 0 0;
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .content-section {
+        padding: 15px;
+        margin-bottom: 10px;
+        background: white;
+    }
+
+    .section-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filter-section {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 8px 12px;
+        border: 1px solid var(--border-light);
+        background: white;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: var(--text-dark);
+    }
+
+    .filter-btn.active {
+        background: var(--primary-green);
+        color: white;
+        border-color: var(--primary-green);
+    }
+
+    .filter-btn:hover {
+        border-color: var(--primary-green);
+    }
+
+    .pengajuan-item {
+        background: var(--very-light-green);
+        border-left: 4px solid var(--primary-green);
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .pengajuan-item:hover {
+        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.15);
+    }
+
+    .pengajuan-info small {
+        display: block;
+        color: #999;
+        font-size: 0.75rem;
+        margin-bottom: 4px;
+    }
+
+    .pengajuan-info div {
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .pengajuan-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .badge {
+        font-size: 0.7rem;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-weight: 600;
+        text-align: center;
+        min-width: 70px;
+    }
+
+    .badge-primary {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .badge-success {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .badge-warning {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .badge-danger {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .action-link {
+        padding: 6px 12px;
+        background: var(--primary-green);
+        color: white;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .action-link:hover {
+        background: var(--primary-dark);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+    }
+
+    .empty-state i {
+        font-size: 64px;
+        color: #ddd;
+        margin-bottom: 15px;
+    }
+
+    .empty-state p {
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 15px;
+        background: var(--light-green);
+        color: var(--text-dark);
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+    }
+
+    .back-btn:hover {
+        background: #a5d6a7;
+        transform: translateX(-3px);
+    }
+
+    @media (max-width: 576px) {
+        .pengajuan-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .pengajuan-status {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .action-link {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+
+<div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+        <h4><i class="fas fa-history"></i> Riwayat Pengajuan Surat</h4>
+        <p>Lihat semua pengajuan surat Anda</p>
+    </div>
+
+    <!-- Back Button -->
+    <div style="padding: 0 15px;">
+        <a href="{{ route('masyarakat.dashboard') }}" class="back-btn">
+            <i class="fas fa-chevron-left"></i> Kembali
+        </a>
+    </div>
+
+    <!-- Content Section -->
+    <div class="content-section">
+        @if(isset($pengajuans) && $pengajuans->count() > 0)
+            <div class="section-title">
+                <i class="fas fa-list"></i> Daftar Pengajuan Anda
+            </div>
+
+            <!-- Filter -->
+            <div class="filter-section">
+                <button class="filter-btn active" onclick="filterStatus('all')">Semua</button>
+                <button class="filter-btn" onclick="filterStatus('diproses')">Diproses</button>
+                <button class="filter-btn" onclick="filterStatus('disetujui')">Disetujui</button>
+                <button class="filter-btn" onclick="filterStatus('ditolak')">Ditolak</button>
+            </div>
+
+            <!-- Items -->
+            @foreach($pengajuans as $pengajuan)
+            <div class="pengajuan-item">
+                <div class="pengajuan-info">
+                    <small>{{ $pengajuan->created_at->format('d M Y H:i') }}</small>
+                    <div>{{ $pengajuan->jenisSurat->nama_surat ?? 'Surat' }}</div>
+                </div>
+                <div class="pengajuan-status">
+                    @if($pengajuan->status === 'diproses')
+                        <span class="badge badge-warning">Diproses</span>
+                    @elseif($pengajuan->status === 'disetujui')
+                        <span class="badge badge-success">Disetujui</span>
+                    @elseif($pengajuan->status === 'ditolak')
+                        <span class="badge badge-danger">Ditolak</span>
+                    @else
+                        <span class="badge badge-primary">{{ ucfirst($pengajuan->status) }}</span>
+                    @endif
+                    <a href="{{ route('masyarakat.detail-pengajuan', $pengajuan->id) }}" class="action-link">
+                        <i class="fas fa-eye"></i> Detail
+                    </a>
+                </div>
+            </div>
+            @endforeach
+        @else
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>Belum ada pengajuan surat</p>
+        </div>
+        @endif
+    </div>
+</div>
+
+<script>
+    function filterStatus(status) {
+        // Update button active state
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        // Filter items (simplified - can be improved with backend filtering)
+        if (status === 'all') {
+            document.querySelectorAll('.pengajuan-item').forEach(item => {
+                item.style.display = 'flex';
+            });
+        } else {
+            document.querySelectorAll('.pengajuan-item').forEach(item => {
+                const badge = item.querySelector('.badge');
+                const isMatch = badge.textContent.trim().toLowerCase() === status.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase();
+                item.style.display = isMatch ? 'flex' : 'none';
+            });
+        }
+    }
+</script>
+
 @endsection

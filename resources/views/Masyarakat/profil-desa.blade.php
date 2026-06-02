@@ -1,6 +1,6 @@
 @extends('layouts.masyarakat')
 
-@section('title', 'Profil Desa - Website Resmi Desa Kalinaun')
+@section('title', 'Profil Desa - SIPAKAL')
 
 @section('content')
 <div>

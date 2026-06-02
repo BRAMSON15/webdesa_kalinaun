@@ -1,216 +1,374 @@
 @extends('layouts.masyarakat')
 
-@section('title', 'Profil Akun - SIPAKAL')
+@section('title', 'Profil Saya - SIPAKAL')
 
 @section('content')
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="fas fa-check-circle"></i> {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
+<style>
+    :root {
+        --primary-green: #28a745;
+        --primary-dark: #1f7e34;
+        --light-green: #c8e6c9;
+        --very-light-green: #e8f5e9;
+        --text-dark: #2d5016;
+        --text-gray: #666;
+        --border-light: #e0e0e0;
+    }
 
-                    @if($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <ul class="mb-0">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
+    .page-container {
+        background: #f5f5f5;
+        padding-bottom: 100px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
 
-                    <div class="row">
-                        <div class="col-md-8 mx-auto">
-                            <!-- Profile Edit Card -->
-                            <div class="card shadow-sm">
-                                <div class="card-header bg-primary text-white">
-                                    <h5 class="mb-0"><i class="fas fa-user-edit"></i> Edit Profil Akun</h5>
-                                </div>
-                                <div class="card-body">
-                                    <form action="{{ route('masyarakat.profil.update') }}" method="POST">
-                                        @csrf
-                                        @method('PUT')
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-green) 0%, #20c997 100%);
+        color: white;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
 
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="name" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control @error('name') is-invalid @enderror" 
-                                                       id="name" name="name" value="{{ old('name', $user->name ?? auth()->user()->name) }}" required>
-                                                @error('name')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
+    .page-header h4 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-                                            <div class="col-md-6 mb-3">
-                                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                                                <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                                                       id="email" name="email" value="{{ old('email', $user->email ?? auth()->user()->email) }}" required>
-                                                @error('email')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
+    .page-header p {
+        margin: 5px 0 0 0;
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
 
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="no_hp" class="form-label">No. HP <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control @error('no_hp') is-invalid @enderror" 
-                                                       id="no_hp" name="no_hp" value="{{ old('no_hp', $user->no_hp ?? '') }}" required>
-                                                @error('no_hp')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
+    .content-section {
+        padding: 15px;
+        margin-bottom: 10px;
+        background: white;
+        border-radius: 8px;
+    }
 
-                                            <div class="col-md-6 mb-3">
-                                                <label for="nik" class="form-label">NIK</label>
-                                                <input type="text" class="form-control @error('nik') is-invalid @enderror" 
-                                                       id="nik" name="nik" value="{{ old('nik', $user->nik ?? '') }}">
-                                                @error('nik')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
+    .profile-header {
+        text-align: center;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-light);
+    }
 
-                                        <div class="mb-3">
-                                            <label for="alamat" class="form-label">Alamat <span class="text-danger">*</span></label>
-                                            <textarea class="form-control @error('alamat') is-invalid @enderror" 
-                                                      id="alamat" name="alamat" rows="3" required>{{ old('alamat', $user->alamat ?? '') }}</textarea>
-                                            @error('alamat')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary-green) 0%, #20c997 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        color: white;
+        font-size: 40px;
+    }
 
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tempat_lahir" class="form-label">Tempat Lahir</label>
-                                                <input type="text" class="form-control @error('tempat_lahir') is-invalid @enderror" 
-                                                       id="tempat_lahir" name="tempat_lahir" value="{{ old('tempat_lahir', $user->tempat_lahir ?? '') }}">
-                                                @error('tempat_lahir')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
+    .profile-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 5px;
+    }
 
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tanggal_lahir" class="form-label">Tanggal Lahir</label>
-                                                <input type="date" class="form-control @error('tanggal_lahir') is-invalid @enderror" 
-                                                       id="tanggal_lahir" name="tanggal_lahir" value="{{ old('tanggal_lahir', $user->tanggal_lahir ?? '') }}">
-                                                @error('tanggal_lahir')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
+    .profile-role {
+        font-size: 0.85rem;
+        color: var(--text-gray);
+    }
 
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
-                                                <select class="form-select @error('jenis_kelamin') is-invalid @enderror" 
-                                                        id="jenis_kelamin" name="jenis_kelamin">
-                                                    <option value="">-- Pilih Jenis Kelamin --</option>
-                                                    <option value="L" {{ old('jenis_kelamin', $user->jenis_kelamin ?? '') == 'L' ? 'selected' : '' }}>Laki-laki</option>
-                                                    <option value="P" {{ old('jenis_kelamin', $user->jenis_kelamin ?? '') == 'P' ? 'selected' : '' }}>Perempuan</option>
-                                                </select>
-                                                @error('jenis_kelamin')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
+    .form-group {
+        margin-bottom: 15px;
+    }
 
-                                            <div class="col-md-6 mb-3">
-                                                <label for="pekerjaan" class="form-label">Pekerjaan</label>
-                                                <input type="text" class="form-control @error('pekerjaan') is-invalid @enderror" 
-                                                       id="pekerjaan" name="pekerjaan" value="{{ old('pekerjaan', $user->pekerjaan ?? '') }}">
-                                                @error('pekerjaan')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
+    .form-label {
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
 
-                                        <div class="d-grid gap-2">
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="fas fa-save"></i> Simpan Perubahan
-                                            </button>
-                                            <a href="{{ route('masyarakat.dashboard') }}" class="btn btn-secondary">
-                                                <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
-                                            </a>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border-light);
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
 
-                            <!-- Account Information Card -->
-                            <div class="card shadow-sm mt-4">
-                                <div class="card-header bg-info text-white">
-                                    <h5 class="mb-0"><i class="fas fa-info-circle"></i> Informasi Akun</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row mb-2">
-                                        <div class="col-md-4 fw-bold">Role:</div>
-                                        <div class="col-md-8">
-                                            <span class="badge bg-success">Masyarakat</span>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-2">
-                                        <div class="col-md-4 fw-bold">Tanggal Registrasi:</div>
-                                        <div class="col-md-8">{{ ($user->created_at ?? auth()->user()->created_at)->format('d F Y') }}</div>
-                                    </div>
-                                    <div class="row mb-2">
-                                        <div class="col-md-4 fw-bold">Terakhir Update:</div>
-                                        <div class="col-md-8">{{ ($user->updated_at ?? auth()->user()->updated_at)->format('d F Y, H:i') }} WIB</div>
-                                    </div>
-                                    <div class="row mb-2">
-                                        <div class="col-md-4 fw-bold">Status Akun:</div>
-                                        <div class="col-md-8">
-                                            <span class="badge bg-success">
-                                                <i class="fas fa-check-circle"></i> Aktif
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+    .form-control:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        outline: none;
+    }
 
-                            <!-- Change Password Card -->
-                            <div class="card shadow-sm mt-4">
-                                <div class="card-header bg-warning text-dark">
-                                    <h5 class="mb-0"><i class="fas fa-key"></i> Ubah Password</h5>
-                                </div>
-                                <div class="card-body">
-                                    <form action="{{ route('masyarakat.profil.update-password') }}" method="POST">
-                                        @csrf
-                                        @method('PUT')
+    .form-text {
+        font-size: 0.8rem;
+        color: var(--text-gray);
+        margin-top: 4px;
+    }
 
-                                        <div class="mb-3">
-                                            <label for="current_password" class="form-label">Password Saat Ini <span class="text-danger">*</span></label>
-                                            <input type="password" class="form-control @error('current_password') is-invalid @enderror" 
-                                                   id="current_password" name="current_password" required>
-                                            @error('current_password')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
 
-                                        <div class="mb-3">
-                                            <label for="password" class="form-label">Password Baru <span class="text-danger">*</span></label>
-                                            <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                                                   id="password" name="password" required>
-                                            @error('password')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
+    .btn {
+        flex: 1;
+        padding: 12px 15px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
 
-                                        <div class="mb-3">
-                                            <label for="password_confirmation" class="form-label">Konfirmasi Password Baru <span class="text-danger">*</span></label>
-                                            <input type="password" class="form-control" 
-                                                   id="password_confirmation" name="password_confirmation" required>
-                                        </div>
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-green) 0%, #1f7e34 100%);
+        color: white;
+    }
 
-                                        <div class="d-grid">
-                                            <button type="submit" class="btn btn-warning">
-                                                <i class="fas fa-key"></i> Ubah Password
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #1f7e34 0%, #15572e 100%);
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background: var(--light-green);
+        color: var(--text-dark);
+    }
+
+    .btn-secondary:hover {
+        background: #a5d6a7;
+    }
+
+    .alert {
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        font-size: 0.9rem;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        color: #155724;
+        border-left: 4px solid #28a745;
+    }
+
+    .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        border-left: 4px solid #dc3545;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 15px;
+        background: var(--light-green);
+        color: var(--text-dark);
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+    }
+
+    .back-btn:hover {
+        background: #a5d6a7;
+        transform: translateX(-3px);
+    }
+
+    @media (max-width: 576px) {
+        .btn-group {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+        <h4><i class="fas fa-user"></i> Profil Saya</h4>
+        <p>Kelola data profil dan keamanan akun Anda</p>
+    </div>
+
+    <!-- Back Button -->
+    <div style="padding: 0 15px;">
+        <a href="{{ route('masyarakat.dashboard') }}" class="back-btn">
+            <i class="fas fa-chevron-left"></i> Kembali
+        </a>
+    </div>
+
+    <!-- Content Section -->
+    <div class="content-section">
+        @if(session('success'))
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span>{{ session('success') }}</span>
+        </div>
+        @endif
+
+        @if($errors->any())
+        <div class="alert alert-error">
+            <div style="flex: 1;">
+                <div style="font-weight: 600; margin-bottom: 8px;">
+                    <i class="fas fa-exclamation-circle"></i> Terjadi kesalahan:
+                </div>
+                <ul style="margin: 0; padding-left: 20px; font-size: 0.85rem;">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+        @endif
+
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="profile-name">{{ auth()->user()->name }}</div>
+            <div class="profile-role">Masyarakat</div>
+        </div>
+
+        <!-- Profile Form -->
+        <form action="{{ route('masyarakat.profil.update') }}" method="PUT" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-user"></i> Nama Lengkap
+                </label>
+                <input type="text" class="form-control" name="name" value="{{ auth()->user()->name }}" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-envelope"></i> Email
+                </label>
+                <input type="email" class="form-control" name="email" value="{{ auth()->user()->email }}" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-phone"></i> Nomor HP
+                </label>
+                <input type="tel" class="form-control" name="no_hp" value="{{ auth()->user()->no_hp ?? '' }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-id-card"></i> NIK
+                </label>
+                <input type="text" class="form-control" value="{{ auth()->user()->nik ?? '-' }}" disabled>
+                <div class="form-text">NIK tidak dapat diubah</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-map-marker-alt"></i> Alamat
+                </label>
+                <textarea class="form-control" name="alamat" rows="3">{{ auth()->user()->alamat ?? '' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-birthday-cake"></i> Tanggal Lahir
+                </label>
+                <input type="date" class="form-control" name="tanggal_lahir" value="{{ auth()->user()->tanggal_lahir ?? '' }}">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-venus-mars"></i> Jenis Kelamin
+                </label>
+                <select class="form-control" name="jenis_kelamin">
+                    <option value="">-- Pilih --</option>
+                    <option value="L" {{ auth()->user()->jenis_kelamin === 'L' ? 'selected' : '' }}>Laki-laki</option>
+                    <option value="P" {{ auth()->user()->jenis_kelamin === 'P' ? 'selected' : '' }}>Perempuan</option>
+                </select>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Simpan Perubahan
+                </button>
+                <a href="{{ route('masyarakat.dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Batal
+                </a>
+            </div>
+        </form>
+
+        <!-- Change Password Section -->
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid var(--border-light);">
+
+        <h6 style="font-weight: 600; color: var(--text-dark); margin-bottom: 15px;">
+            <i class="fas fa-lock"></i> Ubah Password
+        </h6>
+
+        <form action="{{ route('masyarakat.profil.update-password') }}" method="PUT">
+            @csrf
+            @method('PUT')
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-key"></i> Password Saat Ini
+                </label>
+                <input type="password" class="form-control" name="current_password" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-lock"></i> Password Baru
+                </label>
+                <input type="password" class="form-control" name="password" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-lock"></i> Konfirmasi Password Baru
+                </label>
+                <input type="password" class="form-control" name="password_confirmation" required>
+                <div class="form-text">Minimal 8 karakter</div>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check"></i> Perbarui Password
+                </button>
+                <button type="reset" class="btn btn-secondary">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 @endsection

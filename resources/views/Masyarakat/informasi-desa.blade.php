@@ -1,135 +1,245 @@
 @extends('layouts.masyarakat')
 
-@section('title', 'Informasi Desa - Desa Kalinaun')
+@section('title', 'Informasi Desa - SIPAKAL')
 
 @section('content')
-<div>
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
-        <div>
-            <h2 class="mb-1"><i class="fas fa-bullhorn me-2"></i> Informasi Desa</h2>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{{ route('masyarakat.dashboard') }}" class="text-decoration-none">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Informasi Desa</li>
-                </ol>
-            </nav>
-        </div>
-        <form method="GET" action="{{ route('masyarakat.informasi-desa') }}" class="input-group" style="max-width: 380px;">
-            <input type="text" name="search" class="form-control" placeholder="Cari berita atau pengumuman..." value="{{ request('search') }}">
-            <button class="btn btn-success" type="submit">
-                <i class="fas fa-search"></i>
-            </button>
-        </form>
-    </div>
-    <div class="row">
-        <!-- Main Content -->
-        <div class="col-lg-8">
-            <div class="row g-4">
-                @if(isset($informasis) && $informasis->count() > 0)
-                    @foreach($informasis as $info)
-                        <div class="col-12">
-                            <article class="card-premium h-100">
-                                <div class="row g-0">
-                                    <div class="col-md-4">
-                                        <div class="bg-light h-100 d-flex align-items-center justify-content-center border-end" style="min-height: 200px;">
-                                            <i class="fas fa-{{ $info->kategori == 'pengumuman' ? 'bullhorn' : 'calendar-alt' }} fa-4x text-primary-light" style="opacity: 0.3;"></i>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="card-body p-4">
-                                            <div class="d-flex align-items-center gap-2 mb-2">
-                                                <span class="badge {{ $info->kategori == 'pengumuman' ? 'bg-danger' : 'bg-success' }} rounded-pill">
-                                                    {{ ucfirst($info->kategori ?? 'Informasi') }}
-                                                </span>
-                                                <span class="text-muted small"><i class="far fa-calendar-alt me-1"></i> {{ $info->created_at->format('d F Y') }}</span>
-                                            </div>
-                                            <h3 class="fw-bold h4 mb-3">
-                                                <a href="{{ route('masyarakat.detail-informasi', $info->id) }}" class="text-dark text-decoration-none hover-primary">
-                                                    {{ $info->judul }}
-                                                </a>
-                                            </h3>
-                                            <p class="text-muted mb-4">{{ Str::limit($info->konten, 150) }}</p>
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div class="d-flex align-items-center">
-                                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($info->penulis ?? 'Admin') }}&background=22c55e&color=fff" class="rounded-circle me-2" width="24" height="24">
-                                                    <span class="small text-muted">{{ $info->penulis ?? 'Admin Desa' }}</span>
-                                                </div>
-                                                <a href="{{ route('masyarakat.detail-informasi', $info->id) }}" class="btn btn-sm btn-outline-premium">
-                                                    Selengkapnya <i class="fas fa-arrow-right ms-1"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-                        </div>
-                    @endforeach
+<style>
+    :root {
+        --primary-green: #28a745;
+        --primary-dark: #1f7e34;
+        --light-green: #c8e6c9;
+        --very-light-green: #e8f5e9;
+        --text-dark: #2d5016;
+        --text-gray: #666;
+        --border-light: #e0e0e0;
+    }
 
-                    <!-- Pagination -->
-                    <div class="col-12 mt-5">
-                        <div class="d-flex justify-content-center">
-                            {{ $informasis->links() }}
-                        </div>
-                    </div>
+    .page-container {
+        background: #f5f5f5;
+        padding-bottom: 100px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-green) 0%, #20c997 100%);
+        color: white;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-header h4 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .page-header p {
+        margin: 5px 0 0 0;
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .content-section {
+        padding: 15px;
+        margin-bottom: 10px;
+        background: white;
+    }
+
+    .section-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .informasi-card {
+        background: var(--very-light-green);
+        border: 2px solid transparent;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .informasi-card:hover {
+        border-color: var(--primary-green);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+    }
+
+    .informasi-image {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        background: linear-gradient(135deg, var(--light-green) 0%, var(--very-light-green) 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        font-size: 48px;
+    }
+
+    .informasi-content {
+        padding: 12px;
+    }
+
+    .informasi-date {
+        font-size: 0.75rem;
+        color: #999;
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .informasi-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .informasi-excerpt {
+        font-size: 0.8rem;
+        color: var(--text-gray);
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+
+    .informasi-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 12px;
+        background: var(--primary-green);
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .informasi-link:hover {
+        background: var(--primary-dark);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+    }
+
+    .empty-state i {
+        font-size: 64px;
+        color: #ddd;
+        margin-bottom: 15px;
+    }
+
+    .empty-state p {
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 15px;
+        background: var(--light-green);
+        color: var(--text-dark);
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+    }
+
+    .back-btn:hover {
+        background: #a5d6a7;
+        transform: translateX(-3px);
+    }
+
+    @media (max-width: 576px) {
+        .informasi-image {
+            height: 120px;
+        }
+
+        .informasi-title {
+            font-size: 0.9rem;
+        }
+
+        .informasi-excerpt {
+            font-size: 0.75rem;
+        }
+    }
+</style>
+
+<div class="page-container">
+    <!-- Header -->
+    <div class="page-header">
+        <h4><i class="fas fa-info-circle"></i> Informasi Desa</h4>
+        <p>Berita dan pengumuman terbaru dari desa</p>
+    </div>
+
+    <!-- Back Button -->
+    <div style="padding: 0 15px;">
+        <a href="{{ route('masyarakat.dashboard') }}" class="back-btn">
+            <i class="fas fa-chevron-left"></i> Kembali
+        </a>
+    </div>
+
+    <!-- Content Section -->
+    <div class="content-section">
+        <div class="section-title">
+            <i class="fas fa-newspaper"></i> Berita & Pengumuman
+        </div>
+
+        @if(isset($informasis) && $informasis->count() > 0)
+            @foreach($informasis as $informasi)
+            <div class="informasi-card">
+                @if($informasi->gambar)
+                    <img src="{{ asset('storage/' . $informasi->gambar) }}" alt="{{ $informasi->judul }}" class="informasi-image">
                 @else
-                    <!-- Sample Content if Empty -->
-                    <div class="col-12 text-center py-5">
-                        <div class="card-premium p-5">
-                            <i class="fas fa-newspaper fa-4x text-muted mb-3 opacity-25"></i>
-                            <h4 class="text-muted">Belum ada informasi publik yang diterbitkan.</h4>
-                            <p class="text-muted">Silakan kembali lagi nanti untuk mendapatkan update terbaru.</p>
-                        </div>
+                    <div class="informasi-image" style="background: linear-gradient(135deg, var(--light-green) 0%, var(--very-light-green) 100%);">
+                        <i class="fas fa-newspaper"></i>
                     </div>
                 @endif
-            </div>
-        </div>
-
-        <!-- Sidebar Widgets -->
-        <div class="col-lg-4 mt-5 mt-lg-0">
-            <!-- Categories -->
-            <div class="card-premium p-4 mb-4">
-                <h5 class="fw-bold mb-3">Kategori</h5>
-                <div class="list-group list-group-flush">
-                    <a href="?kategori=" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0">
-                        <span>Semua Informasi</span>
-                        <span class="badge bg-light text-dark rounded-pill">{{ \App\Models\InformasiDesa::count() }}</span>
-                    </a>
-                    <a href="?kategori=pengumuman" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0">
-                        <span>Pengumuman</span>
-                        <span class="badge bg-light text-dark rounded-pill">{{ \App\Models\InformasiDesa::where('kategori', 'pengumuman')->count() }}</span>
-                    </a>
-                    <a href="?kategori=kegiatan" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 px-0">
-                        <span>Kegiatan</span>
-                        <span class="badge bg-light text-dark rounded-pill">{{ \App\Models\InformasiDesa::where('kategori', 'kegiatan')->count() }}</span>
+                <div class="informasi-content">
+                    <div class="informasi-date">
+                        <i class="fas fa-calendar-alt"></i>
+                        {{ $informasi->created_at->format('d M Y') }}
+                    </div>
+                    <h6 class="informasi-title">{{ $informasi->judul }}</h6>
+                    <p class="informasi-excerpt">{{ Str::limit(strip_tags($informasi->konten), 150) }}</p>
+                    <a href="{{ route('masyarakat.detail-informasi', $informasi->id) }}" class="informasi-link">
+                        <i class="fas fa-arrow-right"></i> Baca Selengkapnya
                     </a>
                 </div>
             </div>
-
-            <!-- Recent Info -->
-            <div class="card-premium p-4">
-                <h5 class="fw-bold mb-3">Terbaru</h5>
-                @php
-                    $latestInfo = \App\Models\InformasiDesa::latest()->take(3)->get();
-                @endphp
-                @foreach($latestInfo as $latest)
-                    <div class="d-flex gap-3 mb-3 pb-3 border-bottom last-no-border">
-                        <div class="flex-shrink-0 bg-light rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                            <i class="fas fa-{{ $latest->kategori == 'pengumuman' ? 'bullhorn' : 'calendar-alt' }} text-primary"></i>
-                        </div>
-                        <div>
-                            <h6 class="fw-bold mb-1 small">
-                                <a href="{{ route('masyarakat.detail-informasi', $latest->id) }}" class="text-dark text-decoration-none">
-                                    {{ Str::limit($latest->judul, 40) }}
-                                </a>
-                            </h6>
-                            <span class="text-muted" style="font-size: 0.75rem;">{{ $latest->created_at->format('d M Y') }}</span>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
+            @endforeach
+        @else
+        <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <p>Tidak ada informasi desa</p>
         </div>
+        @endif
     </div>
 </div>
 
-@endsection
+@endsection

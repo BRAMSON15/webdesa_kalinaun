@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Beranda - Website Resmi Desa Kalinaun')
+@section('title', 'Beranda - SIPAKAL')
 
 @section('content')
 <!-- Hero Section -->
@@ -11,8 +11,8 @@
             <div class="hero-content">
                 <span class="badge bg-primary-premium mb-3 px-3 py-2" style="background-color: var(--primary-color);">Selamat Datang di </span>
                 <h1 class="hero-title">SISTEM PELAYANAN ADMINISTRASI<br>KALINAUN</h1>
-                <p class="hero-subtitle">Membantu Masyarakat unutuk mewujudkan kehidupan yang sejahtera</p>
-                <div class="d-flex gap-3">
+                <p class="hero-subtitle">Membantu Masyarakat untuk mewujudkan kehidupan yang sejahtera</p>
+                <div class="d-grid gap-3 d-md-flex justify-content-md-start">
                     <a href="#layanan" class="btn btn-primary-premium shadow-lg">Layanan Publik</a>
                     <a href="#profil" class="btn btn-outline-light rounded-pill px-4 fw-bold border-2">Tentang Desa</a>
                 </div>
@@ -74,10 +74,10 @@
     <div class="container py-4 text-center">
         <h2 class="text-white fw-bold mb-4">Mari Bangun Desa Bersama Kami</h2>
         <p class="text-white-50 mb-5 max-w-2xl mx-auto">Suara Anda sangat berarti bagi kami. Gunakan fitur layanan mandiri untuk berinteraksi langsung dengan sistem informasi desa.</p>
-        <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <div class="d-grid gap-3 d-md-flex justify-content-md-center">
             @guest
-                <a href="{{ route('masyarakat-login') }}" class="btn btn-light rounded-pill px-5 py-3 fw-bold text-primary shadow-lg">Login Masyarakat</a>
-                <a href="{{ route('admin-login') }}" class="btn btn-outline-light rounded-pill px-5 py-3 fw-bold border-2 shadow-lg">Login Admin/Kades</a>
+                <a href="{{ route('masyarakat-login') }}" class="btn btn-light rounded-pill px-5 py-3 fw-bold text-primary shadow-lg">Login</a>
+                <!-- <a href="{{ route('admin-login') }}" class="btn btn-outline-light rounded-pill px-5 py-3 fw-bold border-2 shadow-lg">Login Admin/Kades</a> -->
                 <a href="{{ route('register') }}" class="btn btn-warning rounded-pill px-5 py-3 fw-bold shadow-lg">Daftar Akun Baru</a>
             @else
                 <a href="{{ route(auth()->user()->role . '.dashboard') }}" class="btn btn-light rounded-pill px-5 py-3 fw-bold text-primary shadow-lg">Kembali ke Dashboard</a>

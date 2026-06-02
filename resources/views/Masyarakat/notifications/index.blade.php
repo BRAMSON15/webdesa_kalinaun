@@ -1,6 +1,6 @@
 @extends('layouts.masyarakat')
 
-@section('title', 'Pengaduan Masyarakat - SIPAKAL')
+@section('title', 'Notifikasi - SIPAKAL')
 
 @section('content')
 <style>
@@ -67,110 +67,104 @@
     }
 
     .btn-action {
-        flex: 1;
-        min-width: 150px;
-        padding: 10px 15px;
-        background: linear-gradient(135deg, var(--primary-green) 0%, #1f7e34 100%);
+        padding: 8px 12px;
+        background: var(--primary-green);
         color: white;
         border: none;
-        border-radius: 8px;
+        border-radius: 6px;
         font-weight: 600;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         cursor: pointer;
         transition: all 0.3s ease;
         display: flex;
         align-items: center;
-        justify-content: center;
-        gap: 8px;
-        text-decoration: none;
+        gap: 6px;
     }
 
     .btn-action:hover {
-        background: linear-gradient(135deg, #1f7e34 0%, #15572e 100%);
-        transform: translateY(-2px);
+        background: var(--primary-dark);
     }
 
-    .pengaduan-item {
+    .notification-item {
         background: var(--very-light-green);
         border-left: 4px solid var(--primary-green);
         border-radius: 8px;
         padding: 12px;
         margin-bottom: 10px;
         transition: all 0.3s ease;
+        cursor: pointer;
     }
 
-    .pengaduan-item:hover {
+    .notification-item:hover {
         box-shadow: 0 2px 8px rgba(40, 167, 69, 0.15);
     }
 
-    .pengaduan-header {
+    .notification-item.unread {
+        background: #fff9e6;
+        border-left-color: #ffc107;
+    }
+
+    .notification-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
         margin-bottom: 8px;
     }
 
-    .pengaduan-info small {
-        display: block;
-        color: #999;
-        font-size: 0.75rem;
-        margin-bottom: 4px;
-    }
-
-    .pengaduan-info div {
+    .notification-title {
+        font-weight: 600;
         color: var(--text-dark);
-        font-weight: 600;
         font-size: 0.9rem;
+        flex: 1;
     }
 
-    .badge {
-        font-size: 0.65rem;
-        padding: 4px 8px;
-        border-radius: 20px;
-        font-weight: 600;
-        display: inline-block;
-    }
-
-    .badge-primary {
-        background: #d1ecf1;
-        color: #0c5460;
-    }
-
-    .badge-success {
-        background: #d4edda;
-        color: #155724;
-    }
-
-    .badge-warning {
-        background: #fff3cd;
-        color: #856404;
-    }
-
-    .pengaduan-category {
+    .notification-time {
         font-size: 0.75rem;
-        color: var(--text-gray);
-        margin-top: 8px;
+        color: #999;
+        text-align: right;
     }
 
-    .pengaduan-actions {
+    .notification-body {
+        font-size: 0.85rem;
+        color: var(--text-gray);
+        line-height: 1.4;
+        margin-bottom: 8px;
+    }
+
+    .notification-footer {
         display: flex;
         gap: 8px;
-        margin-top: 10px;
     }
 
-    .action-link {
-        padding: 6px 10px;
+    .notification-link {
+        padding: 4px 8px;
         background: var(--primary-green);
         color: white;
-        border-radius: 6px;
+        border-radius: 4px;
         text-decoration: none;
         font-size: 0.75rem;
         font-weight: 600;
         transition: all 0.3s ease;
     }
 
-    .action-link:hover {
+    .notification-link:hover {
         background: var(--primary-dark);
+    }
+
+    .notification-delete {
+        padding: 4px 8px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .notification-delete:hover {
+        background: #c82333;
     }
 
     .empty-state {
@@ -216,14 +210,15 @@
 
         .btn-action {
             width: 100%;
+            justify-content: center;
         }
 
-        .pengaduan-header {
+        .notification-header {
             flex-direction: column;
-            gap: 8px;
+            gap: 4px;
         }
 
-        .pengaduan-actions {
+        .notification-footer {
             flex-wrap: wrap;
         }
     }
@@ -232,8 +227,8 @@
 <div class="page-container">
     <!-- Header -->
     <div class="page-header">
-        <h4><i class="fas fa-comments"></i> Pengaduan Masyarakat</h4>
-        <p>Sampaikan keluhan atau masukan Anda kepada desa</p>
+        <h4><i class="fas fa-bell"></i> Notifikasi</h4>
+        <p>Kelola notifikasi Anda</p>
     </div>
 
     <!-- Back Button -->
@@ -245,60 +240,57 @@
 
     <!-- Content Section -->
     <div class="content-section">
-        @if(session('success'))
-        <div style="padding: 12px 15px; background: #d4edda; color: #155724; border-left: 4px solid #28a745; border-radius: 8px; margin-bottom: 15px; display: flex; gap: 10px;">
-            <i class="fas fa-check-circle"></i>
-            <span>{{ session('success') }}</span>
-        </div>
-        @endif
-
         <div class="section-title">
-            <i class="fas fa-list"></i> Pengaduan Anda
+            <i class="fas fa-inbox"></i> Semua Notifikasi
         </div>
 
         <div class="action-header">
-            <a href="{{ route('masyarakat.pengaduan.create') }}" class="btn-action">
-                <i class="fas fa-plus-circle"></i> Pengaduan Baru
-            </a>
+            <form method="POST" action="{{ route('masyarakat.notifications.read-all') }}" style="flex: 1;">
+                @csrf
+                <button type="submit" class="btn-action">
+                    <i class="fas fa-check-double"></i> Tandai Semua Dibaca
+                </button>
+            </form>
+            <form method="POST" action="{{ route('masyarakat.notifications.delete-all') }}" style="flex: 1; margin-left: 10px;" onsubmit="return confirm('Hapus semua notifikasi?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn-action" style="background: #dc3545;">
+                    <i class="fas fa-trash"></i> Hapus Semua
+                </button>
+            </form>
         </div>
 
-        @if(isset($pengaduans) && $pengaduans->count() > 0)
-            @foreach($pengaduans as $pengaduan)
-            <div class="pengaduan-item">
-                <div class="pengaduan-header">
-                    <div class="pengaduan-info">
-                        <small>{{ $pengaduan->created_at->format('d M Y H:i') }}</small>
-                        <div>{{ Str::limit($pengaduan->judul, 50) }}</div>
-                    </div>
-                    <span class="badge" style="background: {{ $pengaduan->status === 'terselesaikan' ? '#d4edda' : '#fff3cd' }}; color: {{ $pengaduan->status === 'terselesaikan' ? '#155724' : '#856404' }};">
-                        {{ ucfirst($pengaduan->status) }}
-                    </span>
+        @if(isset($notifications) && $notifications->count() > 0)
+            @foreach($notifications as $notification)
+            <div class="notification-item {{ !$notification->read_at ? 'unread' : '' }}">
+                <div class="notification-header">
+                    <div class="notification-title">{{ $notification->title ?? 'Notifikasi' }}</div>
+                    <div class="notification-time">{{ $notification->created_at->diffForHumans() }}</div>
                 </div>
-                <div class="pengaduan-category">
-                    <i class="fas fa-tag"></i> {{ $pengaduan->kategori ?? 'Umum' }}
-                </div>
-                <p style="font-size: 0.85rem; color: var(--text-gray); margin: 8px 0;">
-                    {{ Str::limit(strip_tags($pengaduan->deskripsi), 100) }}
-                </p>
-                <div class="pengaduan-actions">
-                    <a href="{{ route('masyarakat.pengaduan.show', $pengaduan->id) }}" class="action-link">
-                        <i class="fas fa-eye"></i> Lihat Detail
-                    </a>
-                    @if($pengaduan->status !== 'terselesaikan')
-                    <a href="{{ route('masyarakat.pengaduan.edit', $pengaduan->id) }}" class="action-link" style="background: #17a2b8;">
-                        <i class="fas fa-edit"></i> Edit
-                    </a>
+                <p class="notification-body">{{ Str::limit($notification->message ?? '', 150) }}</p>
+                <div class="notification-footer">
+                    @if(!$notification->read_at)
+                    <form method="POST" action="{{ route('masyarakat.notifications.read', $notification->id) }}">
+                        @csrf
+                        <button type="submit" class="notification-link">
+                            <i class="fas fa-eye"></i> Tandai Dibaca
+                        </button>
+                    </form>
                     @endif
+                    <form method="POST" action="{{ route('masyarakat.notifications.destroy', $notification->id) }}" onsubmit="return confirm('Hapus notifikasi ini?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="notification-delete">
+                            <i class="fas fa-trash"></i> Hapus
+                        </button>
+                    </form>
                 </div>
             </div>
             @endforeach
         @else
         <div class="empty-state">
             <i class="fas fa-inbox"></i>
-            <p>Belum ada pengaduan</p>
-            <a href="{{ route('masyarakat.pengaduan.create') }}" class="btn-action" style="margin-top: 20px; max-width: 200px;">
-                <i class="fas fa-plus-circle"></i> Buat Pengaduan Baru
-            </a>
+            <p>Tidak ada notifikasi</p>
         </div>
         @endif
     </div>
