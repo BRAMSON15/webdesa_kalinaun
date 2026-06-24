@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Bansos;
 use App\Models\PenerimaBansos;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class BansosController extends Controller

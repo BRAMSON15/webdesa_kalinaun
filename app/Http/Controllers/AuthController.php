@@ -80,7 +80,7 @@ class AuthController extends Controller
         }
     }
 
-    // ===== GENERIC LOGIN (DEPRECATED - kept for backward compatibility) =====
+    // ===== GENERIC LOGIN (ROLE SELECTION PAGE) =====
     public function showLogin()
     {
         return view('auth.login');
@@ -88,27 +88,15 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
-
-        try {
-            $user = $this->authService->login($request->email, $request->password);
-
-            if ($user) {
-                $route = $this->authService->getRedirectRoute($user);
-                return redirect()->route($route);
-            }
-
-            return back()->withErrors([
-                'email' => 'Email atau password salah.',
-            ]);
-        } catch (\Exception $e) {
-            return back()->withErrors([
-                'email' => $e->getMessage(),
-            ]);
+        // This is now only used as a fallback for generic login attempts
+        // Redirect to appropriate login page based on role
+        $role = $request->get('role', 'masyarakat');
+        
+        if ($role === 'admin') {
+            return redirect()->route('admin-login');
         }
+        
+        return redirect()->route('masyarakat-login');
     }
 
     // ===== REGISTRATION (MASYARAKAT ONLY) =====
@@ -199,5 +187,79 @@ class AuthController extends Controller
         }
 
         return redirect()->route('login')->with('success', 'Password berhasil direset. Silakan login dengan password baru Anda.');
+    }
+
+    // ===== ADMIN/KADES FORGOT PASSWORD =====
+    public function showAdminForgotPassword()
+    {
+        return view('auth.admin-forgot-password');
+    }
+
+    public function sendAdminResetToken(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ], [
+            'email.exists' => 'Email tidak ditemukan dalam sistem.',
+        ]);
+
+        // Verify that the email belongs to admin or kades
+        $user = \App\Models\User::where('email', $request->email)->first();
+        if (!$user || !in_array($user->role, ['admin', 'kades'])) {
+            return back()->withErrors(['email' => 'Email tidak ditemukan atau akun bukan admin/kades.']);
+        }
+
+        $result = $this->authService->sendResetToken($request->email);
+
+        if (!$result) {
+            return back()->withErrors(['email' => 'Email tidak ditemukan.']);
+        }
+
+        return redirect()->route('admin-reset-password', [
+            'token' => $result['token'],
+            'email' => $result['email'],
+        ])->with('success', 'Token reset telah dikirim. Silakan gunakan token di bawah untuk reset password Anda.');
+    }
+
+    public function showAdminResetPassword($token, $email)
+    {
+        $user = $this->authService->validateResetToken($token, $email);
+
+        if (!$user) {
+            return redirect()->route('admin-login')->withErrors(['error' => 'Token tidak valid atau sudah kadaluarsa.']);
+        }
+
+        // Verify user is admin or kades
+        if (!in_array($user->role, ['admin', 'kades'])) {
+            return redirect()->route('admin-login')->withErrors(['error' => 'Akses ditolak.']);
+        }
+
+        return view('auth.admin-reset-password', [
+            'token' => $token,
+            'email' => $email,
+            'resetToken' => $token,
+        ]);
+    }
+
+    public function updateAdminPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = \App\Models\User::where('email', $request->email)->first();
+        if (!$user || !in_array($user->role, ['admin', 'kades'])) {
+            return back()->withErrors(['error' => 'Akses ditolak.']);
+        }
+
+        $success = $this->authService->updatePassword($request->token, $request->email, $request->password);
+
+        if (!$success) {
+            return back()->withErrors(['error' => 'Token tidak valid atau sudah kadaluarsa.']);
+        }
+
+        return redirect()->route('admin-login')->with('success', 'Password berhasil direset. Silakan login dengan password baru Anda.');
     }
 }

@@ -38,7 +38,7 @@ class NotificationController extends Controller
     public function index()
     {
         $notifications = $this->notificationService->getAllNotifications(auth()->id());
-        return view('notifications.index', compact('notifications'));
+        return view('Masyarakat.notifications.index', compact('notifications'));
     }
 
     /**

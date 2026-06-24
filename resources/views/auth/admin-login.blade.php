@@ -53,7 +53,7 @@
                     @enderror
                 </div>
 
-                <a href="{{ route('forgot-password') }}" class="forgot-password">lupa password?</a>
+                <a href="{{ route('admin-forgot-password') }}" class="forgot-password">lupa password?</a>
 
                 <button type="submit" class="btn-submit">masuk sekarang</button>
             </form>

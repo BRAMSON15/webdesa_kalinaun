@@ -29,11 +29,17 @@ Route::get('/register', [AuthController::class, 'showRegister'])->name('register
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Forgot Password Routes
+// Forgot Password Routes (General)
 Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('forgot-password');
 Route::post('/forgot-password', [AuthController::class, 'sendResetToken'])->name('forgot-password.send');
 Route::get('/reset-password/{token}/{email}', [AuthController::class, 'showResetPassword'])->name('reset-password');
 Route::post('/reset-password', [AuthController::class, 'updatePassword'])->name('reset-password.update');
+
+// Admin/Kades Forgot Password Routes
+Route::get('/admin-forgot-password', [AuthController::class, 'showAdminForgotPassword'])->name('admin-forgot-password');
+Route::post('/admin-forgot-password', [AuthController::class, 'sendAdminResetToken'])->name('admin-forgot-password.send');
+Route::get('/admin-reset-password/{token}/{email}', [AuthController::class, 'showAdminResetPassword'])->name('admin-reset-password');
+Route::post('/admin-reset-password', [AuthController::class, 'updateAdminPassword'])->name('admin-reset-password.update');
 
 // Admin Routes
 Route::middleware(['auth', 'role:admin', 'check.account'])->prefix('admin')->name('admin.')->group(function () {
